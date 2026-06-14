@@ -4,4 +4,5 @@ public class TestEntity {
 	private Integer YarYar;
 	
 	private String swan;
+	private String Htet;
 }
