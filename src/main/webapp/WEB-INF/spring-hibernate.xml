@@ -7,14 +7,10 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-
 	<context:component-scan
 		base-package="com.hibernate">
 	</context:component-scan>
 	
-	
-
-	<!-- DataSource -->
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName"
@@ -22,26 +18,23 @@
 		<property name="url"
 			value="jdbc:mysql://localhost:3306/cheat_sheets" />
 		<property name="username" value="root" />
-		<property name="password" value="root" />
+		<property name="password" value="669972855" />
 	</bean>
 
-	<!-- Hibernate SessionFactory -->
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
-		<property name="packagesToScan" value="com.spring.entity" />
+		<property name="packagesToScan" value="com.hibernate.entity" />
 		<property name="hibernateProperties">
 			<props>
 				<prop key="hibernate.hbm2ddl.auto">update</prop>
 				<prop key="hibernate.show_sql">true</prop>
 				<prop key="hibernate.format_sql">true</prop>
 				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</prop>
-
 			</props>
 		</property>
 	</bean>
 
-	<!-- Hibernate Transaction Manager -->
 	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
@@ -49,5 +42,17 @@
 
 	<tx:annotation-driven
 		transaction-manager="transactionManager" />
+		<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+    <property name="host" value="smtp.gmail.com" />
+    <property name="port" value="587" />
+    <property name="username" value="htunhal711@gmail.com" /> <property name="password" value="vjql pkki pxqv mkf" /> <property name="javaMailProperties">
+        <props>
+            <prop key="mail.transport.protocol">smtp</prop>
+            <prop key="mail.smtp.auth">true</prop>
+            <prop key="mail.smtp.starttls.enable">true</prop>
+            <prop key="mail.debug">true</prop>
+        </props>
+    </property>
+</bean>
 
 </beans>
