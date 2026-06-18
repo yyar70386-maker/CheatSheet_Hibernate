@@ -4,9 +4,12 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -28,14 +31,19 @@ public class ReportEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    private User user;
 
+    @Column(columnDefinition = "Text")
     private Integer sheetId;
 
     @Column(columnDefinition = "TEXT")
     private String reason;
 
+    
     private String status;
 
+    @Column(name ="created_at")
     private LocalDateTime createdAt;
 }

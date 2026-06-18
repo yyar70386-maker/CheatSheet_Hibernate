@@ -26,17 +26,23 @@ public class NotificationEntity {
 	private Integer id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name =)
-	private Integer user_id;
+	@JoinColumn(name = "user_id")
+	private User user_id;
 
 	@Column(columnDefinition = "TEXT")
 	private String message;
 
+	@Column(name ="is_read")
 	private Boolean isRead;
+	
+	@Column(name = "notification_type")
 	private String notificationType;
 
+	
+	@Column(name = "linkUrl")
 	private String linkUrl;
 
+	@Column(name ="created_at")
 	private LocalDateTime createdAt;
 
 }
