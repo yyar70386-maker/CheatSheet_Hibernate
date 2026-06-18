@@ -16,9 +16,11 @@
 		<property name="driverClassName"
 			value="com.mysql.cj.jdbc.Driver" />
 		<property name="url"
+
 			value="jdbc:mysql://localhost:3306/cheatsheets_db" />
-		<property name="username" value="root" />
-		<property name="password" value="669972855" />
+
+			<property name="username" value="root" />
+		<property name="password" value="root" />
 	</bean>
 
 	<bean id="sessionFactory"
