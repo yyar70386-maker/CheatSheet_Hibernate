@@ -122,16 +122,21 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public String handleForgotPassword(@RequestParam("email") String email, HttpServletRequest request, Model model) {
+    public String handleForgotPassword(@RequestParam("email") String email, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         String contextPath = request.getRequestURL().toString().replace(request.getRequestURI(), request.getContextPath());
         
         boolean emailSent = userService.sendResetPasswordEmail(email, contextPath);
+        
         if (emailSent) {
-            model.addAttribute("message", "A password reset link has been sent to your email address.");
+            // အီးမေးလ်ပို့အောင်မြင်လျှင် ပြသမည့် Flash Message
+            redirectAttributes.addFlashAttribute("successMessage", "A password reset link has been sent to your email address.");
         } else {
-            model.addAttribute("error", "No account found with this email address.");
+            // အီးမေးလ်မရှိလျှင် သို့မဟုတ် Error တက်လျှင် ပြသမည့် Flash Message
+            redirectAttributes.addFlashAttribute("errorMessage", "No account found with this email address.");
         }
-        return "forgot-password";
+        
+        // URL ကို /forgot-password ဆီသို့ Redirect ပြန်လှည့်ပေးခြင်း
+        return "redirect:/forgot-password";
     }
 
     @GetMapping("/reset-password")
@@ -173,41 +178,39 @@ public class AuthController {
 
         if (!file.isEmpty()) {
             try {
-                // ၁။ ပုံသိမ်းမည့်ဆာဗာလမ်းကြောင်းရှာခြင်း (Tomcat ၏ webapps/[Project]/uploads)
-                String uploadDir = request.getServletContext().getRealPath("/uploads");
+                // 🌟 ၁။ [ပြင်ဆင်ချက်] Tomcat ထဲမှာမသိမ်းဘဲ ကွန်ပျူတာ Hard Drive ထဲမှာ အသေသိမ်းခြင်း
+                // (Project ပြန် Run လည်း၊ Clean လုပ်လည်း ဓာတ်ပုံများ လုံးဝ မပျက်တော့ပါ)
+                String uploadDir = "C:/my_project_uploads/";
                 File dir = new File(uploadDir);
                 if (!dir.exists()) {
-                    dir.mkdirs(); // Folder မရှိသေးရင် ဆောက်ပေးခြင်း
+                    dir.mkdirs(); // Folder မရှိသေးရင် C:/ ထဲမှာ အလိုအလျောက် ဆောက်ပေးမည်
                 }
 
-                // 🌟 [ဒီဇိုင်းကောင်းစေရန် ဖြည့်စွက်ချက်] ပုံဟောင်းရှိနေလျှင် ဆာဗာထဲမှ အရင်ဖျက်ထုတ်ပစ်ခြင်း
+                // ၂။ ပုံဟောင်းရှိနေလျှင် C:/my_project_uploads/ ထဲမှ ရှာပြီး အလိုအလျောက် ဖျက်ထုတ်ခြင်း
                 String oldAvatarName = currentUser.getAvatarPath();
                 if (oldAvatarName != null && !oldAvatarName.isEmpty()) {
                     File oldFile = new File(dir.getAbsolutePath() + File.separator + oldAvatarName);
                     if (oldFile.exists()) {
-                        oldFile.delete(); // ပုံဟောင်းကို အလိုအလျောက် ဖျက်ပေးခြင်း
+                        oldFile.delete(); 
                     }
                 }
 
-                // ၂။ ဖိုင်နာမည်တူတာတွေ မထပ်သွားစေရန် UUID ဖြင့် နာမည်အသစ်ပြောင်းခြင်း
+                // ၃။ ဖိုင်နာမည်တူတာတွေ မထပ်သွားစေရန် UUID ဖြင့် နာမည်အသစ်ပြောင်းခြင်း
                 String originalFilename = file.getOriginalFilename();
                 String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
                 String newFileName = UUID.randomUUID().toString() + extension;
 
-                // ၃။ ပုံအသစ်ကို သတ်မှတ်ထားသော Folder ထဲသို့ ရွှေ့ပြောင်းသိမ်းဆည်းခြင်း
+                // ၄။ ပုံအသစ်ကို သတ်မှတ်ထားသော Folder ထဲသို့ ရွှေ့ပြောင်းသိမ်းဆည်းခြင်း
                 File serverFile = new File(dir.getAbsolutePath() + File.separator + newFileName);
                 file.transferTo(serverFile);
 
-                // ၄။ Database တွင် လမ်းကြောင်းသွားသိမ်းရန် Entity ထဲသို့ ထည့်ခြင်း
+                // ၅။ Database တွင် လမ်းကြောင်းအသစ် သွားသိမ်းခြင်း
                 currentUser.setAvatarPath(newFileName);
-                
-                // Database တွင် သွားရောက် Update လုပ်ခြင်း (merge သုံးထားသော မက်သတ်)
                 userService.updateUser(currentUser);
 
-                // ၅။ Session ထဲက User Data ကိုပါ နောက်ဆုံးပုံအသစ်ဖြင့် လဲလှယ်ပေးခြင်း
+                // ၆။ Session ထဲက User Data ကိုပါ နောက်ဆုံးပုံအသစ်ဖြင့် လဲလှယ်ပေးခြင်း
                 session.setAttribute("currentUser", currentUser);
 
-                // Flash Attribute ဖြင့် အောင်မြင်ကြောင်း Message ပြသရန် ပို့ပေးခြင်း
                 redirectAttributes.addFlashAttribute("message", "Profile picture updated successfully!");
                 return "redirect:/profile";
 
@@ -220,7 +223,6 @@ public class AuthController {
         redirectAttributes.addFlashAttribute("error", "Please select a valid file to upload.");
         return "redirect:/profile";
     }
-    
     
     @PostMapping("/profile/update")
     public String updateProfile(@RequestParam("fullName") String fullName,
