@@ -63,7 +63,7 @@
    
                         </c:when>
                         
-                        <%-- ==================== 🔓 CASE 2: GUEST USER ==================== --%>
+                        <%-- ==================== 🔓 CASE 2: GUEST hi USER ==================== --%>
                         <c:otherwise>
                             <div class="mb-3">
                                 <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fs-6 fw-semibold">
