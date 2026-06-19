@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Java Web Development Project</title>
+    <title>Home -Cheat Sheet Project</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -67,10 +67,10 @@
                         <c:otherwise>
                             <div class="mb-3">
                                 <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fs-6 fw-semibold">
-                                    Java Web Developer Course
+                                    On Job Training Course
                                 </span>
                             </div>
-                            <h1 class="display-4 fw-bold text-dark mb-3">Java Web Application Project</h1>
+                            <h1 class="display-4 fw-bold text-dark mb-3">Cheat Sheet Project</h1>
                             <p class="lead text-muted mb-0">
                                 A systematically structured web application developed using Spring MVC and Hibernate Template architecture patterns.
                             </p>

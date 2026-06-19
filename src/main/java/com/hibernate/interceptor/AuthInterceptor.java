@@ -10,30 +10,30 @@ import com.hibernate.entity.User;
 
 public class AuthInterceptor implements HandlerInterceptor {
 
-    @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String uri = request.getRequestURI();
-        
-        // Allow public pages
-        if (uri.endsWith("login") || uri.endsWith("register")) {
-            return true;
-        }
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+	    String uri = request.getRequestURI();
+	    
+	    // Allow public pages
+	    if (uri.endsWith("login") || uri.endsWith("register")) {
+	        return true;
+	    }
 
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("loggedInUser");
+	    HttpSession session = request.getSession();
+	    User user = (User) session.getAttribute("currentUser");
 
-        // If not logged in, redirect to login page
-        if (user == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return false;
-        }
+	    
+	    if (user == null) {
+	        response.sendRedirect(request.getContextPath() + "/login?error=login_required");
+	        return false;
+	    }
 
-        // Role-based URL protection
-        if (uri.contains("/admin") && !"admin".equals(user.getRole())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Admins Only");
-            return false;
-        }
+	    
+	    if (uri.contains("/admin") && !"admin".equals(user.getRole())) {
+	        response.sendRedirect(request.getContextPath() + "/login?error=admin_only");
+	        return false;
+	    }
 
-        return true;
-    }
+	    return true;
+	}
 }

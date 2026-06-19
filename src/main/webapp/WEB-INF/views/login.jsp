@@ -6,7 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign In - JWD Project</title>
+<title>Sign In - Cheat Sheet Project</title>
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
 	rel="stylesheet">
@@ -63,19 +63,17 @@ body {
 		<h2 class="text-center fw-bold mb-4" style="color: #212529;">Sign
 			In</h2>
 
-		<%-- ⚠️ လော့ဂ်အင် Error တက်လျှင် ပြသမည့် Alert Bar --%>
-		<c:if test="${not empty errorMessage}">
-			<div class="alert alert-danger py-2 small d-flex align-items-center"
-				role="alert">
-				<i class="bi bi-exclamation-triangle-fill me-2"></i> ${errorMessage}
-			</div>
-		</c:if>
+		<c:if test="${not empty loginError}">
+    <div class="alert alert-danger text-center small fw-bold mb-3" role="alert">
+        ⚠️ ${loginError}
+    </div>
+</c:if>
 
 		<form action="${pageContext.request.contextPath}/login" method="POST">
 			<div class="mb-3">
 				<label class="form-label text-secondary small fw-medium">Email
 					Address</label> <input type="email" name="email" class="form-control"
-					placeholder="enter your email" required>
+					placeholder="Enter your email" required>
 			</div>
 
 			<div class="mb-2">
@@ -85,10 +83,11 @@ body {
 			</div>
 
 			<div class="text-end mb-4">
-    <a href="${pageContext.request.contextPath}/forgot-password" class="text-decoration-none small text-primary">
-        <i class="bi bi-question-circle me-1"></i>Forgot Password?
-    </a>
-</div>
+				<a href="${pageContext.request.contextPath}/forgot-password"
+					class="text-decoration-none small text-primary"> <i
+					class="bi bi-question-circle me-1"></i>Forgot Password?
+				</a>
+			</div>
 
 			<div class="d-flex gap-2 mb-3">
 				<a href="${pageContext.request.contextPath}/"
@@ -106,5 +105,15 @@ body {
 			</div>
 		</form>
 	</div>
+
+	<c:if test="${param.error == 'login_required'}">
+		<div class="alert alert-danger text-center font-weight-bold">⚠️
+			Please login first to access that page!</div>
+	</c:if>
+
+	<c:if test="${param.error == 'admin_only'}">
+		<div class="alert alert-danger text-center font-weight-bold">🚫
+			Access Denied: Admin privileges required!</div>
+	</c:if>
 </body>
 </html>

@@ -2,6 +2,7 @@ package com.hibernate.controller;
 
 import com.hibernate.entity.User;
 import com.hibernate.service.UserService;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,20 +70,23 @@ public class AuthController {
     @PostMapping("/login")
     public String processLogin(@RequestParam("email") String email, 
                                @RequestParam("password") String password,
-                               HttpSession session, Model model) {
+                               HttpSession session, 
+                               RedirectAttributes redirectAttributes) { // 🌟 Model နေရာမှာ RedirectAttributes ပြောင်းသုံးပါမယ်
+        
         User user = userService.authenticateByEmail(email, password);
+       
         if (user != null) {
-            // 🌟 Session Attribute Key ကို 'currentUser' အဖြစ် သတ်မှတ်သိမ်းဆည်းခြင်း
             session.setAttribute("currentUser", user);
-            
-            // 🚀 Login အောင်မြင်ပါက URL မှန်ကန်စေရန် /home သို့ Redirect လုပ်မည်
             return "redirect:/home";
         } else {
-            model.addAttribute("error", "Invalid Email or Password!");
-            return "login";
+            // 🌟 addFlashAttribute ကို သုံးလိုက်ရင် Redirect ဖြစ်သွားရင်တောင် ဒေတာ လုံးဝ မပျောက်တော့ပါဘူး
+            redirectAttributes.addFlashAttribute("loginError", "Invalid Email or Password!");
+            
+            // 🚀 လော့ဂ်အင်ပေ့ချ်ဆီ အသေအချာ ပြန်မောင်းနှင်လိုက်ပါတယ်
+            return "redirect:/login"; 
         }
     }
-
+    
     @GetMapping("/logout")
     public String handleLogout(HttpSession session) {
         // Session ထဲရှိ ဒေတာအားလုံးကို ဖျက်ထုတ်ပစ်ခြင်း
@@ -90,18 +94,18 @@ public class AuthController {
         // အကောင့်ထွက်ပြီးနောက် Home Page သို့ ပြန်ပို့ခြင်း
         return "redirect:/"; 
     }
-    // ✨ ၁။ HOME DASHBOARD MAPPING (ထည့်သွင်းပေးထားသော အပိုင်း)
+   
     @GetMapping("/home")
     public String showHomeDashboard(HttpSession session) {
         // လုံခြုံရေးအရ Login ဝင်ထားခြင်း ရှိမရှိ အရင်စစ်ဆေးခြင်း
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
-            return "redirect:/login"; // Login မဝင်ရသေးပါက မောင်းထုတ်မည်
+            return "redirect:/login"; 
         }
         return "home"; // home.jsp ကို ပြသမည်
     }
 
-    // ✨ ၂။ PROFILE MAPPING (တောင်းဆိုချက်အတိုင်း ပြင်ဆင်ပြီး)
+    // ✨ ၂။ PROFILE MAPPING
     @GetMapping("/profile")
     public String showProfile(HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
@@ -156,8 +160,11 @@ public class AuthController {
         }
 
         boolean result = userService.resetPassword(token, password);
+        
+        // 🌟 ဒီနေရာလေးကို အခုလို ပြင်လိုက်တာပါဗျာ (redirect: နေရာမှာ login လို့ပဲ တန်းခေါ်လိုက်တာ)
         if (result) {
-            return "redirect:/login?success=password_reset";
+            model.addAttribute("successMessage", "Password reset successfully! Please login with your new password.");
+            return "login"; 
         } else {
             model.addAttribute("error", "The reset link is invalid or has expired.");
             return "reset-password";
@@ -178,8 +185,7 @@ public class AuthController {
 
         if (!file.isEmpty()) {
             try {
-                // 🌟 ၁။ [ပြင်ဆင်ချက်] Tomcat ထဲမှာမသိမ်းဘဲ ကွန်ပျူတာ Hard Drive ထဲမှာ အသေသိမ်းခြင်း
-                // (Project ပြန် Run လည်း၊ Clean လုပ်လည်း ဓာတ်ပုံများ လုံးဝ မပျက်တော့ပါ)
+               
                 String uploadDir = "C:/my_project_uploads/";
                 File dir = new File(uploadDir);
                 if (!dir.exists()) {
