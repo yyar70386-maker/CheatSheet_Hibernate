@@ -75,8 +75,15 @@ public class AuthController {
             // 🌟 Session Attribute Key ကို 'currentUser' အဖြစ် သတ်မှတ်သိမ်းဆည်းခြင်း
             session.setAttribute("currentUser", user);
             
-            // 🚀 Login အောင်မြင်ပါက URL မှန်ကန်စေရန် /home သို့ Redirect လုပ်မည်
-            return "redirect:/home";
+            // 🚀 [🚨 ဤနေရာတွင် Role အား စစ်ဆေးပြီး လမ်းကြောင်းခွဲပေးရပါမည်]
+            if (user.getRole() == 1) {
+                // Admin (Role = 1) ဖြစ်ပါက Admin Dashboard URL သို့ လွှတ်မည်
+                return "redirect:/admin/dashboard";
+            } else {
+                // သာမန် User ဖြစ်ပါက /home (သို့မဟုတ် /profile) သို့ လွှတ်မည်
+                return "redirect:/home";
+            }
+            
         } else {
             model.addAttribute("error", "Invalid Email or Password!");
             return "login";
