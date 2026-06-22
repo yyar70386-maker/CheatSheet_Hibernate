@@ -22,9 +22,9 @@
   <property name="driverClassName"
    value="com.mysql.cj.jdbc.Driver" />
   <property name="url"
-   value="jdbc:mysql://localhost:3306/cheat_sheetsproject" />
+   value="jdbc:mysql://localhost:3306/cheatsheets_db" />
   <property name="username" value="root" />
-  <property name="password" value="root" />
+  <property name="password" value="669972855" />
  </bean>
 
  <!-- Hibernate SessionFactory -->

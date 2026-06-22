@@ -109,17 +109,60 @@ body {
 								<div class="flex-grow-1">
 									<label class="form-label text-muted small fw-bold">Change
 										Profile Picture</label>
+
 									<div class="input-group input-group-sm"
 										style="max-width: 350px;">
-										<input type="file" name="avatarFile" class="form-control"
-											accept="image/*" required>
-										<button class="btn btn-dark" type="submit">
+										<!-- 💡 id="avatarFile" ကို တိုးထားပါတယ် -->
+										<input type="file" id="avatarFile" name="avatarFile"
+											class="form-control" accept="image/*" required>
+
+										<!-- 💡 id="uploadBtn" ကို တိုးထားပါတယ် -->
+										<button class="btn btn-dark" id="uploadBtn" type="submit">
 											<i class="bi bi-upload me-1"></i>Upload
 										</button>
 									</div>
+
+									<!-- 🌟 တခြားဖိုင်ရွေးရင် ပေါ်လာမယ့် Error Message Card လေး (ပုံမှန်အချိန်တွင် ဖျောက်ထားမည်) -->
+									<div id="fileError"
+										class="text-danger small mt-1 font-weight-bold"
+										style="display: none;"></div>
+
 									<div class="form-text small text-muted">Accepts JPG, PNG
 										images.</div>
 								</div>
+
+								<!-- 📜 စစ်ဆေးပေးမည့် JavaScript Logic -->
+								<script>
+									document
+											.getElementById('avatarFile')
+											.addEventListener(
+													'change',
+													function() {
+														const file = this.files[0];
+														const errorDiv = document
+																.getElementById('fileError');
+														const uploadBtn = document
+																.getElementById('uploadBtn');
+
+														if (file) {
+
+															if (!file.type
+																	.startsWith('image/')) {
+
+																errorDiv.textContent = "❌ Invalid file! Please select an image file (JPG, PNG) only.";
+																errorDiv.style.display = "block";
+
+																this.value = "";
+
+																uploadBtn.disabled = true;
+
+															} else {
+																errorDiv.style.display = "none";
+																uploadBtn.disabled = false;
+															}
+														}
+													});
+								</script>
 							</div>
 						</form>
 
