@@ -1,7 +1,9 @@
 package com.hibernate.controller;
 
 import com.hibernate.entity.User;
+import com.hibernate.service.CategoryService;
 import com.hibernate.service.UserService;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +22,16 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CategoryService categoryService; // 👈 Local မှ CategoryService ကို ထည့်သွင်းထားသည်
     
-        @GetMapping("/")
-        public String showHomePage(HttpSession session) {
-            // Run လိုက်တာနဲ့ views/index.jsp (သို့မဟုတ် home.jsp) ဆီသို့ တန်းပို့ပေးမည်
-            return "home"; 
-        }
+    @GetMapping("/")
+    public String showHomePage(HttpSession session, Model model) {
+        // 👈 Home page card များအတွက် active categories များကို ဆွဲထုတ်ပေးခြင်း
+        model.addAttribute("categorylist", categoryService.findAll());
+        return "home"; 
+    }
    
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
@@ -50,7 +56,6 @@ public class AuthController {
             
         } catch (IllegalArgumentException e) {
             // 🚨 ၃။ Service ဘက်မှ တက်လာသော သီးသန့် Validation Error များကို ဖမ်းယူခြင်း
-            // (Username တူရင် 'Username is already taken!', Email တူရင် 'Email is already registered!' ဟု အတိအကျပြပါမည်)
             model.addAttribute("error", e.getMessage());
             return "register";
             
@@ -69,10 +74,12 @@ public class AuthController {
     @PostMapping("/login")
     public String processLogin(@RequestParam("email") String email, 
                                @RequestParam("password") String password,
-                               HttpSession session, Model model) {
+                               HttpSession session, 
+                               RedirectAttributes redirectAttributes) { // 🌟 GitHub ပါအတိုင်း RedirectAttributes ပြောင်းသုံးထားသည်
+        
         User user = userService.authenticateByEmail(email, password);
+       
         if (user != null) {
-            // 🌟 Session Attribute Key ကို 'currentUser' အဖြစ် သတ်မှတ်သိမ်းဆည်းခြင်း
             session.setAttribute("currentUser", user);
             
             // 🚀 [🚨 ဤနေရာတွင် Role အား စစ်ဆေးပြီး လမ်းကြောင်းခွဲပေးရပါမည်]
@@ -85,30 +92,31 @@ public class AuthController {
             }
             
         } else {
-            model.addAttribute("error", "Invalid Email or Password!");
-            return "login";
+            // 🌟 GitHub ပါအတိုင်း addFlashAttribute ကို သုံးထားသဖြင့် Redirect ဖြစ်သော်လည်း ဒေတာမပျောက်ပါ
+            redirectAttributes.addFlashAttribute("loginError", "Invalid Email or Password!");
+            return "redirect:/login"; 
         }
     }
-
+    
     @GetMapping("/logout")
     public String handleLogout(HttpSession session) {
-        // Session ထဲရှိ ဒေတာအားလုံးကို ဖျက်ထုတ်ပစ်ခြင်း
         session.invalidate(); 
-        // အကောင့်ထွက်ပြီးနောက် Home Page သို့ ပြန်ပို့ခြင်း
         return "redirect:/"; 
     }
-    // ✨ ၁။ HOME DASHBOARD MAPPING (ထည့်သွင်းပေးထားသော အပိုင်း)
+   
     @GetMapping("/home")
-    public String showHomeDashboard(HttpSession session) {
+    public String showHomeDashboard(HttpSession session, Model model) {
         // လုံခြုံရေးအရ Login ဝင်ထားခြင်း ရှိမရှိ အရင်စစ်ဆေးခြင်း
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
-            return "redirect:/login"; // Login မဝင်ရသေးပါက မောင်းထုတ်မည်
+            return "redirect:/login"; 
         }
-        return "home"; // home.jsp ကို ပြသမည်
+        
+        // 👈 Local ပါအတိုင်း Home page dashboard တွင် card များပေါ်ရန် data လှမ်းပို့ပေးခြင်း
+        model.addAttribute("categorylist", categoryService.findAll());
+        return "home"; 
     }
 
-    // ✨ ၂။ PROFILE MAPPING (တောင်းဆိုချက်အတိုင်း ပြင်ဆင်ပြီး)
     @GetMapping("/profile")
     public String showProfile(HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
@@ -135,14 +143,11 @@ public class AuthController {
         boolean emailSent = userService.sendResetPasswordEmail(email, contextPath);
         
         if (emailSent) {
-            // အီးမေးလ်ပို့အောင်မြင်လျှင် ပြသမည့် Flash Message
             redirectAttributes.addFlashAttribute("successMessage", "A password reset link has been sent to your email address.");
         } else {
-            // အီးမေးလ်မရှိလျှင် သို့မဟုတ် Error တက်လျှင် ပြသမည့် Flash Message
             redirectAttributes.addFlashAttribute("errorMessage", "No account found with this email address.");
         }
         
-        // URL ကို /forgot-password ဆီသို့ Redirect ပြန်လှည့်ပေးခြင်း
         return "redirect:/forgot-password";
     }
 
@@ -163,14 +168,15 @@ public class AuthController {
         }
 
         boolean result = userService.resetPassword(token, password);
+        
         if (result) {
-            return "redirect:/login?success=password_reset";
+            // 🌟 GitHub ပါအတိုင်း Login page ဆီ တိုက်ရိုက်မသွားဘဲ Parameter ဖြင့် Redirect လှည့်ထားသည်
+            return "redirect:/login?success=password_reset"; 
         } else {
             model.addAttribute("error", "The reset link is invalid or has expired.");
             return "reset-password";
         }
     }
-    
     
     @PostMapping("/profile/upload-avatar")
     public String handleAvatarUpload(@RequestParam("avatarFile") MultipartFile file,
@@ -185,15 +191,13 @@ public class AuthController {
 
         if (!file.isEmpty()) {
             try {
-                // 🌟 ၁။ [ပြင်ဆင်ချက်] Tomcat ထဲမှာမသိမ်းဘဲ ကွန်ပျူတာ Hard Drive ထဲမှာ အသေသိမ်းခြင်း
-                // (Project ပြန် Run လည်း၊ Clean လုပ်လည်း ဓာတ်ပုံများ လုံးဝ မပျက်တော့ပါ)
                 String uploadDir = "C:/my_project_uploads/";
                 File dir = new File(uploadDir);
                 if (!dir.exists()) {
-                    dir.mkdirs(); // Folder မရှိသေးရင် C:/ ထဲမှာ အလိုအလျောက် ဆောက်ပေးမည်
+                    dir.mkdirs();
                 }
 
-                // ၂။ ပုံဟောင်းရှိနေလျှင် C:/my_project_uploads/ ထဲမှ ရှာပြီး အလိုအလျောက် ဖျက်ထုတ်ခြင်း
+                // ပုံဟောင်းရှိနေလျှင် ဖျက်ထုတ်ခြင်း
                 String oldAvatarName = currentUser.getAvatarPath();
                 if (oldAvatarName != null && !oldAvatarName.isEmpty()) {
                     File oldFile = new File(dir.getAbsolutePath() + File.separator + oldAvatarName);
@@ -202,20 +206,18 @@ public class AuthController {
                     }
                 }
 
-                // ၃။ ဖိုင်နာမည်တူတာတွေ မထပ်သွားစေရန် UUID ဖြင့် နာမည်အသစ်ပြောင်းခြင်း
+                // UUID ဖြင့် နာမည်အသစ်ပြောင်းခြင်း
                 String originalFilename = file.getOriginalFilename();
                 String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
                 String newFileName = UUID.randomUUID().toString() + extension;
 
-                // ၄။ ပုံအသစ်ကို သတ်မှတ်ထားသော Folder ထဲသို့ ရွှေ့ပြောင်းသိမ်းဆည်းခြင်း
+                // ပုံအသစ်သိမ်းဆည်းခြင်း
                 File serverFile = new File(dir.getAbsolutePath() + File.separator + newFileName);
                 file.transferTo(serverFile);
 
-                // ၅။ Database တွင် လမ်းကြောင်းအသစ် သွားသိမ်းခြင်း
+                // Database နှင့် Session update လုပ်ခြင်း
                 currentUser.setAvatarPath(newFileName);
                 userService.updateUser(currentUser);
-
-                // ၆။ Session ထဲက User Data ကိုပါ နောက်ဆုံးပုံအသစ်ဖြင့် လဲလှယ်ပေးခြင်း
                 session.setAttribute("currentUser", currentUser);
 
                 redirectAttributes.addFlashAttribute("message", "Profile picture updated successfully!");
@@ -234,7 +236,7 @@ public class AuthController {
     @PostMapping("/profile/update")
     public String updateProfile(@RequestParam("fullName") String fullName,
                                 @RequestParam("email") String email,
-                                @RequestParam("bio") String bio, // Bio ပါတစ်ခါတည်း လက်ခံခြင်း
+                                @RequestParam("bio") String bio,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
         
@@ -244,18 +246,13 @@ public class AuthController {
         }
 
         try {
-            // ၁။ ဖောင်မှ ရလာသော အချက်အလက်အသစ်များကို လက်ရှိ User ထဲသို့ ထည့်ခြင်း
             currentUser.setFullName(fullName);
             currentUser.setEmail(email);
             currentUser.setBio(bio);
 
-            // ၂။ Database တွင် သွားရောက် Update လုပ်ခြင်း (စောစောက ပြင်ခဲ့သည့် merge သုံးထားသော method)
             userService.updateUser(currentUser);
-
-            // ၃။ HTTP Session ကိုပါ နောက်ဆုံး ဒေတာအသစ်ဖြင့် အစားထိုးခြင်း
             session.setAttribute("currentUser", currentUser);
 
-            // အောင်မြင်ကြောင်း Flash Message ပို့ခြင်း
             redirectAttributes.addFlashAttribute("message", "Profile updated successfully!");
             
         } catch (Exception e) {
@@ -264,4 +261,4 @@ public class AuthController {
         
         return "redirect:/profile";
     }
- }
+}
