@@ -1,15 +1,9 @@
 package com.hibernate.entity;
 
 import java.sql.Timestamp;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -38,7 +32,7 @@ public class CheatsheetEntity {
     @Column(name = "title", nullable = false, length = 255)
     private String title;
 
-    @Column(name = "description", nullable = false, length = 255)
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "content", nullable = false, columnDefinition = "LONGTEXT")
@@ -63,4 +57,12 @@ public class CheatsheetEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    @ManyToMany
+    @JoinTable(
+        name = "cheatsheet_tags",
+        joinColumns = @JoinColumn(name = "sheet_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<TagEntity> tags;
 }

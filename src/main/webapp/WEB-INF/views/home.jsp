@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home -Cheat Sheet Project</title>
+    <title>Home - Cheat Sheet Project</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -21,18 +21,26 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none; /* link လိုင်းကြောင်း ဖျောက်ရန် */
+            display: block;
         }
         .feature-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         }
         .icon-box {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            margin: 0 auto 20px auto;
+        }
+        .icon-box i {
+            font-size: 32px;
+            color: #333;
         }
     </style>
 </head>
@@ -60,10 +68,9 @@
                             <p class="lead text-muted mb-4">
                                 You are currently logged into the system.                               
                             </p>
-   
                         </c:when>
                         
-                        <%-- ==================== 🔓 CASE 2: GUEST hi USER ==================== --%>
+                        <%-- ==================== 🔓 CASE 2: GUEST USER ==================== --%>
                         <c:otherwise>
                             <div class="mb-3">
                                 <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fs-6 fw-semibold">
@@ -74,51 +81,56 @@
                             <p class="lead text-muted mb-0">
                                 A systematically structured web application developed using Spring MVC and Hibernate Template architecture patterns.
                             </p>
-                            </c:otherwise>
+                        </c:otherwise>
                     </c:choose>
                 </div>
             </div>
         </div>
     </div>
 
-    <%-- 📊 3. Project Features Grid --%>
+    <%-- 📂 3. Dynamic Categories Card Section (ဖြည့်စွက်ထားသောအပိုင်း) --%>
     <div class="container my-5 py-4">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold text-dark">Key System Implementations</h2>
-            <p class="text-muted">Core architectural patterns integrated into this enterprise project</p>
-        </div>
         
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100 feature-card p-4">
-                    <div class="icon-box bg-primary-subtle text-primary mb-3">
-                        <i class="bi bi-layers-half fs-3"></i>
-                    </div>
-                    <h5 class="fw-bold">MVC Architecture</h5>
-                    <p class="text-muted small">Designed with distinct Controller, Service, and Repository layers to completely separate business logic from infrastructure.</p>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="card h-100 feature-card p-4">
-                    <div class="icon-box bg-success-subtle text-success mb-3">
-                        <i class="bi bi-shield-check fs-3"></i>
-                    </div>
-                    <h5 class="fw-bold">Server-Side Validation</h5>
-                    <p class="text-muted small">Implements robust server-side processing to validate user credentials using Regular Expressions and avoid duplicate resource generation.</p>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="card h-100 feature-card p-4">
-                    <div class="icon-box bg-warning-subtle text-warning mb-3">
-                        <i class="bi bi-image fs-3"></i>
-                    </div>
-                    <h5 class="fw-bold">Multipart File Upload</h5>
-                    <p class="text-muted small">Handles dynamic user profile avatar image binary data directly via server-side multipart configurations and references database paths seamlessly.</p>
-                </div>
-            </div>
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-dark">Browse Categories</h2>
+            <p class="text-muted">Explore cheat sheets by category and improve your skills.</p>
         </div>
+
+        <c:choose>
+            <%-- Data မရှိရင် ပြမယ့် ပုံစံ --%>
+            <c:when test="${empty categorylist}">
+                <div class="text-center text-muted fs-5 my-5">
+                    <i class="bi bi-folder-x display-4 d-block mb-3"></i>
+                    No categories available at the moment.
+                </div>
+            </c:when>
+            
+            <%-- Data ရှိရင် Loop ပတ်ပြီး Card ၃ ခုစီ စီပြမယ့် ပုံစံ --%>
+            <c:otherwise>
+                <div class="row g-4 justify-content-center">
+                    <c:forEach items="${categorylist}" var="c">
+                        
+                        <div class="col-md-6 col-lg-4">
+                            <%-- Card တစ်ခုလုံးကို နှိပ်ရင် သက်ဆိုင်ရာ Link ကို သွားစေရန် --%>
+                            <a href="${pageContext.request.contextPath}/cheatsheet/category/${c.id}" class="card feature-card h-100 p-4 text-center">
+                                
+                                <div class="icon-box">
+                                    <i class="bi bi-layers-half"></i>
+                                </div>
+                                
+                                <div class="card-body p-0">
+                                    <h4 class="card-title fw-bold text-dark mb-3">${c.name} Cheat Sheets</h4>
+                                    <p class="card-text text-secondary sm">Browse all cheat sheets from this category.</p>
+                                </div>
+                                
+                            </a>
+                        </div>
+
+                    </c:forEach>
+                </div>
+            </c:otherwise>
+        </c:choose>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
