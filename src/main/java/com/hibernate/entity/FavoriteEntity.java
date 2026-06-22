@@ -20,5 +20,5 @@ public class FavoriteEntity {
     // MG Thiri ရဲ့ CheatSheet Class
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cheatsheet_id", nullable = false)
-    private CheatSheetEntity cheatSheet;
+    private CheatsheetEntity cheatSheet;
 }

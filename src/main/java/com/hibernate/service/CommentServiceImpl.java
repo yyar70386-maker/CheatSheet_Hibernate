@@ -5,7 +5,8 @@ import org.springframework.stereotype.Service;
 import com.hibernate.entity.CommentEntity;
 import com.hibernate.entity.CommentReactionEntity;
 import com.hibernate.entity.User;
-import com.hibernate.entity.CheatSheetEntity;
+
+import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.repository.CommentRepositoryImpl;
 import com.hibernate.repository.CommentReactionRepositoryImpl;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class CommentServiceImpl {
         comment.setContent(content);
         
         User user = new User(); user.setId(userId);
-        CheatSheetEntity sheet = new CheatSheetEntity(); sheet.setId(cheatSheetId);
+        CheatsheetEntity sheet = new CheatsheetEntity(); sheet.setId(cheatSheetId);
         
         comment.setUser(user);
         comment.setCheatSheet(sheet);

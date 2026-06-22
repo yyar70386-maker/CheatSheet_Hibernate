@@ -20,7 +20,7 @@ public class CommentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cheatsheet_id", nullable = false)
-    private CheatSheetEntity cheatSheet;
+    private CheatsheetEntity cheatSheet;
 
     // အချင်းချင်း Reply ပြန်ရန်အတွက်
     @ManyToOne(fetch = FetchType.LAZY)

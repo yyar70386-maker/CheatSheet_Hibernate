@@ -20,5 +20,5 @@ public class SheetReactionEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cheatsheet_id", nullable = false)
-    private CheatSheetEntity cheatSheet;
+    private CheatsheetEntity cheatSheet;
 }

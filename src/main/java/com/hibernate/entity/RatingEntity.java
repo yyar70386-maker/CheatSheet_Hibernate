@@ -23,5 +23,5 @@ public class RatingEntity {
     // MG Thiri ရဲ့ CheatSheet Class နဲ့ ချိတ်ဆက်ခြင်း
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cheatsheet_id", nullable = false)
-    private CheatSheetEntity cheatSheet;
+    private CheatsheetEntity cheatSheet;
 }

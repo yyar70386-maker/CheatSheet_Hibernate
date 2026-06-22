@@ -4,7 +4,8 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import com.hibernate.entity.RatingEntity;
 import com.hibernate.entity.User; // Ko Htun Hla's Class
-import com.hibernate.entity.CheatSheetEntity;
+
+import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.repository.RatingRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +40,7 @@ public class RatingServiceImpl implements RatingService {
             User user = new User();
             user.setId(userId);
             
-            CheatSheetEntity sheet = new CheatSheetEntity();
+            CheatsheetEntity sheet = new CheatsheetEntity();
             sheet.setId(cheatSheetId);
             
             newRating.setUser(user);

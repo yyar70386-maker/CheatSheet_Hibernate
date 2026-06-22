@@ -21,7 +21,7 @@ public class InteractionServiceImpl {
         comment.setContent(content);
         
         User user = new User(); user.setId(userId);
-        CheatSheetEntity sheet = new CheatSheetEntity(); sheet.setId(cheatSheetId);
+        CheatsheetEntity sheet = new CheatsheetEntity(); sheet.setId(cheatSheetId);
         
         comment.setUser(user);
         comment.setCheatSheet(sheet);
@@ -42,7 +42,7 @@ public class InteractionServiceImpl {
         } else {
             SheetReactionEntity newReaction = new SheetReactionEntity();
             User user = new User(); user.setId(userId);
-            CheatSheetEntity sheet = new CheatSheetEntity(); sheet.setId(cheatSheetId);
+            CheatsheetEntity sheet = new CheatsheetEntity(); sheet.setId(cheatSheetId);
             
             newReaction.setUser(user);
             newReaction.setCheatSheet(sheet);

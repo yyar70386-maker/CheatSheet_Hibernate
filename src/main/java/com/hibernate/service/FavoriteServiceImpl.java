@@ -4,7 +4,8 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import com.hibernate.entity.FavoriteEntity;
 import com.hibernate.entity.User;
-import com.hibernate.entity.CheatSheetEntity;
+
+import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.repository.FavoriteRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +32,7 @@ public class FavoriteServiceImpl implements FavoriteService {
             User user = new User(); 
             user.setId(userId);
             
-            CheatSheetEntity sheet = new CheatSheetEntity(); 
+            CheatsheetEntity sheet = new CheatsheetEntity(); 
             sheet.setId(cheatSheetId);
             
             newFav.setUser(user); 
