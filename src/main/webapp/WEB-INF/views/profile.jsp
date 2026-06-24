@@ -93,16 +93,20 @@ body {
 							<div class="d-flex align-items-center">
 								<c:choose>
 									<c:when test="${not empty user.avatarPath}">
+										
 										<img
 											src="${pageContext.request.contextPath}/uploads/${user.avatarPath}"
 											class="rounded-circle me-4 shadow-sm"
-											style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #0d6efd;">
+											style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #0d6efd; cursor: pointer;"
+											data-bs-toggle="modal" data-bs-target="#avatarViewModal">
 									</c:when>
 									<c:otherwise>
+										
 										<img
 											src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
 											class="rounded-circle me-4 shadow-sm"
-											style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #ccc;">
+											style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #ccc; cursor: pointer;"
+											data-bs-toggle="modal" data-bs-target="#avatarViewModal">
 									</c:otherwise>
 								</c:choose>
 
@@ -149,7 +153,7 @@ body {
 															if (!file.type
 																	.startsWith('image/')) {
 
-																errorDiv.textContent = "❌ Invalid file! Please select an image file (JPG, PNG) only.";
+																errorDiv.textContent = "❌ Invalid file! Please select an image file (JPG, PNG,..) only.";
 																errorDiv.style.display = "block";
 
 																this.value = "";
@@ -268,6 +272,39 @@ body {
 		</div>
 	</div>
 
+     
+<div class="modal fade" id="avatarViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content bg-dark border-0 shadow-lg">
+            
+           
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title text-white-50">Profile Picture</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            
+            <div class="modal-body text-center p-3">
+                <c:choose>
+                    <c:when test="${not empty user.avatarPath}">
+                        <img src="${pageContext.request.contextPath}/uploads/${user.avatarPath}" 
+                             class="img-fluid rounded shadow" 
+                             style="max-height: 75vh; object-fit: contain;" 
+                             alt="Full Profile">
+                    </c:when>
+                    <c:otherwise>
+                       
+                        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" 
+                             class="img-fluid rounded shadow bg-light p-4" 
+                             style="max-height: 50vh; width: 250px; object-fit: contain;" 
+                             alt="Default Profile">
+                    </c:otherwise>
+                </c:choose>
+            </div>
+            
+        </div>
+    </div>
+</div>
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

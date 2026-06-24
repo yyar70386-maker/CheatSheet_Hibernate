@@ -88,7 +88,7 @@
         </div>
     </div>
 
-    <%-- 📂 3. Dynamic Categories Card Section (ဖြည့်စွက်ထားသောအပိုင်း) --%>
+    
     <div class="container my-5 py-4">
         
         <div class="text-center mb-5">
@@ -97,7 +97,7 @@
         </div>
 
         <c:choose>
-            <%-- Data မရှိရင် ပြမယ့် ပုံစံ --%>
+           
             <c:when test="${empty categorylist}">
                 <div class="text-center text-muted fs-5 my-5">
                     <i class="bi bi-folder-x display-4 d-block mb-3"></i>
@@ -105,13 +105,13 @@
                 </div>
             </c:when>
             
-            <%-- Data ရှိရင် Loop ပတ်ပြီး Card ၃ ခုစီ စီပြမယ့် ပုံစံ --%>
+           
             <c:otherwise>
                 <div class="row g-4 justify-content-center">
                     <c:forEach items="${categorylist}" var="c">
                         
                         <div class="col-md-6 col-lg-4">
-                            <%-- Card တစ်ခုလုံးကို နှိပ်ရင် သက်ဆိုင်ရာ Link ကို သွားစေရန် --%>
+                           
                             <a href="${pageContext.request.contextPath}/cheatsheet/category/${c.id}" class="card feature-card h-100 p-4 text-center">
                                 
                                 <div class="icon-box">

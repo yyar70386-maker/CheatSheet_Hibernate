@@ -177,12 +177,42 @@ public class AuthController {
 
 		if (!file.isEmpty()) {
 			try {
+				
+				String originalFilename = file.getOriginalFilename();
+				if (originalFilename == null || !originalFilename.contains(".")) {
+					redirectAttributes.addFlashAttribute("error", "Invalid file name.");
+					return "redirect:/profile";
+				}
+				
+				
+				String extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+				if (!extension.matches("\\.(jpg|jpeg|png|gif)")) {
+					redirectAttributes.addFlashAttribute("error", "Only Image files (JPG, JPEG, PNG, GIF) are allowed!");
+					return "redirect:/profile";
+				}
+
+				
+				try (java.io.InputStream is = file.getInputStream()) {
+					java.awt.image.BufferedImage bufferedImage = javax.imageio.ImageIO.read(is);
+					
+					
+					if (bufferedImage == null) {
+						redirectAttributes.addFlashAttribute("error", "Fake Image Detected! You cannot bypass with fake extensions.");
+						return "redirect:/profile";
+					}
+				} catch (Exception e) {
+					redirectAttributes.addFlashAttribute("error", "Invalid image content or corrupted file.");
+					return "redirect:/profile";
+				}
+
+				
 				String uploadDir = "C:/my_project_uploads/";
 				File dir = new File(uploadDir);
 				if (!dir.exists()) {
 					dir.mkdirs();
 				}
 
+				
 				String oldAvatarName = currentUser.getAvatarPath();
 				if (oldAvatarName != null && !oldAvatarName.isEmpty()) {
 					File oldFile = new File(dir.getAbsolutePath() + File.separator + oldAvatarName);
@@ -191,8 +221,7 @@ public class AuthController {
 					}
 				}
 
-				String originalFilename = file.getOriginalFilename();
-				String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+				
 				String newFileName = UUID.randomUUID().toString() + extension;
 
 				File serverFile = new File(dir.getAbsolutePath() + File.separator + newFileName);
@@ -202,6 +231,7 @@ public class AuthController {
 				userService.updateUser(currentUser);
 				session.setAttribute("currentUser", currentUser);
 
+				
 				redirectAttributes.addFlashAttribute("message", "Profile picture updated successfully!");
 				return "redirect:/profile";
 
