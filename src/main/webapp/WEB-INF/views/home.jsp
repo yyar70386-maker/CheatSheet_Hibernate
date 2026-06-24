@@ -21,7 +21,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            text-decoration: none; /* link လိုင်းကြောင်း ဖျောက်ရန် */
+            text-decoration: none;
             display: block;
         }
         .feature-card:hover {
@@ -42,6 +42,22 @@
             font-size: 32px;
             color: #333;
         }
+        /* 💡 ပုံထဲက ကတ်ဒီဇိုင်းအတွက် ထပ်တိုးစတိုင် */
+        .cheatsheet-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            background-color: #ffffff;
+        }
+        .author-link {
+            color: #212529;
+            font-weight: 700; /* Bold အရောင်တင်ခြင်း */
+            text-decoration: none;
+        }
+        .author-link:hover {
+            color: #0d6efd; /* Hover အပြာရောင်ပြောင်းခြင်း */
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -55,7 +71,6 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <c:choose>
-                        <%-- ==================== 🔒 CASE 1: USER LOGGED IN ==================== --%>
                         <c:when test="${not empty sessionScope.currentUser}">
                             <div class="mb-3">
                                 <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fs-6 fw-semibold">
@@ -70,7 +85,6 @@
                             </p>
                         </c:when>
                         
-                        <%-- ==================== 🔓 CASE 2: GUEST USER ==================== --%>
                         <c:otherwise>
                             <div class="mb-3">
                                 <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fs-6 fw-semibold">
@@ -88,16 +102,14 @@
         </div>
     </div>
 
-    <%-- 📂 3. Dynamic Categories Card Section (ဖြည့်စွက်ထားသောအပိုင်း) --%>
-    <div class="container my-5 py-4">
-        
-        <div class="text-center mb-5">
+    <%-- 📂 3. Dynamic Categories Card Section --%>
+    <div class="container my-5 py-2">
+        <div class="text-center mb-4">
             <h2 class="fw-bold text-dark">Browse Categories</h2>
             <p class="text-muted">Explore cheat sheets by category and improve your skills.</p>
         </div>
 
         <c:choose>
-            <%-- Data မရှိရင် ပြမယ့် ပုံစံ --%>
             <c:when test="${empty categorylist}">
                 <div class="text-center text-muted fs-5 my-5">
                     <i class="bi bi-folder-x display-4 d-block mb-3"></i>
@@ -105,32 +117,89 @@
                 </div>
             </c:when>
             
-            <%-- Data ရှိရင် Loop ပတ်ပြီး Card ၃ ခုစီ စီပြမယ့် ပုံစံ --%>
             <c:otherwise>
                 <div class="row g-4 justify-content-center">
                     <c:forEach items="${categorylist}" var="c">
-                        
                         <div class="col-md-6 col-lg-4">
-                            <%-- Card တစ်ခုလုံးကို နှိပ်ရင် သက်ဆိုင်ရာ Link ကို သွားစေရန် --%>
                             <a href="${pageContext.request.contextPath}/cheatsheet/category/${c.id}" class="card feature-card h-100 p-4 text-center">
-                                
                                 <div class="icon-box">
                                     <i class="bi bi-layers-half"></i>
                                 </div>
-                                
                                 <div class="card-body p-0">
                                     <h4 class="card-title fw-bold text-dark mb-3">${c.name} Cheat Sheets</h4>
                                     <p class="card-text text-secondary sm">Browse all cheat sheets from this category.</p>
+                                }</div>
+                            </a>
+                        </div>
+                    </c:forEach>
+                </div>
+            </c:otherwise>
+        </c:choose>
+    </div>
+
+    <hr class="container my-5" style="opacity: 0.1;">
+
+    <%-- 📄 🌟 4. [UPDATED] Recent Cheat Sheets Section (မိတ်ဆွေတောင်းဆိုထားသော အပိုင်း) --%>
+    <div class="container mb-5 pb-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-dark">Recent Cheat Sheets</h2>
+            <p class="text-muted">Check out the latest contributions from our developers.</p>
+        </div>
+
+        <c:choose>
+            <%-- Controller မှ cheatsheetlist သို့မဟုတ် sheets ဟူသော variable ဖြင့် data လွှတ်ပေးရမည် --%>
+            <c:when test="${empty cheatsheetlist}">
+                <div class="text-center text-muted fs-6 py-4">
+                    <i class="bi bi-file-earmark-x display-5 d-block mb-2"></i>
+                    No cheat sheets shared yet.
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div class="row g-4">
+                    <c:forEach items="${cheatsheetlist}" var="sheet">
+                        
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card cheatsheet-card p-4 h-100">
+                                
+                                <h3 class="fw-bold text-dark mb-1">${sheet.title}</h3> <p class="text-muted small mb-3">${sheet.description}</p> <a href="${pageContext.request.contextPath}/cheatsheet/view/${sheet.id}" class="text-primary fw-semibold small text-decoration-none d-block mb-4">See More</a>
+                                
+                                <div class="mb-2 text-secondary small d-flex align-items-center">
+                                    <i class="bi bi-person text-dark me-2"></i>
+                                    <a href="${pageContext.request.contextPath}/profile/${sheet.author.id}" class="author-link">
+                                        <c:out value="${sheet.author.fullName}" /> </a>
                                 </div>
                                 
-                            </a>
+                                <div class="mb-2 text-secondary small d-flex align-items-center">
+                                    <i class="bi bi-folder-fill me-2"></i>
+                                    <span>${sheet.category.name} Cheat Sheets</span>
+                                </div>
+                                
+                                <div class="mb-2 text-secondary small d-flex align-items-center">
+                                    <i class="bi bi-calendar-plus me-2"></i>
+                                    <span>Created: ${sheet.createdAt}</span>
+                                </div>
+                                
+                                <div class="mb-4 text-secondary small d-flex align-items-center">
+                                    <i class="bi bi-calendar-check me-2"></i>
+                                    <span>Updated: ${sheet.updatedAt}</span>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <span class="text-primary fw-semibold small">#HR</span>
+                                </div>
+                                
+                                <div class="d-flex gap-3 text-muted small mt-auto pt-2 border-top" style="opacity: 0.8;">
+                                    <div><i class="bi bi-eye me-1"></i> ${sheet.viewCount}</div>
+                                    <div><i class="bi bi-download me-1"></i> ${sheet.downloadCount}</div>
+                                </div>
+
+                            </div>
                         </div>
 
                     </c:forEach>
                 </div>
             </c:otherwise>
         </c:choose>
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

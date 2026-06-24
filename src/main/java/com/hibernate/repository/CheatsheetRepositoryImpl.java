@@ -50,6 +50,21 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
                 .uniqueResult();
     }
 
+    // 🌟 [FIXED] User ID အလိုက် အသက်ဝင်နေသော Cheatsheets အားလုံးကို ဆွဲထုတ်ပေးမည့် Query
+    @Override
+    public List<CheatsheetEntity> findByUserId(Integer userId) {
+        String hql = "select distinct c from CheatsheetEntity c "
+                   + "left join fetch c.tags "
+                   + "left join fetch c.author "
+                   + "where c.author.id = :userId and c.status='active' "
+                   + "order by c.id desc";
+                   
+        return getSession()
+                .createQuery(hql, CheatsheetEntity.class)
+                .setParameter("userId", userId)
+                .list();
+    }
+    
     @Override
     public void update(CheatsheetEntity cheatsheet) {
         CheatsheetEntity old = findById(cheatsheet.getId());
@@ -61,8 +76,6 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
             old.setTags(cheatsheet.getTags());
             old.setViewCount(cheatsheet.getViewCount());
             old.setDownloadCount(cheatsheet.getDownloadCount());
-            
-            // 🌟 Visibility ပြောင်းလဲမှုကိုပါ Database တွင် Update ဖြစ်စေရန် ဖြည့်စွက်ခြင်း
             old.setVisibility(cheatsheet.getVisibility()); 
             
             if (cheatsheet.getAuthor() != null) {
@@ -81,20 +94,17 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
         }
     }
 
-    // ==================== 🌟 VISIBILITY & PAGINATION SQL LOGIC ====================
-
     @Override
     public List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId) {
         int offset = (page - 1) * size;
         
-        // 🌟 FollowEntity ပါဝင်သော FRIEND-ONLY စစ်ဆေးချက်ကို ခေတ္တဖယ်ရှားထားသော Query
         String hql = "select distinct c from CheatsheetEntity c "
                    + "left join fetch c.tags "
                    + "left join fetch c.author "
                    + "where c.category.id = :catId and c.status='active' "
                    + "and (c.visibility = 'PUBLIC' "
                    + "     or (c.visibility = 'PRIVATE' and c.author.id = :currentUserId) "
-                   + "     or (c.visibility = 'FRIEND-ONLY' and c.author.id = :currentUserId)) " // 👈 ရောဂါကင်းအောင် မိမိကိုယ်တိုင်ဆိုရင် မြင်ရအောင်ပဲ ခေတ္တပြင်ထားပါသည်
+                   + "     or (c.visibility = 'FRIEND-ONLY' and c.author.id = :currentUserId)) " 
                    + "order by c.id desc";
         
         return getSession()
@@ -108,7 +118,6 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
 
     @Override
     public long countByCategoryId(Integer categoryId, Integer currentUserId) {
-        // 🌟 Count အတွက် Query ကိုပါ လိုက်လံညှိနှိုင်းပေးခြင်း
         String hql = "select count(distinct c) from CheatsheetEntity c "
                    + "where c.category.id = :catId and c.status='active' "
                    + "and (c.visibility = 'PUBLIC' "
@@ -135,7 +144,6 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
 
     @Override
     public List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId) {
-        // 🌟 Visibility 'PUBLIC' ဖြစ်ပြီး active ဖြစ်နေသည့် cheatsheet ထဲက tag အရေအတွက်ကိုပဲ စစ်ထုတ်ရေတွက်ခြင်း
         return getSession()
                 .createQuery(
                         "select t.id, count(c.id) from TagEntity t "
@@ -146,9 +154,9 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
                 .setParameter("catId", categoryId)
                 .list();
     }
+
     @Override
     public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId) {
-        // 🌟 Tag ID အလိုက် ချိတ်ဆက်ထားပြီး Visibility PUBLIC ဖြစ်သော စာရင်းကိုပဲ ယူခြင်း
         return getSession()
                 .createQuery(
                         "select distinct c from CheatsheetEntity c "

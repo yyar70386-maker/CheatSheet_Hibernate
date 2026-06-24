@@ -79,11 +79,29 @@
     <div class="detail-container">
         
         <%-- ၁။ Title & Author (by Kelvin ပုံစံ) --%>
-        <div>
+        <%-- <div>
             <h1 class="sheet-title">${sheet.title}</h1>
             <span class="author-text">by ${sheet.author != null ? sheet.author.username : 'Unknown'}</span>
         </div>
-
+ --%>
+ <div>
+    <h1 class="sheet-title">${sheet.title}</h1>
+    <span class="author-text">by 
+        <c:choose>
+            <c:when test="${sheet.author != null}">
+                <a href="${pageContext.request.contextPath}/profile/${sheet.author.id}" 
+                   class="text-dark fw-bold text-decoration-none" 
+                   style="border-bottom: 2px solid #0d6efd; padding-bottom: 2px;">
+                    <c:out value="${sheet.author.username}" />
+                </a>
+            </c:when>
+            <c:otherwise>
+                <span class="text-muted fw-normal">Unknown</span>
+            </c:otherwise>
+        </c:choose>
+    </span>
+</div>
+ 
         <%-- ၂။ Description Section --%>
         <p class="description-text">
             ${sheet.description}

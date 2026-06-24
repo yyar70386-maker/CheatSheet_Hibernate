@@ -61,7 +61,6 @@ public class CheatsheetController {
     public ModelAndView edit(@PathVariable Integer id) {
         CheatsheetEntity cheatsheet = cheatsheetService.findById(id);
         
-        // 🌟 Fix: Cheatsheet မရှိရင် list ကို ပြန်မောင်းထုတ်ပြီး NPE ကာကွယ်ခြင်း
         if (cheatsheet == null) {
             return new ModelAndView("redirect:/cheatsheet/list");
         }
@@ -79,9 +78,8 @@ public class CheatsheetController {
     public ModelAndView update(
             @ModelAttribute("cheatsheet") CheatsheetEntity cheatsheet,
             @RequestParam(value = "tagIds", required = false) List<Integer> tagIds,
-            HttpSession session) { // 🌟 Author မပျောက်သွားစေရန် session ယူလိုက်သည်
+            HttpSession session) { 
 
-        // 🌟 Fix: Update လုပ်တဲ့အခါ Author တန်ဖိုး null ဖြစ်မသွားအောင် မူလ DB ထဲက Author ကို ပြန်ထည့်ပေးခြင်း
         CheatsheetEntity existingSheet = cheatsheetService.findById(cheatsheet.getId());
         if (existingSheet != null) {
             cheatsheet.setAuthor(existingSheet.getAuthor());
@@ -109,7 +107,6 @@ public class CheatsheetController {
     public String tagsByCategory(@PathVariable Integer categoryId) {
         List<TagEntity> tags = tagService.findByCategoryId(categoryId);
         
-        // 🌟 Fix: null စစ်ပြီး StringBuilder သုံးကာ Performance မြှင့်တင်ခြင်း
         if (tags == null) return "";
         
         StringBuilder html = new StringBuilder();
@@ -134,9 +131,13 @@ public class CheatsheetController {
         User currentUser = (User) session.getAttribute("currentUser");
         Integer currentUserId = (currentUser != null) ? currentUser.getId() : 0;
         
-        List<CheatsheetEntity> cheatsheets = cheatsheetService.getCheatsheetsByCategoryWithPagination(categoryId, page, pageSize, currentUserId);
-        int totalPages = cheatsheetService.getTotalPagesByCategory(categoryId, pageSize, currentUserId);
+        // 🌟 [CORRECTED] Service ထဲတွင် နာမည်ပြောင်းလဲထားမှုအရ မက်သတ်အမည်များကို ညှိနှိုင်းပြင်ဆင်ထားပါသည်
+        List<CheatsheetEntity> cheatsheets = cheatsheetService.findByCategoryIdWithPagination(categoryId, page, pageSize, currentUserId);
         long totalCheatsheets = cheatsheetService.countByCategoryId(categoryId, currentUserId); 
+        
+        // Total Pages တွက်ချက်ခြင်းကို ဤနေရာတွင် တိုက်ရိုက် Math.ceil ဖြင့် ရှင်းလင်းစွာ လုပ်ဆောင်ပေးလိုက်ပါသည်
+        int totalPages = (int) Math.ceil((double) totalCheatsheets / pageSize);
+        if (totalPages == 0) totalPages = 1;
         
         List<TagEntity> categoryTags = cheatsheetService.findTagsByCategoryId(categoryId);
         
@@ -166,14 +167,12 @@ public class CheatsheetController {
         User currentUser = (User) session.getAttribute("currentUser");
         Integer currentUserId = (currentUser != null) ? currentUser.getId() : 0;
         
-        // 🌟 Fix: cheatsheet.getAuthor() ကို null-safe ဖြစ်အောင် အရင်စစ်ဆေးခြင်း
         boolean isOwner = cheatsheet.getAuthor() != null && 
                           cheatsheet.getAuthor().getId() != null && 
                           cheatsheet.getAuthor().getId().equals(currentUserId);
                           
         boolean isPrivate = "PRIVATE".equalsIgnoreCase(cheatsheet.getVisibility());
         
-        // 🌟 Fix [SECURITY]: Private ဖြစ်ပြီး Owner မဟုတ်ရင် ကြည့်ခွင့်မပေးဘဲ မောင်းထုတ်ခြင်း
         if (isPrivate && !isOwner) {
             return new ModelAndView("redirect:/home"); 
         }
@@ -189,7 +188,8 @@ public class CheatsheetController {
 
     @GetMapping("/tag/{tagId}")
     public ModelAndView browseByTag(@PathVariable("tagId") Integer tagId) {
-        List<CheatsheetEntity> cheatsheets = cheatsheetService.getPublicCheatsheetsByTagId(tagId);
+        // 🌟 [CORRECTED] Service မက်သတ်အမည်နှင့် ကိုက်ညီအောင် ပြင်ဆင်ထားပါသည်
+        List<CheatsheetEntity> cheatsheets = cheatsheetService.findPublicCheatsheetsByTagId(tagId);
         
         var tagObj = tagService.findById(tagId); 
         String tagName = (tagObj != null) ? tagObj.getName() : "Unknown";

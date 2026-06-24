@@ -1,32 +1,32 @@
 package com.hibernate.entity;
 
 import java.time.LocalDateTime;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import javax.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "user_follows")
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter
+@Setter
 public class UserFollowEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer follower_id;
-	private Integer following_id;
-	private LocalDateTime createdAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    // 💡 Integer အစား User Object ကို @ManyToOne ဖြင့် ပြောင်းလဲချိတ်ဆက်ပါမည်
+    // သင့် User Class ထဲက mappedBy="follower" သည် ဤနေရာက "follower" Property ကို ညွှန်းခြင်းဖြစ်သည်
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "follower_id", nullable = false)
+    private User follower;
+
+    // 💡 သင့် User Class ထဲက mappedBy="following" သည် ဤနေရာက "following" Property ကို ညွှန်းခြင်းဖြစ်သည်
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "following_id", nullable = false)
+    private User following;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
 }

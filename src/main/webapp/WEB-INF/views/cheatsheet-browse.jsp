@@ -163,9 +163,25 @@
                                         <span class="see-more-btn" onclick="toggleDescription(this)">See More</span>
                                     </div>
                                     
-                                    <div class="card-meta-item">
+                                    <%-- <div class="card-meta-item">
                                         <i class="bi bi-person-fill"></i> ${sheet.author != null ? sheet.author.username : 'Unknown'}
-                                    </div>
+                                    </div> --%>
+                                    
+                                    <div class="card-meta-item">
+    <i class="bi bi-person-fill text-dark"></i> 
+    <c:choose>
+        <c:when test="${sheet.author != null}">
+            <a href="${pageContext.request.contextPath}/profile/${sheet.author.id}" 
+               class="text-dark fw-bold text-decoration-none" 
+               style="hover: text-decoration: underline;">
+                <c:out value="${sheet.author.username}" />
+            </a>
+        </c:when>
+        <c:otherwise>
+            <span class="text-muted fw-normal">Unknown</span>
+        </c:otherwise>
+    </c:choose>
+</div>
                                     <div class="card-meta-item">
                                         <i class="bi bi-folder-fill"></i> ${sheet.category.name} Cheat Sheets
                                     </div>
