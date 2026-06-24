@@ -19,4 +19,7 @@ public interface CheatsheetService {
     List<TagEntity> findTagsByCategoryId(Integer categoryId);
     List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId);
     List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId);
+    List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size);
+    long countLatestPublic(String keyword);
+    long countAllActive();
 }

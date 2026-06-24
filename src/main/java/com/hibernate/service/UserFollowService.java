@@ -1,11 +1,13 @@
 package com.hibernate.service;
 
 import com.hibernate.entity.User;
+import com.hibernate.dto.NotificationDto;
+import com.hibernate.dto.FollowUserDto;
 import java.util.List;
 
 public interface UserFollowService {
 
-    void followUser(Integer followerId, Integer followingId);
+    NotificationDto followUser(Integer followerId, Integer followingId);
 
     void unfollowUser(Integer followerId, Integer followingId);
 
@@ -20,4 +22,8 @@ public interface UserFollowService {
 
     // 🤝 [ADDED] မိမိမှ Follow လုပ်ထားသည့် လူစာရင်းကို ဆွဲယူရန်
     List<User> getFollowingUserList(Integer userId);
+    List<FollowUserDto> getFollowersForView(Integer profileUserId, Integer currentUserId);
+    List<FollowUserDto> getFollowingForView(Integer profileUserId, Integer currentUserId);
+    long countAll();
+    long countMutualFollowers(Integer currentUserId, Integer targetUserId);
 }

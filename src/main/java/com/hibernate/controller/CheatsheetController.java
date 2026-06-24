@@ -12,7 +12,10 @@ import com.hibernate.entity.TagEntity;
 import com.hibernate.entity.User;
 import com.hibernate.service.CategoryService;
 import com.hibernate.service.CheatsheetService;
+import com.hibernate.service.AuditLogService;
+import com.hibernate.service.NotificationService;
 import com.hibernate.service.TagService;
+import com.hibernate.websocket.NotificationSocketService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +27,9 @@ public class CheatsheetController {
     private final CheatsheetService cheatsheetService;
     private final CategoryService categoryService;
     private final TagService tagService;
+    private final NotificationService notificationService;
+    private final NotificationSocketService notificationSocketService;
+    private final AuditLogService auditLogService;
 
     @GetMapping("/list")
     public ModelAndView list() {
@@ -53,7 +59,13 @@ public class CheatsheetController {
             cheatsheet.setTags(tags);
         }
 
-        cheatsheetService.save(cheatsheet);
+        Integer sheetId = cheatsheetService.save(cheatsheet);
+        if (currentUser != null && sheetId != null) {
+            notificationSocketService.broadcastNotifications(
+                    notificationService.createCheatsheetNotificationsForFollowers(
+                            currentUser.getId(), sheetId, cheatsheet.getTitle()));
+            auditLogService.log(currentUser, "New CheatSheet Created", "Cheatsheet", sheetId);
+        }
         return new ModelAndView("redirect:/cheatsheet/list");
     }
 

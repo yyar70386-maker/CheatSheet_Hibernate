@@ -18,7 +18,7 @@ public class CheatsheetServiceImpl implements CheatsheetService {
     private final CheatsheetRepository cheatsheetRepository;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Integer save(CheatsheetEntity cheatsheet) {
         return cheatsheetRepository.save(cheatsheet);
     }
@@ -80,5 +80,23 @@ public class CheatsheetServiceImpl implements CheatsheetService {
     @Transactional(readOnly = true)
     public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId) {
         return cheatsheetRepository.findPublicCheatsheetsByTagId(tagId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size) {
+        return cheatsheetRepository.findLatestPublic(keyword, page, size);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countLatestPublic(String keyword) {
+        return cheatsheetRepository.countLatestPublic(keyword);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countAllActive() {
+        return cheatsheetRepository.countAllActive();
     }
 }

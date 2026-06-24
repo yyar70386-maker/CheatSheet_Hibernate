@@ -86,4 +86,32 @@ public class UserFollowRepositoryImpl implements UserFollowRepository {
                 .setParameter("userId", userId)
                 .getResultList();
     }
+
+    @Override
+    public long countAll() {
+        Long count = sessionFactory.getCurrentSession()
+                .createQuery("select count(f) from UserFollowEntity f", Long.class)
+                .uniqueResult();
+        return count != null ? count : 0;
+    }
+
+    @Override
+    public long countMutualFollowers(Integer currentUserId, Integer targetUserId) {
+        if (currentUserId == null || targetUserId == null) {
+            return 0;
+        }
+
+        String hql = "select count(f1.id) from UserFollowEntity f1 "
+                   + "where f1.following.id = :targetUserId "
+                   + "and f1.follower.id in ("
+                   + "  select f2.following.id from UserFollowEntity f2 where f2.follower.id = :currentUserId"
+                   + ")";
+
+        Long count = sessionFactory.getCurrentSession()
+                .createQuery(hql, Long.class)
+                .setParameter("targetUserId", targetUserId)
+                .setParameter("currentUserId", currentUserId)
+                .uniqueResult();
+        return count != null ? count : 0;
+    }
 }

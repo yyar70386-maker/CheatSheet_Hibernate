@@ -168,4 +168,51 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
                 .setParameter("tagId", tagId)
                 .list();
     }
+
+    @Override
+    public List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size) {
+        String search = keyword == null ? "" : keyword.trim().toLowerCase();
+        String hql = "select distinct c from CheatsheetEntity c "
+                   + "left join fetch c.author "
+                   + "left join fetch c.category "
+                   + "left join fetch c.tags "
+                   + "where c.status = 'active' and c.visibility = 'PUBLIC' "
+                   + "and (:keyword = '' or lower(c.title) like :likeKeyword "
+                   + "or lower(c.description) like :likeKeyword "
+                   + "or lower(c.content) like :likeKeyword) "
+                   + "order by c.createdAt desc, c.id desc";
+
+        return getSession()
+                .createQuery(hql, CheatsheetEntity.class)
+                .setParameter("keyword", search)
+                .setParameter("likeKeyword", "%" + search + "%")
+                .setFirstResult((page - 1) * size)
+                .setMaxResults(size)
+                .list();
+    }
+
+    @Override
+    public long countLatestPublic(String keyword) {
+        String search = keyword == null ? "" : keyword.trim().toLowerCase();
+        String hql = "select count(distinct c) from CheatsheetEntity c "
+                   + "where c.status = 'active' and c.visibility = 'PUBLIC' "
+                   + "and (:keyword = '' or lower(c.title) like :likeKeyword "
+                   + "or lower(c.description) like :likeKeyword "
+                   + "or lower(c.content) like :likeKeyword)";
+
+        Long count = getSession()
+                .createQuery(hql, Long.class)
+                .setParameter("keyword", search)
+                .setParameter("likeKeyword", "%" + search + "%")
+                .uniqueResult();
+        return count != null ? count : 0;
+    }
+
+    @Override
+    public long countAllActive() {
+        Long count = getSession()
+                .createQuery("select count(c) from CheatsheetEntity c where c.status = 'active'", Long.class)
+                .uniqueResult();
+        return count != null ? count : 0;
+    }
 }

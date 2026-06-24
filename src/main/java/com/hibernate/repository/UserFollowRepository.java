@@ -13,4 +13,6 @@ public interface UserFollowRepository {
     // 🌟 ဤနေရာတွင် မက်သဒ်နှစ်ခု ဖြည့်စွက်ပါ
     List<User> findFollowersByUserId(Integer userId);
     List<User> findFollowingByUserId(Integer userId);
+    long countAll();
+    long countMutualFollowers(Integer currentUserId, Integer targetUserId);
 }

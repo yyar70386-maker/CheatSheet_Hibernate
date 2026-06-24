@@ -2,10 +2,13 @@ package com.hibernate.controller;
 
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.User;
+import com.hibernate.dto.NotificationDto;
 import com.hibernate.service.CategoryService;
+import com.hibernate.service.AnnouncementService;
 import com.hibernate.service.CheatsheetService;
 import com.hibernate.service.UserFollowService;
 import com.hibernate.service.UserService;
+import com.hibernate.websocket.NotificationSocketService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -28,17 +31,34 @@ public class AuthController {
 
     @Autowired
     private CategoryService categoryService; 
+
+    @Autowired
+    private AnnouncementService announcementService;
     
     @Autowired
     private UserFollowService userFollowService;
     
     @Autowired
     private CheatsheetService cheatsheetService;
+
+    @Autowired
+    private NotificationSocketService notificationSocketService;
     
     @GetMapping("/")
-    public String showHomePage(HttpSession session, Model model) {
+    public String showHomePage(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "q", defaultValue = "") String query,
+            HttpSession session,
+            Model model) {
+        int pageSize = 6;
         model.addAttribute("categorylist", categoryService.findAll());
-        return "home"; 
+        model.addAttribute("announcements", announcementService.findLatest(3));
+        model.addAttribute("cheatsheetlist", cheatsheetService.findLatestPublic(query, page, pageSize));
+        model.addAttribute("searchQuery", query);
+        model.addAttribute("currentPage", page);
+        long total = cheatsheetService.countLatestPublic(query);
+        model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / pageSize)));
+        return "home";
     }
    
     @GetMapping("/register")
@@ -93,13 +113,23 @@ public class AuthController {
     }
    
     @GetMapping("/home")
-    public String showHomeDashboard(HttpSession session, Model model) {
+    public String showHomeDashboard(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "q", defaultValue = "") String query,
+            HttpSession session,
+            Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "redirect:/login"; 
+        if (currentUser != null) {
+            model.addAttribute("currentUser", currentUser);
         }
         model.addAttribute("categorylist", categoryService.findAll());
-        return "home"; 
+        model.addAttribute("announcements", announcementService.findLatest(3));
+        model.addAttribute("cheatsheetlist", cheatsheetService.findLatestPublic(query, page, 6));
+        model.addAttribute("searchQuery", query);
+        model.addAttribute("currentPage", page);
+        long total = cheatsheetService.countLatestPublic(query);
+        model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / 6)));
+        return "home";
     }
 
     // 👤 မိမိကိုယ်ပိုင် Profile ကိုကြည့်ရှုခြင်း
@@ -132,10 +162,9 @@ public class AuthController {
         if (currentUser == null) {
             return "redirect:/login";
         }
-        List<User> followersList = userFollowService.getFollowersUserList(currentUser.getId());
+        model.addAttribute("profileUsers", userFollowService.getFollowersForView(currentUser.getId(), currentUser.getId()));
+        model.addAttribute("listType", "followers");
         model.addAttribute("pageTitle", "My Followers");
-        model.addAttribute("userList", followersList);
-        
         return "follow_list"; 
     }
 
@@ -145,10 +174,9 @@ public class AuthController {
         if (currentUser == null) {
             return "redirect:/login";
         }
-        List<User> followingList = userFollowService.getFollowingUserList(currentUser.getId());
+        model.addAttribute("profileUsers", userFollowService.getFollowingForView(currentUser.getId(), currentUser.getId()));
+        model.addAttribute("listType", "following");
         model.addAttribute("pageTitle", "Following Users");
-        model.addAttribute("userList", followingList);
-        
         return "follow_list"; 
     }
     
@@ -172,6 +200,7 @@ public class AuthController {
         model.addAttribute("targetUser", targetUser);
         model.addAttribute("followersCount", userFollowService.getFollowersCount(id));
         model.addAttribute("followingCount", userFollowService.getFollowingCount(id));
+        model.addAttribute("mutualFollowersCount", userFollowService.countMutualFollowers(currentUser.getId(), id));
         
         boolean isFollowing = userFollowService.isFollowing(currentUser.getId(), id);
         model.addAttribute("isFollowing", isFollowing);
@@ -191,7 +220,8 @@ public class AuthController {
         if (currentUser == null) {
             return "redirect:/login";
         }
-        userFollowService.followUser(currentUser.getId(), id);
+        NotificationDto notification = userFollowService.followUser(currentUser.getId(), id);
+        notificationSocketService.broadcastToUser(id, notification);
         return "redirect:/profile/" + id; 
     }
 

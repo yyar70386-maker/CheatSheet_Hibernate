@@ -118,6 +118,10 @@
                             <span class="stats-count">${followingCount}</span>
                             <span class="stats-label">Following</span>
                         </div>
+                        <div class="stats-box">
+                            <span class="stats-count">${mutualFollowersCount}</span>
+                            <span class="stats-label">Mutual</span>
+                        </div>
                     </div>
                 </div>
                 

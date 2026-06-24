@@ -1,5 +1,7 @@
 package com.hibernate.repository;
 
+import java.util.List;
+
 import com.hibernate.entity.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -49,5 +51,18 @@ public class UserRepository {
                 .createQuery("FROM User WHERE resetToken = :token", User.class);
         query.setParameter("token", token);
         return query.uniqueResult();
+    }
+
+    public List<User> findAll() {
+        return sessionFactory.getCurrentSession()
+                .createQuery("from User order by id desc", User.class)
+                .list();
+    }
+
+    public long countAll() {
+        Long count = sessionFactory.getCurrentSession()
+                .createQuery("select count(u) from User u", Long.class)
+                .uniqueResult();
+        return count != null ? count : 0;
     }
 }
