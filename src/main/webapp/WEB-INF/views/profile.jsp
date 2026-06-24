@@ -112,17 +112,17 @@ body {
 
 									<div class="input-group input-group-sm"
 										style="max-width: 350px;">
-										<!-- 💡 id="avatarFile" ကို တိုးထားပါတယ် -->
+
 										<input type="file" id="avatarFile" name="avatarFile"
 											class="form-control" accept="image/*" required>
 
-										<!-- 💡 id="uploadBtn" ကို တိုးထားပါတယ် -->
+
 										<button class="btn btn-dark" id="uploadBtn" type="submit">
 											<i class="bi bi-upload me-1"></i>Upload
 										</button>
 									</div>
 
-									<!-- 🌟 တခြားဖိုင်ရွေးရင် ပေါ်လာမယ့် Error Message Card လေး (ပုံမှန်အချိန်တွင် ဖျောက်ထားမည်) -->
+
 									<div id="fileError"
 										class="text-danger small mt-1 font-weight-bold"
 										style="display: none;"></div>
@@ -131,7 +131,7 @@ body {
 										images.</div>
 								</div>
 
-								<!-- 📜 စစ်ဆေးပေးမည့် JavaScript Logic -->
+
 								<script>
 									document
 											.getElementById('avatarFile')
@@ -206,6 +206,23 @@ body {
 						</form>
 					</div>
 
+					<c:if test="${not empty errorMsg}">
+						<div class="alert alert-danger alert-dismissible fade show"
+							role="alert">
+							<strong>Error:</strong> ${errorMsg}
+							<button type="button" class="btn-close" data-bs-dismiss="alert"
+								aria-label="Close"></button>
+						</div>
+					</c:if>
+
+					<c:if test="${not empty successMsg}">
+						<div class="alert alert-success alert-dismissible fade show"
+							role="alert">
+							<strong>Success:</strong> ${successMsg}
+							<button type="button" class="btn-close" data-bs-dismiss="alert"
+								aria-label="Close"></button>
+						</div>
+					</c:if>
 					<div
 						class="tab-pane fade ${param.tab == 'security' ? 'show active' : ''}"
 						id="security-pane" role="tabpanel">
@@ -216,18 +233,21 @@ body {
 						<form
 							action="${pageContext.request.contextPath}/profile/change-password"
 							method="POST">
+
 							<div class="mb-3">
 								<label class="form-label text-muted small fw-bold">Old
 									Password</label> <input type="password" name="oldPassword"
 									class="form-control" placeholder="Enter current password"
 									required>
 							</div>
+
 							<div class="mb-3">
 								<label class="form-label text-muted small fw-bold">New
 									Password</label> <input type="password" name="newPassword"
 									class="form-control" placeholder="At least 6 characters"
-									required>
+									minlength="6" required>
 							</div>
+
 							<div class="text-end pt-2">
 								<button type="submit" class="btn btn-dark px-4 btn-sm">
 									<i class="bi bi-key me-2"></i>Change Password

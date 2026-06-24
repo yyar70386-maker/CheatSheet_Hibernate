@@ -64,10 +64,18 @@ body {
 			In</h2>
 
 		<c:if test="${not empty loginError}">
-    <div class="alert alert-danger text-center small fw-bold mb-3" role="alert">
-        ⚠️ ${loginError}
-    </div>
-</c:if>
+			<div class="alert alert-danger text-center small fw-bold mb-3"
+				role="alert">⚠️ ${loginError}</div>
+		</c:if>
+		<c:if test="${param.success == 'password_changed'}">
+			<div class="alert alert-success alert-dismissible fade show"
+				role="alert">
+				<i class="bi bi-check-circle-fill me-2"></i> Password changed
+				successfully! Please login again with your new password.
+				<button type="button" class="btn-close" data-bs-dismiss="alert"
+					aria-label="Close"></button>
+			</div>
+		</c:if>
 
 		<form action="${pageContext.request.contextPath}/login" method="POST">
 			<div class="mb-3">

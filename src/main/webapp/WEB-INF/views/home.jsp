@@ -21,7 +21,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            text-decoration: none; /* link လိုင်းကြောင်း ဖျောက်ရန် */
+            text-decoration: none; 
             display: block;
         }
         .feature-card:hover {
