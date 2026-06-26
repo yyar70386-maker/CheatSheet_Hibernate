@@ -207,8 +207,11 @@ public class CheatsheetController {
     }
     
     
+<<<<<<< Updated upstream
     
     
+=======
+>>>>>>> Stashed changes
     @GetMapping("/view-pdf/{id}")
     public void viewPdf(@PathVariable("id") Integer id, HttpServletResponse response) {
         try {
@@ -252,5 +255,8 @@ public class CheatsheetController {
             e.printStackTrace();
         }
     }
+<<<<<<< Updated upstream
     
+=======
+>>>>>>> Stashed changes
 }
