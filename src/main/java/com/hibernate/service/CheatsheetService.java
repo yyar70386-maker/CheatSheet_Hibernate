@@ -21,4 +21,5 @@ public interface CheatsheetService {
     // --- 🌟 Tag System ပုံစံသစ်များ ---
     List<TagEntity> findTagsByCategoryId(Integer categoryId); // Public Count တွက်ပြီးသား Tag စာရင်းယူရန်
     List<CheatsheetEntity> getPublicCheatsheetsByTagId(Integer tagId); // Tag အလိုက် Public Cheatsheet သီးသန့်ဆွဲထုတ်ရန်
+	int getTotalSheetsCount();
 }

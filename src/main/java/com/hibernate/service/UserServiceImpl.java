@@ -1,0 +1,135 @@
+package com.hibernate.service;
+
+import com.hibernate.entity.User;
+import com.hibernate.repository.UserRepository;
+import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@Transactional // 🔥 Transactional ကို တစ်နေရာတည်း စနစ်တကျ စီမံထားပါသည်
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Override
+    public void registerUser(User user) {
+        String usernamePattern = "^[a-zA-Z0-9]{4,20}$";
+        
+        if (user.getUsername() == null || !user.getUsername().matches(usernamePattern)) {
+            throw new IllegalArgumentException("Username must be 4-20 characters long and contain only letters and numbers (no spaces)!");
+        }
+        if (userRepository.findByUsername(user.getUsername()) != null) {
+            throw new IllegalArgumentException("Username '" + user.getUsername() + "' is already taken!");
+        }
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            throw new IllegalArgumentException("Email address is already registered!");
+        }
+        
+        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        user.setPassword(hashedPassword);
+        user.setRole(0); // Default user role
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User authenticateByEmail(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        if (user != null && BCrypt.checkpw(password, user.getPassword())) {
+            return user;
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User findById(int id) { 
+        return userRepository.findById(id); 
+    }
+    
+    @Override
+    public void updateProfile(int id, String fullName, String email) {
+        User user = userRepository.findById(id);
+        if (user != null) {
+            user.setFullName(fullName);
+            user.setEmail(email);
+            userRepository.update(user);
+        }
+    }
+
+    @Override
+    public boolean changePassword(int id, String oldPassword, String newPassword) {
+        User user = userRepository.findById(id);
+        if (user != null && BCrypt.checkpw(oldPassword, user.getPassword())) {
+            user.setPassword(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
+            userRepository.update(user);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean sendResetPasswordEmail(String email, String contextPath) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) return false;
+
+        String token = UUID.randomUUID().toString();
+        user.setResetToken(token);
+        user.setTokenExpiry(LocalDateTime.now().plusMinutes(15)); 
+        userRepository.update(user);
+
+        String resetUrl = contextPath + "/reset-password?token=" + token;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Password Reset Request");
+        message.setText("သင်၏ Password အား ပြန်လည်ပြင်ဆင်ရန် အောက်ပါ Link ကို နှိပ်ပါ-\n" + resetUrl + "\n\nဤ Link သည် ၁၁ မိနစ်အတွင်းသာ အသုံးတည့်ပါမည်။");
+        
+        mailSender.send(message); 
+        return true;
+    }
+
+    @Override
+    public boolean resetPassword(String token, String newPassword) {
+        User user = userRepository.findByResetToken(token);
+        if (user == null || user.getTokenExpiry().isBefore(LocalDateTime.now())) {
+            return false; 
+        }
+
+        user.setPassword(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
+        user.setResetToken(null); 
+        user.setTokenExpiry(null);
+        userRepository.update(user);
+        return true;
+    }
+    
+    @Override
+    public void updateUser(User user) {
+        userRepository.update(user); 
+    }
+
+    // 🌟 ၃။ UI တွင် List ကွက်တိပေါ်လာစေရန် return အမှန် ပြင်ဆင်ပြီးသား Method
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> getAllUsers() {
+        return userRepository.getAllUsers(); // 👈 UserRepository ဆီက List ကို တိုက်ရိုက်ယူပြီး ပြန်ပေးလိုက်ပါပြီ
+    }
+
+    // 🌟 ၄။ Admin က လှမ်းဖျက်ရင် အလုပ်လုပ်မည့် Delete Method
+    @Override
+    public void deleteUser(int id) {
+        userRepository.deleteUser(id); // 👈 UserRepository ဆီက deleteUser ကို လှမ်းခေါ်လိုက်ပါပြီ
+    }
+}

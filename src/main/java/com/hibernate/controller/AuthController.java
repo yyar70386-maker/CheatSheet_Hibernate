@@ -2,6 +2,8 @@ package com.hibernate.controller;
 
 import com.hibernate.entity.User;
 import com.hibernate.service.CategoryService;
+import com.hibernate.service.CheatsheetService;
+import com.hibernate.service.TagService;
 import com.hibernate.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,11 +27,16 @@ public class AuthController {
 
 	@Autowired
 	private CategoryService categoryService;
+	 @Autowired
+	    private CheatsheetService cheatsheetService;
+
+	    @Autowired
+	    private TagService tagService;
 
 	@GetMapping("/")
 	public String showHomePage(HttpSession session, Model model) {
 
-		model.addAttribute("categorylist", categoryService.findAll());
+		model.addAttribute("categorylist", categoryService.findAllActive());
 		return "home";
 	}
 
@@ -100,8 +107,12 @@ public class AuthController {
 			return "redirect:/login";
 		}
 
-		model.addAttribute("categorylist", categoryService.findAll());
-		return "home";
+		 model.addAttribute("totalSheets", cheatsheetService.getTotalSheetsCount());
+	        model.addAttribute("totalTags", tagService.getTotalTagsCount());
+
+	        // မူရင်းအတိုင်း Category List ကို ဆွဲထုတ်ပေးထားခြင်း
+	        model.addAttribute("categorylist", categoryService.findAllActive());
+	        return "home";
 	}
 
 	@GetMapping("/profile")

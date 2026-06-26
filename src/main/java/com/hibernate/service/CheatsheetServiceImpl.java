@@ -18,6 +18,13 @@ import lombok.RequiredArgsConstructor;
 public class CheatsheetServiceImpl implements CheatsheetService {
 
     private final CheatsheetRepository repo;
+    
+ // 🌟 Сheatsheets အရေအတွက်ကို Repository ဆီကနေတစ်ဆင့် လှမ်းယူပေးမည့် မက်သတ်
+    @Override
+    @Transactional(readOnly = true)
+    public int getTotalSheetsCount() {
+        return repo.getTotalSheetsCount();
+    }
 
     @Override
     @Transactional

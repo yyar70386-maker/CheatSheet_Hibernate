@@ -1,142 +1,89 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Create Tag</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Tag Management</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <style>
+        /* 📌 ၁။ Window Scroll မဖြစ်အောင် ချုပ်ခြင်း */
+        html, body {
+            height: 100vh;
+            overflow: hidden; 
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
-}
+        /* 📌 ၂။ Navbar အမြင့် ပုံသေထားခြင်း */
+        .navbar {
+            height: 56px;
+            z-index: 1030;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+        }
 
-body{
-    background:#f4f8ff;
-}
+        /* 📌 ၃။ Sidebar နဲ့ Content Wrapper (ဒါပါမှ ဘေးချင်းယှဉ်မှာပါ) */
+        .app-container {
+            display: flex;
+            height: calc(100vh - 56px); 
+            width: 100%;
+        }
 
-.form-container{
-    width:700px;
-    margin:60px auto;
-    background:white;
-    padding:50px;
-    border-radius:20px;
-    border:2px solid #bbdefb;
-    box-shadow:0 4px 20px rgba(21,101,192,0.15);
-}
+        /* 📌 ၄။ Sidebar Width သတ်မှတ်ခြင်း */
+        .admin-sidebar {
+            width: 280px;
+            height: 100%;
+            flex-shrink: 0;
+            overflow-y: auto; 
+        }
 
-.form-icon{
-    text-align:center;
-    font-size:55px;
-    color:#1976d2;
-    margin-bottom:20px;
-}
-
-.form-title{
-    text-align:center;
-    color:#1565c0;
-    margin-bottom:40px;
-    font-size:42px;
-    font-weight:bold;
-}
-
-.form-group{
-    margin-bottom:30px;
-}
-
-.form-group label{
-    display:block;
-    margin-bottom:12px;
-    font-weight:bold;
-    color:#0d47a1;
-    font-size:20px;
-}
-
-.form-control{
-    width:100%;
-    padding:17px;
-    border:2px solid #90caf9;
-    border-radius:12px;
-    font-size:18px;
-    outline:none;
-    background:white;
-}
-
-.form-control:focus{
-    border-color:#1976d2;
-}
-
-.btn-primary{
-    width:100%;
-    padding:18px;
-    border:none;
-    border-radius:12px;
-    background:#1976d2;
-    color:white;
-    font-size:20px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-.btn-primary:hover{
-    background:#0d47a1;
-}
-
-.back-link{
-    display:block;
-    text-align:center;
-    margin-top:25px;
-    color:#1976d2;
-    text-decoration:none;
-    font-weight:bold;
-}
-</style>
-
+        /* 📌 ၅။ ညာဘက် Content Area သီးသန့် Scroll စနစ် */
+        .main-content-area {
+            flex-grow: 1;
+            height: 100%;
+            overflow-y: auto; 
+            min-width: 0;
+            padding: 24px;
+            background-color: #f8f9fa;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-light">
 
-<div class="form-container">
+    <%-- 🧩 Navbar Include လုပ်ခြင်း --%>
+    <jsp:include page="header.jsp" />
 
-    <h1 class="form-title">Create Tag</h1>
+    <%-- 🌐 App Container Wrapper --%>
+    <div class="app-container">
 
-    <form:form method="post"
-               action="${pageContext.request.contextPath}/tag/save"
-               modelAttribute="tag">
+        <%-- 🛠️ ဘယ်ဘက်ခြမ်း - SIDEBAR COMPONENT --%>
+        <jsp:include page="sidebar.jsp">
+            <jsp:param name="activePage" value="tags" />
+        </jsp:include>
 
-        <div class="form-group">
-            <label>Tag Name</label>
-            <form:input path="name"
-                        cssClass="form-control"
-                        placeholder="Enter tag name..."/>
-        </div>
+        <%-- 📂 ညာဘက်ခြမ်း MAIN CONTENT AREA --%>
+        <div class="main-content-area">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark m-0">Tag Management</h2>
+                    <p class="text-muted m-0 small">Manage your system tags and keywords.</p>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label>Category</label>
+            <%-- Tag ပြသမည့် နေရာ (ဒီအောက်မှာ Table ကုဒ်တွေ ဆက်ရေးလို့ရပါပြီ) --%>
+            <div class="card border-0 shadow-sm rounded-3 p-4">
+                <p class="text-muted">You can manage tags right here.</p>
+            </div>
+            
+        </div> <%-- /main-content-area --%>
+    </div> <%-- /app-container --%>
 
-            <form:select path="category.id" cssClass="form-control">
-                <form:option value="">-- Select Category --</form:option>
-
-                <c:forEach items="${categorylist}" var="c">
-                    <form:option value="${c.id}">
-                        ${c.name}
-                    </form:option>
-                </c:forEach>
-            </form:select>
-        </div>
-
-        <input type="submit" value="Create Tag" class="btn-primary"/>
-
-    </form:form>
-
-    <a href="${pageContext.request.contextPath}/tag/list" class="back-link">
-        Back to List
-    </a>
-
-</div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

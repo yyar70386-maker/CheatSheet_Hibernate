@@ -19,4 +19,5 @@ public interface CheatsheetRepository {
     List<TagEntity> findTagsByCategoryId(Integer categoryId);
     List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId);
     List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId);
+	int getTotalSheetsCount();
 }
