@@ -26,8 +26,8 @@ import java.util.UUID;
 @Controller
 public class AuthController {
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private CategoryService categoryService; 
@@ -86,9 +86,11 @@ public class AuthController {
         }
     }
 
-		model.addAttribute("categorylist", categoryService.findAll());
-		return "home";
-	}
+    // 🌟 [ADDED] Login Page UI ကို ပြသပေးရန် GetMapping
+    @GetMapping("/login")
+    public String showLoginForm() {
+        return "login"; 
+    }
 
     @PostMapping("/login")
     public String processLogin(@RequestParam("email") String email, 
@@ -131,7 +133,6 @@ public class AuthController {
         return "home";
     }
 
-    // 👤 မိမိကိုယ်ပိုင် Profile ကိုကြည့်ရှုခြင်း
     @GetMapping("/profile")
     public String showProfile(HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
@@ -148,7 +149,6 @@ public class AuthController {
 
         List<CheatsheetEntity> myCheatSheets = cheatsheetService.findByUserId(user.getId());
         
-        // 🌟 [FIXED] JSP ထဲက အခေါ်အဝေါ် မလွဲစေရန် ကာကွယ်ရေးအနေဖြင့် နာမည်နှစ်မျိုးလုံးဖြင့် ပို့ပေးလိုက်ပါသည်
         model.addAttribute("cheatSheetsList", myCheatSheets);
         model.addAttribute("cheatsheetlist", myCheatSheets);
 
@@ -179,7 +179,6 @@ public class AuthController {
         return "follow_list"; 
     }
     
-    // 🔍 တခြားသူ၏ Profile ကို သွားရောက်ကြည့်ရှုခြင်း
     @GetMapping("/profile/{id}")
     public String viewTargetProfile(@PathVariable Integer id, HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
@@ -206,7 +205,6 @@ public class AuthController {
 
         List<CheatsheetEntity> targetUserCheatSheets = cheatsheetService.findByUserId(id); 
         
-        // 🌟 [FIXED] user-profile.jsp ထဲတွင် ${cheatsheetlist} ဟု ရေးထားသောကြောင့် စာလုံးအသေးဖြင့် ကွက်တိ ပို့ပေးလိုက်ပါပြီ
         model.addAttribute("cheatsheetlist", targetUserCheatSheets);
         model.addAttribute("cheatSheetsList", targetUserCheatSheets); 
 
@@ -234,7 +232,10 @@ public class AuthController {
         return "redirect:/profile/" + id; 
     }
 
-		try {
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordForm() {
+        return "forgot-password"; 
+    }
 
     @PostMapping("/forgot-password")
     public String handleForgotPassword(@RequestParam("email") String email, HttpServletRequest request, RedirectAttributes redirectAttributes) {
@@ -248,7 +249,11 @@ public class AuthController {
         return "redirect:/forgot-password";
     }
 
-		} catch (IllegalArgumentException e) {
+    @GetMapping("/reset-password")
+    public String showResetPasswordForm(@RequestParam("token") String token, Model model) {
+        model.addAttribute("token", token);
+        return "reset-password"; 
+    }
 
     @PostMapping("/reset-password")
     public String handleResetPassword(@RequestParam("token") String token,
