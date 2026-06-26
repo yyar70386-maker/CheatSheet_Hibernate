@@ -25,6 +25,51 @@ body {
 	font-weight: bold;
 	color: #0d6efd;
 }
+
+/* 🌟 Facebook Style Profile Avatar Layer များ */
+.profile-avatar-container {
+	position: relative;
+	width: 90px;
+	height: 90px;
+	display: inline-block;
+}
+
+.profile-avatar-img {
+	width: 90px;
+	height: 90px;
+	border-radius: 50%;
+	object-fit: cover;
+	box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+	cursor: pointer;
+	transition: transform 0.2s ease-in-out;
+}
+
+.profile-avatar-img:hover {
+	transform: scale(1.03);
+}
+
+/* 📷 Camera Overlay Button Design */
+.camera-overlay-btn {
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+	background-color: #e4e6eb;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+	border: 2px solid #ffffff;
+	transition: background-color 0.2s, transform 0.2s;
+}
+
+.camera-overlay-btn:hover {
+	background-color: #d8dadf;
+	transform: scale(1.1);
+}
 </style>
 </head>
 <body>
@@ -86,86 +131,63 @@ body {
 						class="tab-pane fade ${param.tab != 'security' ? 'show active' : ''}"
 						id="info-pane" role="tabpanel">
 
-						<form
+						<form id="profileAvatarForm"
 							action="${pageContext.request.contextPath}/profile/upload-avatar"
 							method="POST" enctype="multipart/form-data"
 							class="mb-4 pb-4 border-bottom">
+							
 							<div class="d-flex align-items-center">
-								<c:choose>
-									<c:when test="${not empty user.avatarPath}">
-										
-										<img
-											src="${pageContext.request.contextPath}/uploads/${user.avatarPath}"
-											class="rounded-circle me-4 shadow-sm"
-											style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #0d6efd; cursor: pointer;"
-											data-bs-toggle="modal" data-bs-target="#avatarViewModal">
-									</c:when>
-									<c:otherwise>
-										
-										<img
-											src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-											class="rounded-circle me-4 shadow-sm"
-											style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #ccc; cursor: pointer;"
-											data-bs-toggle="modal" data-bs-target="#avatarViewModal">
-									</c:otherwise>
-								</c:choose>
-
-								<div class="flex-grow-1">
-									<label class="form-label text-muted small fw-bold">Change
-										Profile Picture</label>
-
-									<div class="input-group input-group-sm"
-										style="max-width: 350px;">
-
-										<input type="file" id="avatarFile" name="avatarFile"
-											class="form-control" accept="image/*" required>
-
-
-										<button class="btn btn-dark" id="uploadBtn" type="submit">
-											<i class="bi bi-upload me-1"></i>Upload
-										</button>
-									</div>
-
-
-									<div id="fileError"
-										class="text-danger small mt-1 font-weight-bold"
-										style="display: none;"></div>
-
-									<div class="form-text small text-muted">Accepts JPG, PNG
-										images.</div>
+								
+								<div class="profile-avatar-container me-4">
+									<c:choose>
+										<c:when test="${not empty user.avatarPath}">
+											<img src="${pageContext.request.contextPath}/uploads/${user.avatarPath}"
+												class="profile-avatar-img"
+												style="border: 3px solid #0d6efd;"
+												data-bs-toggle="modal" data-bs-target="#avatarViewModal"
+												title="Click to view full image">
+										</c:when>
+										<c:otherwise>
+											<img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+												class="profile-avatar-img"
+												style="border: 3px solid #ccc;"
+												data-bs-toggle="modal" data-bs-target="#avatarViewModal"
+												title="Click to view full image">
+										</c:otherwise>
+									</c:choose>
+									
+									<label for="avatarFile" class="camera-overlay-btn" title="Change Profile Picture">
+										<i class="bi bi-camera-fill text-dark fs-6"></i>
+									</label>
+									
+									<input type="file" id="avatarFile" name="avatarFile" accept="image/*" style="display: none;" required>
 								</div>
 
+								<div class="flex-grow-1">
+									<h6 class="mb-1 fw-bold text-dark">Profile Picture</h6>
+									<p class="text-muted small mb-0">Click the camera icon to select and instantly upload a new photo.</p>
+									<div class="form-text small text-muted">Accepts JPG, PNG formats.</div>
+									
+									<div id="fileError" class="text-danger small mt-1 fw-bold" style="display: none;"></div>
+								</div>
 
 								<script>
-									document
-											.getElementById('avatarFile')
-											.addEventListener(
-													'change',
-													function() {
-														const file = this.files[0];
-														const errorDiv = document
-																.getElementById('fileError');
-														const uploadBtn = document
-																.getElementById('uploadBtn');
+									document.getElementById('avatarFile').addEventListener('change', function() {
+										const file = this.files[0];
+										const errorDiv = document.getElementById('fileError');
+										const form = document.getElementById('profileAvatarForm');
 
-														if (file) {
-
-															if (!file.type
-																	.startsWith('image/')) {
-
-																errorDiv.textContent = "❌ Invalid file! Please select an image file (JPG, PNG,..) only.";
-																errorDiv.style.display = "block";
-
-																this.value = "";
-
-																uploadBtn.disabled = true;
-
-															} else {
-																errorDiv.style.display = "none";
-																uploadBtn.disabled = false;
-															}
-														}
-													});
+										if (file) {
+											if (!file.type.startsWith('image/')) {
+												errorDiv.textContent = "❌ Invalid file! Please select an image file (JPG, PNG) only.";
+												errorDiv.style.display = "block";
+												this.value = ""; // Clear input
+											} else {
+												errorDiv.style.display = "none";
+												form.submit(); // ဓာတ်ပုံမှန်ကန်ပါက Form အား တန်းတင်လိုက်ခြင်း
+											}
+										}
+									});
 								</script>
 							</div>
 						</form>
@@ -199,8 +221,8 @@ body {
 							</div>
 							<div class="text-end pt-2">
 								<a href="${pageContext.request.contextPath}/"
-									class="btn btn-primary px-4 btn-sm"> <i
-									class="bi bi-arrow-left me-1"></i> Back to Home Dashboard
+									class="btn btn-secondary px-4 btn-sm me-2"> <i
+									class="bi bi-arrow-left me-1"></i> Back to Dashboard
 								</a>
 								<button type="submit" class="btn btn-primary px-4 btn-sm">
 									<i class="bi bi-save me-2"></i>Update Profile
@@ -267,8 +289,6 @@ body {
 
 		<div class="d-flex justify-content-end align-items-center gap-3 mt-4">
 
-
-
 		</div>
 	</div>
 
@@ -277,12 +297,10 @@ body {
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content bg-dark border-0 shadow-lg">
             
-           
             <div class="modal-header border-0 pb-0">
                 <h6 class="modal-title text-white-50">Profile Picture</h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            
             
             <div class="modal-body text-center p-3">
                 <c:choose>
@@ -293,7 +311,6 @@ body {
                              alt="Full Profile">
                     </c:when>
                     <c:otherwise>
-                       
                         <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" 
                              class="img-fluid rounded shadow bg-light p-4" 
                              style="max-height: 50vh; width: 250px; object-fit: contain;" 
