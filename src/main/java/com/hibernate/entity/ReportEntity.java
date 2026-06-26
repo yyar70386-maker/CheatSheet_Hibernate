@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,7 +37,7 @@ public class ReportEntity {
     @JoinColumn(name="user_id")
     private User user;
 
-    @Column(columnDefinition = "Text")
+    @Column(name = "sheet_id")
     private Integer sheetId;
 
     @Column(columnDefinition = "TEXT")
@@ -44,6 +46,7 @@ public class ReportEntity {
     
     private String status;
 
-    @Column(name ="created_at")
+    @CreationTimestamp
+    @Column(name ="created_at", updatable = false)
     private LocalDateTime createdAt;
 }

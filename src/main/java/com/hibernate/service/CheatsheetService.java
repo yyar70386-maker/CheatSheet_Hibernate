@@ -5,20 +5,21 @@ import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.TagEntity;
 
 public interface CheatsheetService {
-
-    // --- မူလ CRUD စနစ်များ ---
     Integer save(CheatsheetEntity cheatsheet);
     List<CheatsheetEntity> findAll();
     CheatsheetEntity findById(Integer id);
     void update(CheatsheetEntity cheatsheet);
     void delete(Integer id);
-
-    // --- Visibility & Pagination စနစ်များ ---
-    List<CheatsheetEntity> getCheatsheetsByCategoryWithPagination(Integer categoryId, int page, int size, Integer currentUserId);
-    int getTotalPagesByCategory(Integer categoryId, int size, Integer currentUserId);
-    long countByCategoryId(Integer categoryId, Integer currentUserId);
     
-    // --- 🌟 Tag System ပုံစံသစ်များ ---
-    List<TagEntity> findTagsByCategoryId(Integer categoryId); // Public Count တွက်ပြီးသား Tag စာရင်းယူရန်
-    List<CheatsheetEntity> getPublicCheatsheetsByTagId(Integer tagId); // Tag အလိုက် Public Cheatsheet သီးသန့်ဆွဲထုတ်ရန်
+    // 🌟 [ADDED] Controller မှ လှမ်းခေါ်နိုင်ရန် Interface တွင် လာရောက်ကြေညာပေးခြင်း
+    List<CheatsheetEntity> findByUserId(Integer userId);
+
+    List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId);
+    long countByCategoryId(Integer categoryId, Integer currentUserId);
+    List<TagEntity> findTagsByCategoryId(Integer categoryId);
+    List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId);
+    List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId);
+    List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size);
+    long countLatestPublic(String keyword);
+    long countAllActive();
 }

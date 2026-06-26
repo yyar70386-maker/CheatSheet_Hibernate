@@ -3,6 +3,7 @@ package com.hibernate.entity;
 import javax.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -20,6 +21,13 @@ public class User {
 
     @Column(unique = true, nullable = false)
     private String email;
+    
+    @OneToMany(mappedBy = "follower")
+    private List<UserFollowEntity> followingList;
+
+    @OneToMany(mappedBy = "following")
+    private List<UserFollowEntity> followerList;
+    
 
     private String fullName;
     private int role; // 0 = User, 1 = Admin

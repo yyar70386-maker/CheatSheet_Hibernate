@@ -1,9 +1,6 @@
 package com.hibernate.service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,94 +12,91 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CheatsheetServiceImpl implements CheatsheetService {
 
-    private final CheatsheetRepository repo;
+    private final CheatsheetRepository cheatsheetRepository;
 
     @Override
     @Transactional
     public Integer save(CheatsheetEntity cheatsheet) {
-        return repo.save(cheatsheet);
+        return cheatsheetRepository.save(cheatsheet);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<CheatsheetEntity> findAll() {
-        return repo.findAll();
+        return cheatsheetRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
     public CheatsheetEntity findById(Integer id) {
-        return repo.findById(id);
+        return cheatsheetRepository.findById(id);
     }
 
     @Override
-    @Transactional
     public void update(CheatsheetEntity cheatsheet) {
-        repo.update(cheatsheet);
+        cheatsheetRepository.update(cheatsheet);
     }
 
     @Override
-    @Transactional
     public void delete(Integer id) {
-        repo.delete(id);
+        cheatsheetRepository.delete(id);
     }
 
-    // --- Visibility & Pagination Logics ---
+    // 🌟 [ADDED] Interface ၏ စည်းကမ်းချက်အရ Repository ထဲက findByUserId ကို လှမ်းခေါ်ပေးခြင်း
+    @Override
+    @Transactional(readOnly = true)
+    public List<CheatsheetEntity> findByUserId(Integer userId) {
+        return cheatsheetRepository.findByUserId(userId);
+    }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CheatsheetEntity> getCheatsheetsByCategoryWithPagination(Integer categoryId, int page, int size, Integer currentUserId) {
-        return repo.findByCategoryIdWithPagination(categoryId, page, size, currentUserId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public int getTotalPagesByCategory(Integer categoryId, int size, Integer currentUserId) {
-        long totalRecords = repo.countByCategoryId(categoryId, currentUserId);
-        int totalPages = (int) Math.ceil((double) totalRecords / size);
-        return totalPages == 0 ? 1 : totalPages;
+    public List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId) {
+        return cheatsheetRepository.findByCategoryIdWithPagination(categoryId, page, size, currentUserId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public long countByCategoryId(Integer categoryId, Integer currentUserId) {
-        return repo.countByCategoryId(categoryId, currentUserId);
+        return cheatsheetRepository.countByCategoryId(categoryId, currentUserId);
     }
 
-    // --- 🌟 Tag List With "PUBLIC ONLY" Count Logic ---
     @Override
     @Transactional(readOnly = true)
     public List<TagEntity> findTagsByCategoryId(Integer categoryId) {
-        // ၁။ သတ်မှတ်ထားသော Category အောက်ရှိ Active Tag စာရင်းကို ယူခြင်း
-        List<TagEntity> tags = repo.findTagsByCategoryId(categoryId);
-        
-        // ၂။ Repository မှ [TagId, Count] (PUBLIC Cheatsheets သီးသန့်) ရလဒ်ကို ယူခြင်း
-        List<Object[]> countResults = repo.countCheatsheetsPerTagByRepository(categoryId);
-        
-        // ၃။ ဒေတာများကို Map ထဲသို့ စုစည်းခြင်း
-        Map<Integer, Long> countMap = new HashMap<>();
-        if (countResults != null) {
-            for (Object[] result : countResults) {
-                countMap.put((Integer) result[0], (Long) result[1]);
-            }
-        }
-        
-        // ၄။ Loop ပတ်၍ Tag နာမည်နောက်တွင် (Public Count) စာသား ထည့်သွင်းပေးခြင်း
-        for (TagEntity tag : tags) {
-            long count = countMap.getOrDefault(tag.getId(), 0L);
-            tag.setName(tag.getName() + " (" + count + ")");
-        }
-        
-        return tags;
+        return cheatsheetRepository.findTagsByCategoryId(categoryId);
     }
 
-    // --- 🌟 Tag Filter View Logic ---
     @Override
     @Transactional(readOnly = true)
-    public List<CheatsheetEntity> getPublicCheatsheetsByTagId(Integer tagId) {
-        // Tag ID အလိုက် PUBLIC ဖြစ်ပြီး Active ဖြစ်သော စာရင်းကို ဆွဲထုတ်ရန် Repository သို့ လှမ်းခေါ်ခြင်း
-        return repo.findPublicCheatsheetsByTagId(tagId);
+    public List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId) {
+        return cheatsheetRepository.countCheatsheetsPerTagByRepository(categoryId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId) {
+        return cheatsheetRepository.findPublicCheatsheetsByTagId(tagId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size) {
+        return cheatsheetRepository.findLatestPublic(keyword, page, size);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countLatestPublic(String keyword) {
+        return cheatsheetRepository.countLatestPublic(keyword);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countAllActive() {
+        return cheatsheetRepository.countAllActive();
     }
 }

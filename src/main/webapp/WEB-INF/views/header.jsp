@@ -24,6 +24,24 @@
     .dropdown-item:hover {
         background-color: #f8f9fa;
     }
+    .notification-button {
+        position: relative;
+    }
+    .notification-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        transform: translate(35%, -35%);
+        display: none;
+    }
+    .notification-menu {
+        width: 320px;
+        max-height: 380px;
+        overflow-y: auto;
+    }
+    .notification-item {
+        white-space: normal;
+    }
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
@@ -61,6 +79,22 @@
                     
                     <%-- ==================== 🔒 CASE 2: USER IS LOGGED IN ==================== --%>
                     <c:otherwise>
+                        <li class="nav-item dropdown me-lg-2">
+                            <a class="nav-link notification-button" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-bell fs-5"></i>
+                                <span id="notificationBadge" class="badge rounded-pill bg-danger notification-badge">0</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end notification-menu" aria-labelledby="notificationDropdown">
+                                <li class="dropdown-header d-flex justify-content-between align-items-center">
+                                    <span>Notifications</span>
+                                    <a class="small text-decoration-none" href="${pageContext.request.contextPath}/notifications">View all</a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li id="notificationEmpty" class="px-3 py-2 text-muted small">No notifications yet.</li>
+                                <li id="notificationList"></li>
+                            </ul>
+                        </li>
+
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <c:choose>
@@ -96,3 +130,78 @@
         </div>
     </div>
 </nav>
+
+<c:if test="${not empty sessionScope.currentUser}">
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script>
+        (function () {
+            var contextPath = '${pageContext.request.contextPath}';
+            var currentUserId = '${sessionScope.currentUser.id}';
+            var badge = document.getElementById('notificationBadge');
+            var list = document.getElementById('notificationList');
+            var empty = document.getElementById('notificationEmpty');
+            var unreadCount = 0;
+
+            function setBadge(count) {
+                unreadCount = count || 0;
+                badge.textContent = unreadCount;
+                badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+            }
+
+            function escapeHtml(value) {
+                var div = document.createElement('div');
+                div.textContent = value || '';
+                return div.innerHTML;
+            }
+
+            function addNotification(notification, prepend) {
+                empty.style.display = 'none';
+
+                var item = document.createElement('a');
+                item.className = 'dropdown-item notification-item small';
+                item.href = notification.linkUrl ? contextPath + notification.linkUrl : contextPath + '/notifications';
+                item.innerHTML = '<div class="fw-semibold">' + escapeHtml(notification.message) + '</div>'
+                    + '<div class="text-muted">' + escapeHtml(notification.notificationType || 'NOTIFICATION') + '</div>';
+
+                if (prepend && list.firstChild) {
+                    list.insertBefore(item, list.firstChild);
+                } else {
+                    list.appendChild(item);
+                }
+            }
+
+            function loadRecentNotifications() {
+                fetch(contextPath + '/notifications/recent')
+                    .then(function (response) { return response.json(); })
+                    .then(function (data) {
+                        list.innerHTML = '';
+                        setBadge(data.unreadCount);
+                        if (!data.notifications || data.notifications.length === 0) {
+                            empty.style.display = 'block';
+                            return;
+                        }
+                        data.notifications.forEach(function (notification) {
+                            addNotification(notification, false);
+                        });
+                    });
+            }
+
+            function connectNotificationSocket() {
+                var socket = new SockJS(contextPath + '/ws-notifications');
+                var stompClient = Stomp.over(socket);
+                stompClient.debug = null;
+                stompClient.connect({}, function () {
+                    stompClient.subscribe('/topic/notifications/' + currentUserId, function (message) {
+                        var notification = JSON.parse(message.body);
+                        setBadge(unreadCount + 1);
+                        addNotification(notification, true);
+                    });
+                });
+            }
+
+            loadRecentNotifications();
+            connectNotificationSocket();
+        })();
+    </script>
+</c:if>
