@@ -104,6 +104,22 @@
     <version>1.5</version>
 </dependency>
 
+
+<!-- Source: https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports -->
+<dependency>
+    <groupId>net.sf.jasperreports</groupId>
+    <artifactId>jasperreports</artifactId>
+    <version>6.21.3</version>
+    <scope>compile</scope>
+</dependency>
+
+
+
+
+
+
+
+
 <dependency>
     <groupId>commons-io</groupId>
     <artifactId>commons-io</artifactId>

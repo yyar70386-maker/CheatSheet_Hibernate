@@ -1,6 +1,9 @@
 package com.hibernate.controller;
 
+import java.io.InputStream;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
@@ -202,4 +205,52 @@ public class CheatsheetController {
         
         return mv;
     }
+    
+    
+    
+    
+    @GetMapping("/view-pdf/{id}")
+    public void viewPdf(@PathVariable("id") Integer id, HttpServletResponse response) {
+        try {
+            // ၁။ Service Layer မှတစ်ဆင့် Data ရှာဖွေခြင်း (Read-only transaction အလုပ်လုပ်မည်)
+            CheatsheetEntity cheatsheet = cheatsheetService.findById(id);
+            
+            if (cheatsheet != null) {
+                // Null-safe ဖြစ်အောင် စစ်ဆေးပြီး download count ကို ၁ တိုးပေးခြင်း
+                int currentDownloads = (cheatsheet.getDownloadCount() != null) ? cheatsheet.getDownloadCount() : 0;
+                cheatsheet.setDownloadCount(currentDownloads + 1);
+                
+                // ၂။ Service ရဲ့ @Transactional update ကို ခေါ်ပြီး DB တွင် သွားသိမ်းခြင်း
+                cheatsheetService.update(cheatsheet);
+                
+                // ၃။ Jasper Report ဖြင့် PDF တည်ဆောက်ခြင်း
+                InputStream reportStream = this.getClass().getResourceAsStream("/reports/cheatsheet_template.jasper");
+                
+                List<CheatsheetEntity> dataList = java.util.Collections.singletonList(cheatsheet);
+                net.sf.jasperreports.engine.data.JRBeanCollectionDataSource dataSource = 
+                        new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(dataList);
+
+                java.util.Map<String, Object> parameters = new java.util.HashMap<>();
+                
+                net.sf.jasperreports.engine.JasperPrint jasperPrint = 
+                        net.sf.jasperreports.engine.JasperFillManager.fillReport(reportStream, parameters, dataSource);
+                
+                // ၄။ Browser တွင် ဒေါင်းလုဒ်မကျဘဲ Inline (တန်းပွင့်) ပြသရန် Header သတ်မှတ်ခြင်း
+                response.setContentType("application/pdf");
+                String filename = (cheatsheet.getTitle() != null) ? cheatsheet.getTitle() : "cheatsheet";
+                response.setHeader("Content-Disposition", "inline; filename=\"" + filename + ".pdf\"");
+
+                // ၅။ PDF Output Stream ထုတ်လွှတ်ခြင်း
+                java.io.OutputStream out = response.getOutputStream();
+                net.sf.jasperreports.engine.JasperExportManager.exportReportToPdfStream(jasperPrint, out);
+                out.flush();
+            } else {
+                response.sendRedirect(response.encodeRedirectURL("/cheatsheet/list"));
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
 }

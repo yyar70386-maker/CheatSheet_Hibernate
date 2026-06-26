@@ -186,9 +186,23 @@
                                     </div>
                                 </div>
 
-                                <div class="stats-section mt-auto">
-                                    <span><i class="bi bi-eye-fill me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
-                                    <span><i class="bi bi-download me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                <%-- မူလ Stats Section နေရာတွင် ဤကုဒ်ဖြင့် အစားထိုးပြင်ဆင်ပါ --%>
+                                <div class="stats-section mt-auto d-flex justify-content-between align-items-center">
+                                    <div class="d-flex gap-3">
+                                        <span><i class="bi bi-eye-fill me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+                                        <span><i class="bi bi-download me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                    </div>
+                                    
+                                    <%-- 🌟 တိုးမြှင့်ချက်: ကတ်ပြားပေါ်မှနေ၍ PDF ကို တန်းပွင့်ကြည့်နိုင်မယ့် အိုင်ကွန်ခလုတ်လေး --%>
+                                    <div>
+                                        <a href="${pageContext.request.contextPath}/cheatsheet/view-pdf/${sheet.id}" 
+                                           target="_blank" 
+                                           class="btn btn-sm btn-outline-danger px-2 py-1 d-flex align-items-center gap-1"
+                                           style="border-radius: 6px; font-size: 12px; font-weight: bold;"
+                                           title="View PDF Document">
+                                            <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
