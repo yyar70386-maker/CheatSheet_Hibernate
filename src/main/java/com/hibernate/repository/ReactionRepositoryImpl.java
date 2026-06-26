@@ -11,32 +11,33 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReactionRepositoryImpl {
     private final SessionFactory sessionFactory;
-    
     public Session getSession() { return sessionFactory.getCurrentSession(); }
 
-    // --- Comment Reaction အပိုင်း ---
-    public void saveOrUpdateCommentReaction(CommentReactionEntity obj) {
-        getSession().saveOrUpdate(obj);
+    public SheetReactionEntity getSheetReaction(Integer userId, Integer sheetId) {
+        String hql = "FROM SheetReactionEntity r WHERE r.user.id = :uId AND r.cheatSheet.id = :sId";
+        return getSession().createQuery(hql, SheetReactionEntity.class)
+                .setParameter("uId", userId).setParameter("sId", sheetId).uniqueResult();
     }
+    public void saveOrUpdateSheetReaction(SheetReactionEntity obj) { getSession().saveOrUpdate(obj); }
+    public void deleteSheetReaction(SheetReactionEntity obj) { getSession().delete(obj); }
 
     public CommentReactionEntity getCommentReaction(Integer userId, Integer commentId) {
-        String hql = "FROM CommentReactionEntity c WHERE c.user.id = :userId AND c.comment.id = :commentId";
+        String hql = "FROM CommentReactionEntity r WHERE r.user.id = :uId AND r.comment.id = :cId";
         return getSession().createQuery(hql, CommentReactionEntity.class)
-                .setParameter("userId", userId)
-                .setParameter("commentId", commentId)
-                .uniqueResult();
+                .setParameter("uId", userId).setParameter("cId", commentId).uniqueResult();
+    }
+    public void saveOrUpdateCommentReaction(CommentReactionEntity obj) { getSession().saveOrUpdate(obj); }
+    public void deleteCommentReaction(CommentReactionEntity obj) { getSession().delete(obj); }
+
+    // 🌟 CheatSheet အတွက် Like/Dislike ရေတွက်ရန်
+    public Long countSheetReactions(Integer sheetId, Boolean isLike) {
+        String hql = "SELECT COUNT(r) FROM SheetReactionEntity r WHERE r.cheatSheet.id = :sId AND r.isLike = :isLike";
+        return (Long) getSession().createQuery(hql).setParameter("sId", sheetId).setParameter("isLike", isLike).uniqueResult();
     }
 
-    // --- Sheet Reaction အပိုင်း ---
-    public void saveOrUpdateSheetReaction(SheetReactionEntity obj) {
-        getSession().saveOrUpdate(obj);
-    }
-
-    public SheetReactionEntity getSheetReaction(Integer userId, Integer sheetId) {
-        String hql = "FROM SheetReactionEntity s WHERE s.user.id = :userId AND s.cheatSheet.id = :sheetId";
-        return getSession().createQuery(hql, SheetReactionEntity.class)
-                .setParameter("userId", userId)
-                .setParameter("sheetId", sheetId)
-                .uniqueResult();
+    // 🌟 Comment အတွက် Like/Dislike ရေတွက်ရန်
+    public Long countCommentReactions(Integer commentId, Boolean isLike) {
+        String hql = "SELECT COUNT(r) FROM CommentReactionEntity r WHERE r.comment.id = :cId AND r.isLike = :isLike";
+        return (Long) getSession().createQuery(hql).setParameter("cId", commentId).setParameter("isLike", isLike).uniqueResult();
     }
 }
