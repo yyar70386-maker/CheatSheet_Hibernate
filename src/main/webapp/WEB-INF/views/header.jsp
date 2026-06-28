@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
@@ -24,6 +24,7 @@
     .dropdown-item:hover {
         background-color: #f8f9fa;
     }
+    /* 🌟 Notification Custom Styles */
     .notification-button {
         position: relative;
     }
@@ -46,8 +47,9 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
     <div class="container">
-        <a class="navbar-brand text-primary" href="${pageContext.request.contextPath}/">
-            <i class="bi bi-code-square me-2"></i>JWD Project
+        <a class="navbar-brand fw-bold fs-4 d-flex align-items-center" href="${pageContext.request.contextPath}/">
+            <i class="bi bi-code-square me-2 text-primary"></i> 
+            <span class="text-dark">Cheat</span><span class="text-primary">Sheet</span>
         </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +59,9 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" href="${pageContext.request.contextPath}/"><i class="bi bi-house-door me-1"></i> Home</a>
+                    <a class="nav-link active" href="${pageContext.request.contextPath}/">
+                        <i class="bi bi-house-door me-1"></i> Home
+                    </a>
                 </li>
             </ul>
             
@@ -131,6 +135,7 @@
     </div>
 </nav>
 
+<%-- ==================== 🌐 WEBSOCKET REAL-TIME NOTIFICATION SCRIPT ==================== --%>
 <c:if test="${not empty sessionScope.currentUser}">
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>

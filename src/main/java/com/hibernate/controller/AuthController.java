@@ -7,6 +7,7 @@ import com.hibernate.service.CategoryService;
 import com.hibernate.service.AnnouncementService;
 import com.hibernate.service.CheatsheetService;
 import com.hibernate.service.UserFollowService;
+import com.hibernate.service.TagService;
 import com.hibernate.service.UserService;
 import com.hibernate.websocket.NotificationSocketService;
 
@@ -33,14 +34,17 @@ public class AuthController {
     private CategoryService categoryService; 
 
     @Autowired
+    private CheatsheetService cheatsheetService;
+
+    @Autowired
+    private TagService tagService;
+
+    @Autowired
     private AnnouncementService announcementService;
     
     @Autowired
     private UserFollowService userFollowService;
     
-    @Autowired
-    private CheatsheetService cheatsheetService;
-
     @Autowired
     private NotificationSocketService notificationSocketService;
     
@@ -51,13 +55,21 @@ public class AuthController {
             HttpSession session,
             Model model) {
         int pageSize = 6;
-        model.addAttribute("categorylist", categoryService.findAll());
+        
+        // Active ဖြစ်နေတဲ့ Category list ကိုသာ ဆွဲထုတ်ပြသခြင်း
+        model.addAttribute("categorylist", categoryService.findAllActive());
         model.addAttribute("announcements", announcementService.findLatest(3));
         model.addAttribute("cheatsheetlist", cheatsheetService.findLatestPublic(query, page, pageSize));
         model.addAttribute("searchQuery", query);
         model.addAttribute("currentPage", page);
+        
         long total = cheatsheetService.countLatestPublic(query);
         model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / pageSize)));
+        
+        // သူငယ်ချင်းဖြစ်သူ ထည့်သွင်းထားသော Total Count Metrics များ
+        model.addAttribute("totalSheets", cheatsheetService.getTotalSheetsCount());
+        model.addAttribute("totalTags", tagService.getTotalTagsCount());
+        
         return "home";
     }
    
@@ -86,7 +98,6 @@ public class AuthController {
         }
     }
 
-    // 🌟 [ADDED] Login Page UI ကို ပြသပေးရန် GetMapping
     @GetMapping("/login")
     public String showLoginForm() {
         return "login"; 
@@ -123,13 +134,18 @@ public class AuthController {
         if (currentUser != null) {
             model.addAttribute("currentUser", currentUser);
         }
-        model.addAttribute("categorylist", categoryService.findAll());
+        model.addAttribute("categorylist", categoryService.findAllActive());
         model.addAttribute("announcements", announcementService.findLatest(3));
         model.addAttribute("cheatsheetlist", cheatsheetService.findLatestPublic(query, page, 6));
         model.addAttribute("searchQuery", query);
         model.addAttribute("currentPage", page);
+        
         long total = cheatsheetService.countLatestPublic(query);
         model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / 6)));
+        
+        model.addAttribute("totalSheets", cheatsheetService.getTotalSheetsCount());
+        model.addAttribute("totalTags", tagService.getTotalTagsCount());
+        
         return "home";
     }
 

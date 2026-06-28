@@ -25,3 +25,5 @@ public interface CheatsheetRepository {
     long countLatestPublic(String keyword);
     long countAllActive();
 }
+	int getTotalSheetsCount();
+}

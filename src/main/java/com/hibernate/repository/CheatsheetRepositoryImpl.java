@@ -15,6 +15,17 @@ import lombok.RequiredArgsConstructor;
 public class CheatsheetRepositoryImpl implements CheatsheetRepository {
 
     private final SessionFactory sessionFactory;
+    
+ // 🌟 စုစုပေါင်း Cheatsheets အရေအတွက်ကို ဒေတာဘေ့စ်ကနေ HQL နဲ့ လှမ်းရေတွက်မည့် မက်သတ်
+    @Override
+    public int getTotalSheetsCount() {
+        // 💡 မှတ်ချက်။ ။ CheatsheetEntity နေရာတွင် မိမိဆောက်ထားသော Entity Class နာမည်အတိုင်း ဖြစ်ရပါမည်
+        String hql = "SELECT COUNT(c) FROM CheatsheetEntity c"; 
+        
+        Long count = (Long) getSession().createQuery(hql).uniqueResult();
+        
+        return count != null ? count.intValue() : 0;
+    }
 
     public Session getSession() {
         return sessionFactory.getCurrentSession();

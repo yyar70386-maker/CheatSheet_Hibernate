@@ -1,21 +1,26 @@
 package com.hibernate.service;
 
 import java.util.List;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.TagEntity;
 import com.hibernate.repository.CheatsheetRepository;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor // Repository ကို Constructor Injection အလိုအလျောက်လုပ်ပေးရန်
 @Transactional
 public class CheatsheetServiceImpl implements CheatsheetService {
 
     private final CheatsheetRepository cheatsheetRepository;
+
+    // 🌟 [ADDED] Сheatsheets အရေအတွက်ကို Repository ဆီကနေတစ်ဆင့် လှမ်းယူပေးမည့် မက်သတ်
+    @Override
+    @Transactional(readOnly = true)
+    public int getTotalSheetsCount() {
+        return cheatsheetRepository.getTotalSheetsCount();
+    }
 
     @Override
     @Transactional
@@ -36,16 +41,17 @@ public class CheatsheetServiceImpl implements CheatsheetService {
     }
 
     @Override
+    @Transactional
     public void update(CheatsheetEntity cheatsheet) {
         cheatsheetRepository.update(cheatsheet);
     }
 
     @Override
+    @Transactional
     public void delete(Integer id) {
         cheatsheetRepository.delete(id);
     }
 
-    // 🌟 [ADDED] Interface ၏ စည်းကမ်းချက်အရ Repository ထဲက findByUserId ကို လှမ်းခေါ်ပေးခြင်း
     @Override
     @Transactional(readOnly = true)
     public List<CheatsheetEntity> findByUserId(Integer userId) {
@@ -66,20 +72,8 @@ public class CheatsheetServiceImpl implements CheatsheetService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TagEntity> findTagsByCategoryId(Integer categoryId) {
-        return cheatsheetRepository.findTagsByCategoryId(categoryId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId) {
         return cheatsheetRepository.countCheatsheetsPerTagByRepository(categoryId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId) {
-        return cheatsheetRepository.findPublicCheatsheetsByTagId(tagId);
     }
 
     @Override
@@ -98,5 +92,26 @@ public class CheatsheetServiceImpl implements CheatsheetService {
     @Transactional(readOnly = true)
     public long countAllActive() {
         return cheatsheetRepository.countAllActive();
+    }
+
+    // --- 🌟 Tag System မက်သတ်များ ---
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TagEntity> findTagsByCategoryId(Integer categoryId) {
+        return cheatsheetRepository.findTagsByCategoryId(categoryId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId) {
+        return cheatsheetRepository.findPublicCheatsheetsByTagId(tagId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CheatsheetEntity> getPublicCheatsheetsByTagId(Integer tagId) {
+        // Interface ထဲမှာ နာမည်ကွဲနေတဲ့အတွက် မက်သတ်နှစ်ခုလုံးက တစ်ခုတည်းကိုပဲ လှမ်းခေါ်အောင် ညွှန်းပေးထားပါတယ်
+        return cheatsheetRepository.findPublicCheatsheetsByTagId(tagId);
     }
 }

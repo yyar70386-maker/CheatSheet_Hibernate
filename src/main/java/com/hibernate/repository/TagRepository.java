@@ -19,4 +19,6 @@ public interface TagRepository {
     List<TagEntity> findByCategoryId(Integer categoryId);
 
     List<TagEntity> findByIds(List<Integer> ids);
+
+	int getTotalTagsCount();
 }
