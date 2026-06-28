@@ -207,43 +207,53 @@ public class CheatsheetController {
     }
     
     
-<<<<<<< Updated upstream
-    
-    
-=======
->>>>>>> Stashed changes
+
     @GetMapping("/view-pdf/{id}")
-    public void viewPdf(@PathVariable("id") Integer id, HttpServletResponse response) {
+    public void viewPdf(@PathVariable("id") Integer id, HttpServletResponse response, HttpSession session) {
         try {
-            // ၁။ Service Layer မှတစ်ဆင့် Data ရှာဖွေခြင်း (Read-only transaction အလုပ်လုပ်မည်)
+            // ၁။ DB ထဲမှ သက်ဆိုင်ရာ Cheatsheet Data ကို ဆွဲထုတ်ခြင်း
             CheatsheetEntity cheatsheet = cheatsheetService.findById(id);
             
             if (cheatsheet != null) {
-                // Null-safe ဖြစ်အောင် စစ်ဆေးပြီး download count ကို ၁ တိုးပေးခြင်း
+                // Download Count ကို ၁ တိုးပြီး DB တွင် ပြန်သိမ်းခြင်း
                 int currentDownloads = (cheatsheet.getDownloadCount() != null) ? cheatsheet.getDownloadCount() : 0;
                 cheatsheet.setDownloadCount(currentDownloads + 1);
-                
-                // ၂။ Service ရဲ့ @Transactional update ကို ခေါ်ပြီး DB တွင် သွားသိမ်းခြင်း
                 cheatsheetService.update(cheatsheet);
                 
-                // ၃။ Jasper Report ဖြင့် PDF တည်ဆောက်ခြင်း
+                // ၂။ Jasper Report 템플릿 (.jasper) ဖိုင်ကို လမ်းကြောင်းပြောင်းယူခြင်း
                 InputStream reportStream = this.getClass().getResourceAsStream("/reports/cheatsheet_template.jasper");
                 
                 List<CheatsheetEntity> dataList = java.util.Collections.singletonList(cheatsheet);
                 net.sf.jasperreports.engine.data.JRBeanCollectionDataSource dataSource = 
                         new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(dataList);
 
+                // 🌟 [ဒီအကွက်ထဲမှာ အသစ်ဖြည့်သွင်းပေးထားပါတယ်ဗျာ]
                 java.util.Map<String, Object> parameters = new java.util.HashMap<>();
                 
+                // Session ထဲမှ လက်ရှိ Login ဝင်ထားသော User Object ကို ယူသည်
+                User currentUser = (User) session.getAttribute("currentUser");
+                
+                // User ရဲ့ Name သို့မဟုတ် Username ကို ယူသည် (မရှိလျှင် Guest User ဟု သတ်မှတ်မည်)
+                String username = "Guest User";
+                if (currentUser != null) {
+                    if (currentUser.getUsername() != null) {
+                        username = currentUser.getUsername(); // 🌟 Fix: getName() အစား getUsername() ကို သုံးထားပါသည်
+                    }
+                }
+
+                // Jaspersoft Studio ရဲ့ Parameter ဆီသို့ နာမည်ကို တိုက်ရိုက် လှမ်းထည့်ပေးခြင်း
+                parameters.put("DownloadedBy", username);
+
+                // ၃။ Jasper Report ဖြည့်သွင်းတည်ဆောက်ခြင်း
                 net.sf.jasperreports.engine.JasperPrint jasperPrint = 
                         net.sf.jasperreports.engine.JasperFillManager.fillReport(reportStream, parameters, dataSource);
                 
-                // ၄။ Browser တွင် ဒေါင်းလုဒ်မကျဘဲ Inline (တန်းပွင့်) ပြသရန် Header သတ်မှတ်ခြင်း
+                // ၄။ Browser တွင် PDF ပြသရန် Response Header များ သတ်မှတ်ခြင်း
                 response.setContentType("application/pdf");
                 String filename = (cheatsheet.getTitle() != null) ? cheatsheet.getTitle() : "cheatsheet";
                 response.setHeader("Content-Disposition", "inline; filename=\"" + filename + ".pdf\"");
 
-                // ၅။ PDF Output Stream ထုတ်လွှတ်ခြင်း
+                // ၅။ PDF ကို Output Stream ဖြင့် ဆွဲထုတ်ပေးခြင်း
                 java.io.OutputStream out = response.getOutputStream();
                 net.sf.jasperreports.engine.JasperExportManager.exportReportToPdfStream(jasperPrint, out);
                 out.flush();
@@ -255,8 +265,6 @@ public class CheatsheetController {
             e.printStackTrace();
         }
     }
-<<<<<<< Updated upstream
-    
-=======
->>>>>>> Stashed changes
-}
+        
+        
+    }
