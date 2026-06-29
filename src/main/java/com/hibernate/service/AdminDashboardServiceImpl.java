@@ -15,7 +15,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
 
     private final UserRepository userRepository;
     private final UserFollowRepository userFollowRepository;
-    private final CheatsheetService cheatsheetService;
+    private final CheatSheetService cheatsheetService;
     private final ReportService reportService;
     private final AnnouncementService announcementService;
     private final AuditLogService auditLogService;

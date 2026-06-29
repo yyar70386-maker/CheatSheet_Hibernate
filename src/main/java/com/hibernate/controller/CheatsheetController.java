@@ -14,7 +14,7 @@ import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.TagEntity;
 import com.hibernate.entity.User;
 import com.hibernate.service.CategoryService;
-import com.hibernate.service.CheatsheetService;
+import com.hibernate.service.CheatSheetService;
 import com.hibernate.service.AuditLogService;
 import com.hibernate.service.NotificationService;
 import com.hibernate.service.TagService;
@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/cheatsheet")
 public class CheatsheetController {
 
-    private final CheatsheetService cheatsheetService;
+    private final CheatSheetService cheatsheetService;
     private final CategoryService categoryService;
     private final TagService tagService;
     private final NotificationService notificationService;

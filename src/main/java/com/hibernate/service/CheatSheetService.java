@@ -4,7 +4,7 @@ import java.util.List;
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.TagEntity;
 
-public interface CheatsheetService {
+public interface CheatSheetService {
     Integer save(CheatsheetEntity cheatsheet);
     List<CheatsheetEntity> findAll();
     CheatsheetEntity findById(Integer id);

@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "cheatsheets")
-public class CheatsheetEntity {
+public class CheatSheetEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

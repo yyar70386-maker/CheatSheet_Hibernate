@@ -5,7 +5,7 @@ import com.hibernate.entity.User;
 import com.hibernate.dto.NotificationDto;
 import com.hibernate.service.CategoryService;
 import com.hibernate.service.AnnouncementService;
-import com.hibernate.service.CheatsheetService;
+import com.hibernate.service.CheatSheetService;
 import com.hibernate.service.UserFollowService;
 import com.hibernate.service.TagService;
 import com.hibernate.service.UserService;
@@ -34,7 +34,7 @@ public class AuthController {
     private CategoryService categoryService; 
 
     @Autowired
-    private CheatsheetService cheatsheetService;
+    private CheatSheetService cheatsheetService;
 
     @Autowired
     private TagService tagService;

@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor // Repository ကို Constructor Injection အလိုအလျောက်လုပ်ပေးရန်
 @Transactional
-public class CheatsheetServiceImpl implements CheatsheetService {
+public class CheatsheetServiceImpl implements CheatSheetService {
 
     private final CheatsheetRepository cheatsheetRepository;
 
