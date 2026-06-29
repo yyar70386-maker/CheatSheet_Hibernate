@@ -19,6 +19,16 @@ public class TagRepositoryImpl implements TagRepository {
     public Session getSession() {
         return sessionFactory.getCurrentSession();
     }
+ // 🌟 စုစုပေါင်း Tags အရေအတွက်ကို ဒေတာဘေ့စ်ကနေ HQL နဲ့ လှမ်းရေတွက်မည့် မက်သတ်
+    @Override
+    public int getTotalTagsCount() {
+        // 💡 မှတ်ချက်။ ။ တကယ်လို့ မိမိရဲ့ Tag Entity Class နာမည်က TagEntity မဟုတ်ဘဲ Tag ဖြစ်နေရင် အောက်ကစာသားမှာ လိုက်ပြင်ပေးပါ
+        String hql = "SELECT COUNT(t) FROM TagEntity t";
+        
+        Long count = (Long) getSession().createQuery(hql).uniqueResult();
+        
+        return count != null ? count.intValue() : 0;
+    }
 
     @Override
     public Integer save(TagEntity tag) {

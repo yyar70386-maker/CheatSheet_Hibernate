@@ -19,4 +19,11 @@ public interface CheatsheetRepository {
     List<TagEntity> findTagsByCategoryId(Integer categoryId);
     List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId);
     List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId);
+ // 💡 CheatsheetRepository.java ရဲ့ အောက်ဆုံးနားတွင် ထည့်ရန်
+    List<CheatsheetEntity> findByUserId(Integer userId);
+    List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size);
+    long countLatestPublic(String keyword);
+    long countAllActive();
+
+	int getTotalSheetsCount();
 }

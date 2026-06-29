@@ -15,6 +15,13 @@ import lombok.RequiredArgsConstructor;
 public class TagServiceImpl implements TagService {
 
     private final TagRepository repo;
+    
+ // 🌟 ဒီမက်သတ်လေး ထည့်ပေးလိုက်ရင် Error ချက်ချင်း ပျောက်သွားပါလိမ့်မယ်
+    @Override
+    @Transactional(readOnly = true)
+    public int getTotalTagsCount() {
+        return repo.getTotalTagsCount();
+    }
 
     @Override
     @Transactional
