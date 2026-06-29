@@ -66,4 +66,18 @@ public class UserRepositoryImpl implements UserRepository {
         query.setParameter("token", token);
         return query.uniqueResult();
     }
+
+    // 🌟 ဖြည့်စွက်ထားသော Method (၁) - အားလုံးကို ပြန်ထုတ်ပေးရန်
+    @Override
+    public List<User> findAll() {
+        return getAllUsers(); // getAllUsers() ရှိပြီးသားမို့လို့ ပြန်သုံးထားပါတယ်
+    }
+
+    // 🌟 ဖြည့်စွက်ထားသော Method (၂) - Total အရေအတွက်ကို ရေတွက်ရန်
+    @Override
+    public long countAll() {
+        String hql = "SELECT COUNT(u) FROM User u";
+        Query<Long> query = sessionFactory.getCurrentSession().createQuery(hql, Long.class);
+        return query.uniqueResult();
+    }
 }

@@ -24,6 +24,6 @@ public interface CheatsheetRepository {
     List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size);
     long countLatestPublic(String keyword);
     long countAllActive();
-}
+
 	int getTotalSheetsCount();
 }
