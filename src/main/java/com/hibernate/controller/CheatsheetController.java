@@ -204,9 +204,12 @@ public class CheatsheetController {
     
 
     @GetMapping("/view-pdf/{id}")
-    public void viewPdf(@PathVariable("id") Integer id, HttpServletResponse response) {
+    public void viewPdf(
+            @PathVariable("id") Integer id, 
+            HttpServletResponse response, 
+            HttpSession session) { // 🌟 Fix 1: Login User ဒေတာ ယူရန် session ကို ထည့်သွင်းလိုက်ပါသည်
         try {
-            // ၁။ Service Layer မှတစ်ဆင့် Data ရှာဖွေခြင်း (Read-only transaction အလုပ်လုပ်မည်)
+            // ၁။ Service Layer မှတစ်ဆင့် Data ရှာဖွေခြင်း
             CheatsheetEntity cheatsheet = cheatsheetService.findById(id);
             
             if (cheatsheet != null) {
@@ -225,6 +228,21 @@ public class CheatsheetController {
                         new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(dataList);
 
                 java.util.Map<String, Object> parameters = new java.util.HashMap<>();
+                
+                // 🌟 Fix 2: Session ထဲမှ လက်ရှိ Login ဝင်ထားသော User ကို ဆွဲထုတ်ခြင်း
+                User currentUser = (User) session.getAttribute("currentUser");
+                
+                // User ရဲ့ နာမည်ကို စစ်ဆေးခြင်း (မရှိလျှင် Guest User ဟု ပြသမည်)
+                String username = "Guest User";
+                if (currentUser != null) {
+                    // သင့် User entity ထဲက နာမည်ယူတဲ့ method က getUsername() သို့မဟုတ် getFullName() ဖြစ်ပါက ၎င်းအတိုင်း ပြောင်းလဲပေးနိုင်ပါတယ်
+                    if (currentUser.getUsername() != null) {
+                        username = currentUser.getUsername();
+                    }
+                }
+                
+                // 🌟 Fix 3: Jaspersoft Studio က Parameter သို့ တန်ဖိုးကို ကွက်တိ လှမ်းထည့်ပေးခြင်း
+                parameters.put("DownloadedBy", username); 
                 
                 net.sf.jasperreports.engine.JasperPrint jasperPrint = 
                         net.sf.jasperreports.engine.JasperFillManager.fillReport(reportStream, parameters, dataSource);
