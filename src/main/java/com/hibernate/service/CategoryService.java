@@ -25,4 +25,6 @@ public interface CategoryService {
     void delete(Integer id);
 
 	List<CategoryEntity> findAll();
+
+    long countAllActive();
 }

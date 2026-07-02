@@ -11,7 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.hibernate.entity.CategoryEntity;
+import com.hibernate.entity.User;
+import com.hibernate.service.AuditLogService;
 import com.hibernate.service.CategoryService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final AuditLogService auditLogService;
 
     @GetMapping("/list")
     public ModelAndView categoryList() {
@@ -35,9 +41,13 @@ public class CategoryController {
 
     @PostMapping("/save")
     public ModelAndView saveCategory(
-            @ModelAttribute("category") CategoryEntity category) {
+            @ModelAttribute("category") CategoryEntity category,
+            HttpServletRequest request,
+            HttpSession session) {
 
-        categoryService.save(category);
+        Integer id = categoryService.save(category);
+        auditLogService.log((User) session.getAttribute("currentUser"), "Create Category", "Category", id,
+                "Created category: " + category.getName(), request.getRemoteAddr());
 
         return new ModelAndView("redirect:/category/list");
     }
@@ -53,18 +63,26 @@ public class CategoryController {
 
     @PostMapping("/update")
     public ModelAndView updateCategory(
-            @ModelAttribute("category") CategoryEntity category) {
+            @ModelAttribute("category") CategoryEntity category,
+            HttpServletRequest request,
+            HttpSession session) {
 
         categoryService.update(category);
+        auditLogService.log((User) session.getAttribute("currentUser"), "Update Category", "Category", category.getId(),
+                "Updated category: " + category.getName(), request.getRemoteAddr());
 
         return new ModelAndView("redirect:/category/list");
     }
 
     @GetMapping("/delete/{id}")
     public ModelAndView deleteCategory(
-            @PathVariable("id") Integer id) {
+            @PathVariable("id") Integer id,
+            HttpServletRequest request,
+            HttpSession session) {
 
         categoryService.delete(id);
+        auditLogService.log((User) session.getAttribute("currentUser"), "Delete Category", "Category", id,
+                "Category deactivated.", request.getRemoteAddr());
 
         return new ModelAndView("redirect:/category/list");
     }

@@ -116,6 +116,9 @@
                         </select>
                         <button type="button" id="rateSubmitBtn" onclick="submitRatingJS()" class="btn btn-sm btn-outline-warning text-dark fw-bold">Rate / Undo</button>
                     </div>
+                    <button type="button" class="action-btn text-danger" data-bs-toggle="modal" data-bs-target="#reportSheetModal">
+                        <i class="bi bi-flag"></i> Report
+                    </button>
                 </c:when>
 
                 <c:otherwise>

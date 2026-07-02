@@ -11,7 +11,6 @@
 </head>
 <body class="bg-light">
 <jsp:include page="header.jsp" />
-
 <main class="container py-4" style="max-width: 980px;">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -27,7 +26,7 @@
 
     <c:choose>
         <c:when test="${empty announcements}">
-            <div class="text-center bg-white border rounded-4 py-5">
+            <div class="text-center bg-white border rounded-3 py-5">
                 <i class="bi bi-megaphone display-5 text-muted d-block mb-2"></i>
                 <div class="fw-semibold">No announcements yet</div>
             </div>
@@ -35,20 +34,33 @@
         <c:otherwise>
             <div class="d-grid gap-3">
                 <c:forEach items="${announcements}" var="a">
-                    <div class="bg-white border rounded-4 p-4 shadow-sm">
+                    <div class="bg-white border rounded-3 p-4 shadow-sm">
                         <div class="d-flex justify-content-between align-items-start gap-3">
                             <div>
-                                <h5 class="fw-bold mb-2">${a.title}</h5>
-                                <p class="mb-3 text-muted">${a.content}</p>
+                                <h5 class="fw-bold mb-2"><c:out value="${a.title}" /></h5>
+                                <p class="mb-3 text-muted"><c:out value="${a.content}" /></p>
                                 <div class="text-muted small">
                                     <c:out value="${a.createdBy != null ? (a.createdBy.fullName != null ? a.createdBy.fullName : a.createdBy.username) : 'Admin'}" />
-                                    <span class="mx-2">•</span>${a.createdAt}
+                                    <span class="mx-2">|</span>${a.createdAt}
+                                    <span class="mx-2">|</span><span class="badge text-bg-${a.status == 'active' ? 'success' : 'secondary'}">${a.status}</span>
                                 </div>
                             </div>
                             <c:if test="${sessionScope.currentUser.role == 1}">
-                                <div class="d-flex gap-2">
+                                <div class="d-flex gap-2 flex-wrap justify-content-end">
                                     <a class="btn btn-outline-secondary btn-sm" href="${pageContext.request.contextPath}/admin/announcements/edit/${a.id}">Edit</a>
-                                    <form action="${pageContext.request.contextPath}/admin/announcements/delete/${a.id}" method="post">
+                                    <c:choose>
+                                        <c:when test="${a.status == 'active'}">
+                                            <form action="${pageContext.request.contextPath}/admin/announcements/${a.id}/status/inactive" method="post">
+                                                <button class="btn btn-outline-warning btn-sm" type="submit">Deactivate</button>
+                                            </form>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <form action="${pageContext.request.contextPath}/admin/announcements/${a.id}/status/active" method="post">
+                                                <button class="btn btn-outline-success btn-sm" type="submit">Activate</button>
+                                            </form>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <form action="${pageContext.request.contextPath}/admin/announcements/delete/${a.id}" method="post" onsubmit="return confirm('Delete this announcement?');">
                                         <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
                                     </form>
                                 </div>
@@ -60,7 +72,6 @@
         </c:otherwise>
     </c:choose>
 </main>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

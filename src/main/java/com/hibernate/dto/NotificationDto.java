@@ -12,6 +12,7 @@ public class NotificationDto {
 
     private Integer id;
     private Integer userId;
+    private String title;
     private String message;
     private Boolean isRead;
     private String notificationType;
@@ -26,6 +27,7 @@ public class NotificationDto {
         if (notification.getUser() != null) {
             dto.setUserId(notification.getUser().getId());
         }
+        dto.setTitle(notification.getTitle());
         dto.setMessage(notification.getMessage());
         dto.setIsRead(notification.getIsRead());
         dto.setNotificationType(notification.getNotificationType());

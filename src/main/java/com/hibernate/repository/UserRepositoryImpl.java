@@ -80,4 +80,12 @@ public class UserRepositoryImpl implements UserRepository {
         Query<Long> query = sessionFactory.getCurrentSession().createQuery(hql, Long.class);
         return query.uniqueResult();
     }
+
+    @Override
+    public List<User> findLatest(int limit) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("FROM User u ORDER BY u.id DESC", User.class)
+                .setMaxResults(limit)
+                .getResultList();
+    }
 }

@@ -36,4 +36,11 @@ public class CommentRepositoryImpl {
                 .setParameter("sheetId", sheetId)
                 .getResultList();
     }
+
+    public long countAll() {
+        Long count = getSession()
+                .createQuery("select count(c) from CommentEntity c", Long.class)
+                .uniqueResult();
+        return count != null ? count : 0;
+    }
 }

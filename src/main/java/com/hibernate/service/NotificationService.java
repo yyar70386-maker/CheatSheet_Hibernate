@@ -8,6 +8,10 @@ public interface NotificationService {
 
     NotificationDto createNotification(Integer userId, Integer senderId, String message, String type, String linkUrl);
 
+    NotificationDto createNotification(Integer userId, Integer senderId, String title, String message, String type, String linkUrl);
+
+    List<NotificationDto> broadcast(Integer senderId, String title, String message, String type, String linkUrl);
+
     NotificationDto createFollowNotification(Integer followerId, Integer followingId);
 
     List<NotificationDto> createAnnouncementNotifications(Integer senderId, Integer announcementId, String title);
@@ -23,4 +27,8 @@ public interface NotificationService {
     void markAsRead(Integer notificationId, Integer userId);
 
     void markAllAsRead(Integer userId);
+
+    void delete(Integer notificationId, Integer userId);
+
+    long countAll();
 }

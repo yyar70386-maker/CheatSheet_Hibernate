@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
@@ -13,9 +14,13 @@ import org.springframework.web.servlet.ModelAndView;
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.TagEntity;
 import com.hibernate.entity.User;
+import com.hibernate.dto.NotificationDto;
+import com.hibernate.service.AuditLogService;
 import com.hibernate.service.CategoryService;
 import com.hibernate.service.CheatsheetService;
+import com.hibernate.service.NotificationService;
 import com.hibernate.service.TagService;
+import com.hibernate.websocket.NotificationSocketService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +32,9 @@ public class CheatsheetController {
     private final CheatsheetService cheatsheetService;
     private final CategoryService categoryService;
     private final TagService tagService;
+    private final AuditLogService auditLogService;
+    private final NotificationService notificationService;
+    private final NotificationSocketService notificationSocketService;
 
     @GetMapping("/list")
     public ModelAndView list() {
@@ -44,6 +52,7 @@ public class CheatsheetController {
     public ModelAndView save(
             @ModelAttribute("cheatsheet") CheatsheetEntity cheatsheet,
             @RequestParam(value = "tagIds", required = false) List<Integer> tagIds,
+            HttpServletRequest request,
             HttpSession session) {
 
         User currentUser = (User) session.getAttribute("currentUser");
@@ -56,7 +65,14 @@ public class CheatsheetController {
             cheatsheet.setTags(tags);
         }
 
-        cheatsheetService.save(cheatsheet);
+        Integer id = cheatsheetService.save(cheatsheet);
+        auditLogService.log(currentUser, "Create Cheatsheet", "Cheatsheet", id,
+                "Created cheatsheet: " + cheatsheet.getTitle(), request.getRemoteAddr());
+        if (currentUser != null && "PUBLIC".equalsIgnoreCase(cheatsheet.getVisibility())) {
+            List<NotificationDto> notifications = notificationService.createCheatsheetNotificationsForFollowers(
+                    currentUser.getId(), id, cheatsheet.getTitle());
+            notificationSocketService.broadcastNotifications(notifications);
+        }
         return new ModelAndView("redirect:/cheatsheet/list");
     }
 
@@ -82,6 +98,7 @@ public class CheatsheetController {
     public ModelAndView update(
             @ModelAttribute("cheatsheet") CheatsheetEntity cheatsheet,
             @RequestParam(value = "tagIds", required = false) List<Integer> tagIds,
+            HttpServletRequest request,
             HttpSession session) { // 🌟 Author မပျောက်သွားစေရန် session ယူလိုက်သည်
 
         // 🌟 Fix: Update လုပ်တဲ့အခါ Author တန်ဖိုး null ဖြစ်မသွားအောင် မူလ DB ထဲက Author ကို ပြန်ထည့်ပေးခြင်း
@@ -98,12 +115,16 @@ public class CheatsheetController {
         }
 
         cheatsheetService.update(cheatsheet);
+        auditLogService.log((User) session.getAttribute("currentUser"), "Update Cheatsheet", "Cheatsheet", cheatsheet.getId(),
+                "Updated cheatsheet: " + cheatsheet.getTitle(), request.getRemoteAddr());
         return new ModelAndView("redirect:/cheatsheet/list");
     }
 
     @GetMapping("/delete/{id}")
-    public ModelAndView delete(@PathVariable Integer id) {
+    public ModelAndView delete(@PathVariable Integer id, HttpServletRequest request, HttpSession session) {
         cheatsheetService.delete(id);
+        auditLogService.log((User) session.getAttribute("currentUser"), "Delete Cheatsheet", "Cheatsheet", id,
+                "Cheatsheet deactivated.", request.getRemoteAddr());
         return new ModelAndView("redirect:/cheatsheet/list");
     }
 

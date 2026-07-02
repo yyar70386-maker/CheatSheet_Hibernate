@@ -79,4 +79,12 @@ public class CategoryRepositoryImpl implements CategoryRepository {
             getSession().update(category);
         }
     }
+
+    @Override
+    public long countAllActive() {
+        Long count = getSession()
+                .createQuery("select count(c) from CategoryEntity c where c.status = 'ACTIVE'", Long.class)
+                .uniqueResult();
+        return count != null ? count : 0;
+    }
 }

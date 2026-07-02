@@ -25,4 +25,6 @@ public interface UserRepository {
     List<User> findAll();
 
     long countAll();
+
+    List<User> findLatest(int limit);
 }

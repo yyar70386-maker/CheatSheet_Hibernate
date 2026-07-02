@@ -40,9 +40,17 @@ public class ReportEntity {
     @Column(name = "sheet_id")
     private Integer sheetId;
 
+    @Column(name = "target_type", length = 45)
+    private String targetType;
+
+    @Column(name = "target_id")
+    private Integer targetId;
+
     @Column(columnDefinition = "TEXT")
     private String reason;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
     
     private String status;
 

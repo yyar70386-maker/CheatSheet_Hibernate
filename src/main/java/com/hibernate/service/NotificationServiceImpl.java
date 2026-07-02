@@ -26,6 +26,11 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationDto createNotification(Integer userId, Integer senderId, String message, String type, String linkUrl) {
+        return createNotification(userId, senderId, type, message, type, linkUrl);
+    }
+
+    @Override
+    public NotificationDto createNotification(Integer userId, Integer senderId, String title, String message, String type, String linkUrl) {
         User user = userRepository.findById(userId);
         if (user == null) {
             throw new IllegalArgumentException("Notification recipient not found.");
@@ -33,6 +38,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         NotificationEntity notification = new NotificationEntity();
         notification.setUser(user);
+        notification.setTitle(title);
         notification.setMessage(message);
         notification.setNotificationType(type);
         notification.setLinkUrl(linkUrl);
@@ -46,6 +52,15 @@ public class NotificationServiceImpl implements NotificationService {
         NotificationDto dto = NotificationDto.fromEntity(notification);
 
         return dto;
+    }
+
+    @Override
+    public List<NotificationDto> broadcast(Integer senderId, String title, String message, String type, String linkUrl) {
+        return userRepository.findAll()
+                .stream()
+                .filter(user -> senderId == null || !user.getId().equals(senderId))
+                .map(user -> createNotification(user.getId(), senderId, title, message, type, linkUrl))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -65,6 +80,7 @@ public class NotificationServiceImpl implements NotificationService {
         return createNotification(
                 followingId,
                 followerId,
+                "New follower",
                 message,
                 "FOLLOW",
                 "/profile/" + followerId);
@@ -72,16 +88,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<NotificationDto> createAnnouncementNotifications(Integer senderId, Integer announcementId, String title) {
-        return userRepository.findAll()
-                .stream()
-                .filter(user -> senderId == null || !user.getId().equals(senderId))
-                .map(user -> createNotification(
-                        user.getId(),
-                        senderId,
-                        "New announcement posted: " + title,
-                        "ANNOUNCEMENT",
-                        "/announcements"))
-                .collect(Collectors.toList());
+        return broadcast(senderId, "New announcement", "New announcement posted: " + title, "ANNOUNCEMENT", "/announcements");
     }
 
     @Override
@@ -94,6 +101,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .map(user -> createNotification(
                         user.getId(),
                         authorId,
+                        "New cheat sheet",
                         authorName + " created a new cheat sheet: " + title,
                         "CHEATSHEET",
                         "/cheatsheet/detail/" + cheatsheetId))
@@ -132,5 +140,16 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void markAllAsRead(Integer userId) {
         notificationRepository.markAllAsRead(userId);
+    }
+
+    @Override
+    public void delete(Integer notificationId, Integer userId) {
+        notificationRepository.delete(notificationId, userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countAll() {
+        return notificationRepository.countAll();
     }
 }

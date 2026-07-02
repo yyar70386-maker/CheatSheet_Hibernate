@@ -55,4 +55,10 @@ public class CategoryServiceImpl implements CategoryService {
     public void delete(Integer id) {
         repo.delete(id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countAllActive() {
+        return repo.countAllActive();
+    }
 }
