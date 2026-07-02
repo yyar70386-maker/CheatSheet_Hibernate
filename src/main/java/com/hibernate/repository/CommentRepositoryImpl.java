@@ -13,27 +13,44 @@ public class CommentRepositoryImpl {
     
     private final SessionFactory sessionFactory;
     
-    public Session getSession() { 
-        return sessionFactory.getCurrentSession(); 
+    public Session getSession() { return sessionFactory.getCurrentSession(); }
+
+    public Integer insertComment(CommentEntity obj) { return (Integer) getSession().save(obj); }
+    public CommentEntity getById(Integer id) { return getSession().get(CommentEntity.class, id); }
+    
+    // Void type ဖြစ်သည့်အတွက် return မလိုတော့ပါ
+    public void update(CommentEntity obj) { 
+        getSession().saveOrUpdate(obj); 
+    }
+    
+    public void delete(CommentEntity obj) { getSession().delete(obj); }
+
+    public void deleteRepliesByParentId(Integer parentId) {
+        String hql = "DELETE FROM CommentEntity c WHERE c.parentComment.id = :pId";
+        getSession().createQuery(hql).setParameter("pId", parentId).executeUpdate();
     }
 
-    public Integer insertComment(CommentEntity obj) {
-        return (Integer) getSession().save(obj);
-    }
-
-    public CommentEntity getById(Integer id) {
-        return getSession().get(CommentEntity.class, id);
-    }
-
-    // 🌟 ဤနေရာတွင် JOIN FETCH ထည့်သွင်း၍ LazyInitializationException အား ဖြေရှင်းထားသည်
     public List<CommentEntity> getCommentsBySheetId(Integer sheetId) {
-        String hql = "SELECT c FROM CommentEntity c " +
-                     "JOIN FETCH c.user " +                 // User Data ကို တစ်ခါတည်း ဆွဲထုတ်ရန်
-                     "LEFT JOIN FETCH c.parentComment " +   // Reply (Parent Comment) ကိုပါ တစ်ခါတည်း ဆွဲထုတ်ရန်
-                     "WHERE c.cheatSheet.id = :sheetId ORDER BY c.id ASC";
-                     
-        return getSession().createQuery(hql, CommentEntity.class)
-                .setParameter("sheetId", sheetId)
-                .getResultList();
+        String hql = "SELECT c FROM CommentEntity c JOIN FETCH c.user LEFT JOIN FETCH c.parentComment WHERE c.cheatSheet.id = :sheetId ORDER BY c.id ASC";
+        return getSession().createQuery(hql, CommentEntity.class).setParameter("sheetId", sheetId).getResultList();
+    }
+
+    public List<CommentEntity> findAllCommentsForAdmin() {
+        String hql = "SELECT c FROM CommentEntity c LEFT JOIN FETCH c.user LEFT JOIN FETCH c.cheatSheet ORDER BY c.id DESC";
+        return getSession().createQuery(hql, CommentEntity.class).getResultList();
+    }
+
+    public List<CommentEntity> findAllSortedByLikesAdmin() {
+        String hql = "SELECT c FROM CommentEntity c LEFT JOIN FETCH c.user LEFT JOIN FETCH c.cheatSheet " +
+                     "LEFT JOIN CommentReactionEntity r ON r.comment.id = c.id AND r.isLike = true " +
+                     "GROUP BY c.id ORDER BY COUNT(r.id) DESC";
+        return getSession().createQuery(hql, CommentEntity.class).getResultList();
+    }
+
+    public List<CommentEntity> findAllSortedByDislikesAdmin() {
+        String hql = "SELECT c FROM CommentEntity c LEFT JOIN FETCH c.user LEFT JOIN FETCH c.cheatSheet " +
+                     "LEFT JOIN CommentReactionEntity r ON r.comment.id = c.id AND r.isLike = false " +
+                     "GROUP BY c.id ORDER BY COUNT(r.id) DESC";
+        return getSession().createQuery(hql, CommentEntity.class).getResultList();
     }
 }

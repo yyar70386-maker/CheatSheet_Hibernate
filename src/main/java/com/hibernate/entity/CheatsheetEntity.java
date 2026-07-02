@@ -2,12 +2,9 @@ package com.hibernate.entity;
 
 import java.sql.Timestamp;
 import java.util.List;
-
 import javax.persistence.*;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -65,4 +62,11 @@ public class CheatsheetEntity {
         inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<TagEntity> tags;
+
+    // 🌟 Admin Dashboard အတွက် Filter ထည့်ရန်
+    @Transient
+    private Long likeCount = 0L;
+    
+    @Transient
+    private Long dislikeCount = 0L;
 }

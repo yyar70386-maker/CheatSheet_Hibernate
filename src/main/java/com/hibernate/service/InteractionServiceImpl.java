@@ -1,7 +1,7 @@
 package com.hibernate.service;
 
 import java.util.List;
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional; 
 import org.springframework.stereotype.Service;
 import com.hibernate.entity.*;
 import com.hibernate.repository.CommentRepositoryImpl;
@@ -15,7 +15,6 @@ public class InteractionServiceImpl {
     private final CommentRepositoryImpl commentRepo;
     private final ReactionRepositoryImpl reactionRepo;
 
-    // 🌟 ဤနေရာတွင် Return Type အား String မှ Integer (ID) သို့ ပြောင်းထားပါသည်
     @Transactional
     public Integer addComment(Integer userId, Integer cheatSheetId, String content, Integer parentCommentId) {
         CommentEntity comment = new CommentEntity();
@@ -27,7 +26,48 @@ public class InteractionServiceImpl {
             CommentEntity parent = new CommentEntity(); parent.setId(parentCommentId);
             comment.setParentComment(parent);
         }
-        return commentRepo.insertComment(comment); // Database ထဲရောက်သွားသော ID အသစ်ကို ပြန်ပို့မည်
+        return commentRepo.insertComment(comment);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CommentEntity> findAllAdmin(String filter) {
+        if ("mostLikes".equals(filter)) {
+            return commentRepo.findAllSortedByLikesAdmin();
+        } else if ("mostDislikes".equals(filter)) {
+            return commentRepo.findAllSortedByDislikesAdmin();
+        }
+        return commentRepo.findAllCommentsForAdmin(); 
+    }
+
+    @Transactional
+    public void deleteCommentAdmin(Integer commentId) {
+        CommentEntity comment = commentRepo.getById(commentId);
+        if (comment != null) {
+            commentRepo.deleteRepliesByParentId(commentId);
+            commentRepo.delete(comment);
+        }
+    }
+
+    @Transactional
+    public boolean editComment(Integer commentId, Integer userId, String newContent) {
+        CommentEntity comment = commentRepo.getById(commentId);
+        if (comment != null && comment.getUser().getId().equals(userId)) {
+            comment.setContent(newContent);
+            commentRepo.update(comment);
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional
+    public boolean deleteComment(Integer commentId, Integer userId) {
+        CommentEntity comment = commentRepo.getById(commentId);
+        if (comment != null && comment.getUser().getId().equals(userId)) {
+            commentRepo.deleteRepliesByParentId(commentId);
+            commentRepo.delete(comment);
+            return true;
+        }
+        return false;
     }
 
     @Transactional
@@ -37,8 +77,7 @@ public class InteractionServiceImpl {
             if (existing.getIsLike().equals(isLike)) {
                 reactionRepo.deleteSheetReaction(existing); return "removed";
             } else {
-                existing.setIsLike(isLike);
-                reactionRepo.saveOrUpdateSheetReaction(existing); return "updated";
+                existing.setIsLike(isLike); reactionRepo.saveOrUpdateSheetReaction(existing); return "updated";
             }
         } else {
             SheetReactionEntity newReaction = new SheetReactionEntity();
@@ -48,7 +87,7 @@ public class InteractionServiceImpl {
             reactionRepo.saveOrUpdateSheetReaction(newReaction); return "added";
         }
     }
-    
+
     @Transactional
     public String likeComment(Integer userId, Integer commentId, Boolean isLike) {
         CommentReactionEntity existing = reactionRepo.getCommentReaction(userId, commentId);
@@ -56,8 +95,7 @@ public class InteractionServiceImpl {
             if (existing.getIsLike().equals(isLike)) {
                 reactionRepo.deleteCommentReaction(existing); return "removed";
             } else {
-                existing.setIsLike(isLike);
-                reactionRepo.saveOrUpdateCommentReaction(existing); return "updated";
+                existing.setIsLike(isLike); reactionRepo.saveOrUpdateCommentReaction(existing); return "updated";
             }
         } else {
             CommentReactionEntity newReaction = new CommentReactionEntity();
@@ -68,7 +106,7 @@ public class InteractionServiceImpl {
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<CommentEntity> getCommentsBySheetId(Integer sheetId, Integer currentUserId) {
         List<CommentEntity> comments = commentRepo.getCommentsBySheetId(sheetId);
         for (CommentEntity c : comments) {
@@ -82,12 +120,18 @@ public class InteractionServiceImpl {
         return comments;
     }
 
-    @Transactional
-    public SheetReactionEntity getSheetReaction(Integer userId, Integer sheetId) { return reactionRepo.getSheetReaction(userId, sheetId); }
+    @Transactional(readOnly = true)
+    public SheetReactionEntity getSheetReaction(Integer userId, Integer sheetId) { 
+        return reactionRepo.getSheetReaction(userId, sheetId); 
+    }
 
-    @Transactional
-    public Long countSheetReactions(Integer sheetId, Boolean isLike) { return reactionRepo.countSheetReactions(sheetId, isLike); }
+    @Transactional(readOnly = true)
+    public Long countSheetReactions(Integer sheetId, Boolean isLike) { 
+        return reactionRepo.countSheetReactions(sheetId, isLike); 
+    }
 
-    @Transactional
-    public Long countCommentReactions(Integer commentId, Boolean isLike) { return reactionRepo.countCommentReactions(commentId, isLike); }
+    @Transactional(readOnly = true)
+    public Long countCommentReactions(Integer commentId, Boolean isLike) { 
+        return reactionRepo.countCommentReactions(commentId, isLike); 
+    }
 }

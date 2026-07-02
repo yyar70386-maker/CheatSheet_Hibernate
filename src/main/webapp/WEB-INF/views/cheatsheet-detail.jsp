@@ -49,15 +49,12 @@
 
     <div class="detail-container">
         
-        <%-- 🌟 Title & Author (Profile Link + View Count အပြည့်အစုံ ပေါင်းစပ်ပြီး) --%>
         <div>
             <h1 class="sheet-title">${sheet.title}</h1>
             <span class="author-text">by 
                 <c:choose>
                     <c:when test="${sheet.author != null}">
-                        <a href="${pageContext.request.contextPath}/profile/${sheet.author.id}" 
-                           class="text-dark fw-bold text-decoration-none" 
-                           style="border-bottom: 2px solid #0d6efd; padding-bottom: 2px;">
+                        <a href="${pageContext.request.contextPath}/profile/${sheet.author.id}" class="text-dark fw-bold text-decoration-none" style="border-bottom: 2px solid #0d6efd; padding-bottom: 2px;">
                             <c:out value="${sheet.author.username}" />
                         </a>
                     </c:when>
@@ -69,10 +66,7 @@
             </span>
         </div>
  
-        <%-- 🌟 Description Section --%>
-        <p class="description-text">
-            ${sheet.description}
-        </p>
+        <p class="description-text">${sheet.description}</p>
 
         <div class="code-container-box">
             <pre class="plain-code-text"><c:out value="${sheet.content}" /></pre>
@@ -84,26 +78,21 @@
             </c:forEach>
         </div>
 
-        <%-- 🌟 INTERACTION BAR (AJAX Seamless) --%>
+        <%-- 🌟 INTERACTION BAR --%>
         <div class="interaction-bar">
             <c:choose>
                 <c:when test="${not empty sessionScope.currentUser}">
                     <button type="button" onclick="toggleFavJS(this)" class="action-btn btn-heart ${isFavorited ? 'active' : ''}">
-                        <i class="${isFavorited ? 'fa-solid' : 'fa-regular'} fa-heart"></i> 
-                        <span id="favText">${isFavorited ? 'Saved' : 'Save'}</span>
+                        <i class="${isFavorited ? 'fa-solid' : 'fa-regular'} fa-heart"></i> <span id="favText">${isFavorited ? 'Saved' : 'Save'}</span>
                     </button>
-
                     <div class="vr mx-2"></div> 
-
                     <button type="button" id="sheetLikeBtn" onclick="reactSheetJS(true)" class="action-btn btn-like ${userSheetLike == true ? 'active' : ''}">
                         <i class="fa-solid fa-thumbs-up"></i> <span id="sheetLikeCount">${sheetLikes != null ? sheetLikes : 0}</span>
                     </button>
                     <button type="button" id="sheetDislikeBtn" onclick="reactSheetJS(false)" class="action-btn btn-dislike ${userSheetLike == false ? 'active' : ''}">
                         <i class="fa-solid fa-thumbs-down"></i> <span id="sheetDislikeCount">${sheetDislikes != null ? sheetDislikes : 0}</span>
                     </button>
-
                     <div class="vr mx-2"></div> 
-                    
                     <div class="d-flex align-items-center">
                         <span class="me-3 fw-bold text-dark"><i class="fa-solid fa-star text-warning"></i> ${avgRating > 0 ? avgRating : '0.0'}</span>
                         <span class="text-muted me-2" style="font-size: 14px;">Your Rate:</span>
@@ -117,7 +106,6 @@
                         <button type="button" id="rateSubmitBtn" onclick="submitRatingJS()" class="btn btn-sm btn-outline-warning text-dark fw-bold">Rate / Undo</button>
                     </div>
                 </c:when>
-
                 <c:otherwise>
                     <span class="text-muted"><i class="bi bi-info-circle text-primary"></i> Please <strong><a href="${pageContext.request.contextPath}/login" class="text-decoration-none">Login</a></strong> to interact.</span>
                     <span class="ms-auto fw-bold text-dark"><i class="fa-solid fa-star text-warning"></i> ${avgRating > 0 ? avgRating : '0.0'}</span>
@@ -152,14 +140,31 @@
                         <div id="commentThread_${comment.id}">
                             <div class="comment-box">
                                 <div class="comment-author"><i class="fa-solid fa-circle-user text-primary me-1"></i> ${comment.user.username}</div>
-                                <div class="comment-text">${comment.content}</div>
                                 
+                                <%-- Comment Text & Edit Form --%>
+                                <div class="comment-text" id="commentText_${comment.id}">${comment.content}</div>
+                                
+                                <div id="editForm_${comment.id}" style="display:none;" class="mt-2">
+                                    <div class="input-group">
+                                        <input type="text" id="editInput_${comment.id}" class="form-control form-control-sm" value="${comment.content}">
+                                        <button class="btn btn-sm btn-success" type="button" onclick="submitEditJS(${comment.id})">Save</button>
+                                        <button class="btn btn-sm btn-secondary" type="button" onclick="hideEditForm(${comment.id})">Cancel</button>
+                                    </div>
+                                </div>
+
                                 <div class="mt-2">
                                     <c:choose>
                                         <c:when test="${not empty sessionScope.currentUser}">
                                             <button type="button" id="cLikeBtn_${comment.id}" onclick="reactCommentJS(${comment.id}, true)" class="btn btn-sm btn-link text-decoration-none p-0 me-2 ${comment.currentUserReaction == true ? 'text-primary fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-up-fill"></i> <span id="cLikeCount_${comment.id}">${comment.likeCount}</span></button>
                                             <button type="button" id="cDislikeBtn_${comment.id}" onclick="reactCommentJS(${comment.id}, false)" class="btn btn-sm btn-link text-decoration-none p-0 me-3 ${comment.currentUserReaction == false ? 'text-danger fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-down-fill"></i> <span id="cDislikeCount_${comment.id}">${comment.dislikeCount}</span></button>
                                             <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-muted" onclick="document.getElementById('replyForm_${comment.id}').style.display='block';"><i class="bi bi-reply"></i> Reply</button>
+                                            
+                                            <%-- 🌟 Edit & Delete Buttons --%>
+                                            <c:if test="${sessionScope.currentUser.id == comment.user.id}">
+                                                <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-primary ms-3" onclick="showEditForm(${comment.id})"><i class="bi bi-pencil-square"></i> Edit</button>
+                                                <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-danger ms-2" onclick="deleteCommentJS(${comment.id}, 'main')"><i class="bi bi-trash"></i> Delete</button>
+                                            </c:if>
+
                                         </c:when>
                                         <c:otherwise>
                                             <span class="text-muted me-3" style="font-size: 13px;"><i class="bi bi-hand-thumbs-up"></i> ${comment.likeCount}</span>
@@ -173,15 +178,32 @@
                             <div id="repliesContainer_${comment.id}">
                                 <c:forEach items="${commentsList}" var="reply">
                                     <c:if test="${reply.parentComment != null && reply.parentComment.id == comment.id}">
-                                        <div class="comment-box reply-box">
+                                        <div class="comment-box reply-box" id="replyNode_${reply.id}">
                                             <div class="comment-author"><i class="fa-solid fa-reply text-info me-1"></i> ${reply.user.username} <span class="text-muted fw-normal" style="font-size:12px;">replied to ${comment.user.username}</span></div>
-                                            <div class="comment-text">${reply.content}</div>
+                                            
+                                            <%-- Reply Text & Edit Form --%>
+                                            <div class="comment-text" id="commentText_${reply.id}">${reply.content}</div>
+                                            
+                                            <div id="editForm_${reply.id}" style="display:none;" class="mt-2">
+                                                <div class="input-group">
+                                                    <input type="text" id="editInput_${reply.id}" class="form-control form-control-sm" value="${reply.content}">
+                                                    <button class="btn btn-sm btn-success" type="button" onclick="submitEditJS(${reply.id})">Save</button>
+                                                    <button class="btn btn-sm btn-secondary" type="button" onclick="hideEditForm(${reply.id})">Cancel</button>
+                                                </div>
+                                            </div>
 
                                             <div class="mt-2">
                                                 <c:if test="${not empty sessionScope.currentUser}">
                                                     <button type="button" id="cLikeBtn_${reply.id}" onclick="reactCommentJS(${reply.id}, true)" class="btn btn-sm btn-link text-decoration-none p-0 me-2 ${reply.currentUserReaction == true ? 'text-primary fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-up-fill"></i> <span id="cLikeCount_${reply.id}">${reply.likeCount}</span></button>
                                                     <button type="button" id="cDislikeBtn_${reply.id}" onclick="reactCommentJS(${reply.id}, false)" class="btn btn-sm btn-link text-decoration-none p-0 me-3 ${reply.currentUserReaction == false ? 'text-danger fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-down-fill"></i> <span id="cDislikeCount_${reply.id}">${reply.dislikeCount}</span></button>
                                                     <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-muted" onclick="document.getElementById('replyForm_${comment.id}').style.display='block'; document.getElementById('replyInput_${comment.id}').value='@${reply.user.username} '"><i class="bi bi-reply"></i> Reply</button>
+                                                    
+                                                    <%-- 🌟 Edit & Delete Buttons (Reply) --%>
+                                                    <c:if test="${sessionScope.currentUser.id == reply.user.id}">
+                                                        <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-primary ms-3" onclick="showEditForm(${reply.id})"><i class="bi bi-pencil-square"></i> Edit</button>
+                                                        <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-danger ms-2" onclick="deleteCommentJS(${reply.id}, 'reply')"><i class="bi bi-trash"></i> Delete</button>
+                                                    </c:if>
+
                                                 </c:if>
                                             </div>
                                         </div>
@@ -210,7 +232,7 @@
     <jsp:include page="footer.jsp" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <%-- 🌟 JAVASCRIPT FOR SEAMLESS UI (NO REFRESH) --%>
+    <%-- 🌟 JAVASCRIPT FOR SEAMLESS UI (NO REFRESH + EDIT/DELETE FULL) --%>
     <script>
         const currentUserId = parseInt('${sessionScope.currentUser != null ? sessionScope.currentUser.id : 0}') || 0;
         const currentUserName = "${sessionScope.currentUser != null ? sessionScope.currentUser.username : 'Guest'}";
@@ -222,6 +244,7 @@
             return true;
         }
 
+        // --- 1. Toggle Favorite ---
         function toggleFavJS(btn) {
             if (!checkLogin()) return;
             fetch(contextPath + '/favorite/toggle', {method: 'POST', body: new URLSearchParams({userId: currentUserId, cheatSheetId: currentSheetId})})
@@ -236,6 +259,7 @@
             }).catch(err => alert("Error: " + err.message));
         }
 
+        // --- 2. Sheet Reaction ---
         function reactSheetJS(isLike) {
             if (!checkLogin()) return;
             fetch(contextPath + '/interaction/react-sheet', {method: 'POST', body: new URLSearchParams({userId: currentUserId, cheatSheetId: currentSheetId, isLike: isLike})})
@@ -244,11 +268,12 @@
                 document.getElementById('sheetLikeCount').innerText = data.likes;
                 document.getElementById('sheetDislikeCount').innerText = data.dislikes;
                 let lBtn = document.getElementById('sheetLikeBtn'); let dBtn = document.getElementById('sheetDislikeBtn');
-                if (isLike) { lBtn.classList.add('active'); dBtn.classList.remove('active'); } 
-                else { dBtn.classList.add('active'); lBtn.classList.remove('active'); }
+                if (isLike) { lBtn.classList.toggle('active'); dBtn.classList.remove('active'); } 
+                else { dBtn.classList.toggle('active'); lBtn.classList.remove('active'); }
             }).catch(err => alert("Action failed: " + err.message));
         }
 
+        // --- 3. Comment Reaction ---
         function reactCommentJS(commentId, isLike) {
             if (!checkLogin()) return;
             fetch(contextPath + '/interaction/react-comment', {method: 'POST', body: new URLSearchParams({userId: currentUserId, commentId: commentId, isLike: isLike})})
@@ -258,15 +283,16 @@
                 document.getElementById('cDislikeCount_' + commentId).innerText = data.dislikes;
                 let lBtn = document.getElementById('cLikeBtn_' + commentId); let dBtn = document.getElementById('cDislikeBtn_' + commentId);
                 if (isLike) {
-                    lBtn.classList.add('text-primary', 'fw-bold'); lBtn.classList.remove('text-muted', 'text-danger');
+                    lBtn.classList.toggle('text-primary'); lBtn.classList.toggle('fw-bold'); lBtn.classList.remove('text-muted');
                     dBtn.classList.remove('text-danger', 'fw-bold'); dBtn.classList.add('text-muted');
                 } else {
-                    dBtn.classList.add('text-danger', 'fw-bold'); dBtn.classList.remove('text-muted', 'text-primary');
+                    dBtn.classList.toggle('text-danger'); dBtn.classList.toggle('fw-bold'); dBtn.classList.remove('text-muted');
                     lBtn.classList.remove('text-primary', 'fw-bold'); lBtn.classList.add('text-muted');
                 }
             }).catch(err => alert("Action failed: " + err.message));
         }
 
+        // --- 4. Submit Rating ---
         function submitRatingJS() {
             if (!checkLogin()) return;
             let stars = document.getElementById('ratingSelect').value;
@@ -279,6 +305,7 @@
             }).catch(err => alert("Error: " + err.message));
         }
 
+        // --- 5. Post Main Comment ---
         function postMainCommentJS() {
             if (!checkLogin()) return;
             const input = document.getElementById('mainCommentContent');
@@ -293,11 +320,23 @@
                 <div id="commentThread_`+newId+`">
                     <div class="comment-box">
                         <div class="comment-author"><i class="fa-solid fa-circle-user text-primary me-1"></i> `+currentUserName+`</div>
-                        <div class="comment-text">`+content+`</div>
+                        
+                        <div class="comment-text" id="commentText_`+newId+`">`+content+`</div>
+                        <div id="editForm_`+newId+`" style="display:none;" class="mt-2">
+                            <div class="input-group">
+                                <input type="text" id="editInput_`+newId+`" class="form-control form-control-sm" value="`+content+`">
+                                <button class="btn btn-sm btn-success" type="button" onclick="submitEditJS(`+newId+`)">Save</button>
+                                <button class="btn btn-sm btn-secondary" type="button" onclick="hideEditForm(`+newId+`)">Cancel</button>
+                            </div>
+                        </div>
+
                         <div class="mt-2">
                             <button type="button" id="cLikeBtn_`+newId+`" onclick="reactCommentJS(`+newId+`, true)" class="btn btn-sm btn-link text-decoration-none p-0 me-2 text-muted"><i class="bi bi-hand-thumbs-up-fill"></i> <span id="cLikeCount_`+newId+`">0</span></button>
                             <button type="button" id="cDislikeBtn_`+newId+`" onclick="reactCommentJS(`+newId+`, false)" class="btn btn-sm btn-link text-decoration-none p-0 me-3 text-muted"><i class="bi bi-hand-thumbs-down-fill"></i> <span id="cDislikeCount_`+newId+`">0</span></button>
                             <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-muted" onclick="document.getElementById('replyForm_`+newId+`').style.display='block';"><i class="bi bi-reply"></i> Reply</button>
+                            
+                            <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-primary ms-3" onclick="showEditForm(`+newId+`)"><i class="bi bi-pencil-square"></i> Edit</button>
+                            <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-danger ms-2" onclick="deleteCommentJS(`+newId+`, 'main')"><i class="bi bi-trash"></i> Delete</button>
                         </div>
                     </div>
                     <div id="repliesContainer_`+newId+`"></div>
@@ -312,12 +351,12 @@
                 
                 let msg = document.getElementById('noCommentsMsg');
                 if (msg) msg.remove();
-                
                 document.getElementById('commentsWrapper').insertAdjacentHTML('beforeend', html);
                 input.value = ''; 
             }).catch(err => alert("Action failed: " + err.message));
         }
 
+        // --- 6. Post Reply ---
         function postReplyJS(parentId) {
             if (!checkLogin()) return;
             const input = document.getElementById('replyInput_' + parentId);
@@ -329,18 +368,72 @@
             .then(data => {
                 const newId = data.id;
                 const html = `
-                <div class="comment-box reply-box">
+                <div class="comment-box reply-box" id="replyNode_`+newId+`">
                     <div class="comment-author"><i class="fa-solid fa-reply text-info me-1"></i> `+currentUserName+`</div>
-                    <div class="comment-text">`+content+`</div>
+                    
+                    <div class="comment-text" id="commentText_`+newId+`">`+content+`</div>
+                    <div id="editForm_`+newId+`" style="display:none;" class="mt-2">
+                        <div class="input-group">
+                            <input type="text" id="editInput_`+newId+`" class="form-control form-control-sm" value="`+content+`">
+                            <button class="btn btn-sm btn-success" type="button" onclick="submitEditJS(`+newId+`)">Save</button>
+                            <button class="btn btn-sm btn-secondary" type="button" onclick="hideEditForm(`+newId+`)">Cancel</button>
+                        </div>
+                    </div>
+
                     <div class="mt-2">
                         <button type="button" id="cLikeBtn_`+newId+`" onclick="reactCommentJS(`+newId+`, true)" class="btn btn-sm btn-link text-decoration-none p-0 me-2 text-muted"><i class="bi bi-hand-thumbs-up-fill"></i> <span id="cLikeCount_`+newId+`">0</span></button>
                         <button type="button" id="cDislikeBtn_`+newId+`" onclick="reactCommentJS(`+newId+`, false)" class="btn btn-sm btn-link text-decoration-none p-0 me-3 text-muted"><i class="bi bi-hand-thumbs-down-fill"></i> <span id="cDislikeCount_`+newId+`">0</span></button>
                         <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-muted" onclick="document.getElementById('replyForm_`+parentId+`').style.display='block'; document.getElementById('replyInput_`+parentId+`').value='@`+currentUserName+` '"><i class="bi bi-reply"></i> Reply</button>
+                        
+                        <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-primary ms-3" onclick="showEditForm(`+newId+`)"><i class="bi bi-pencil-square"></i> Edit</button>
+                        <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-danger ms-2" onclick="deleteCommentJS(`+newId+`, 'reply')"><i class="bi bi-trash"></i> Delete</button>
                     </div>
                 </div>`;
                 document.getElementById('repliesContainer_' + parentId).insertAdjacentHTML('beforeend', html);
                 input.value = '';
                 document.getElementById('replyForm_' + parentId).style.display = 'none'; 
+            }).catch(err => alert("Action failed: " + err.message));
+        }
+
+        // --- 7. Show / Hide Edit Form ---
+        function showEditForm(id) {
+            document.getElementById('commentText_' + id).style.display = 'none';
+            document.getElementById('editForm_' + id).style.display = 'block';
+        }
+        function hideEditForm(id) {
+            document.getElementById('editForm_' + id).style.display = 'none';
+            document.getElementById('commentText_' + id).style.display = 'block';
+        }
+
+        // --- 8. Submit Edit Comment ---
+        function submitEditJS(id) {
+            let newContent = document.getElementById('editInput_' + id).value.trim();
+            if(newContent === "") { alert("Comment cannot be empty"); return; }
+            fetch(contextPath + '/interaction/comment/edit', {method: 'POST', body: new URLSearchParams({userId: currentUserId, commentId: id, newContent: newContent})})
+            .then(res => res.json()).then(data => {
+                if(data.success) {
+                    document.getElementById('commentText_' + id).innerText = newContent;
+                    hideEditForm(id);
+                } else {
+                    alert("Failed to edit comment.");
+                }
+            }).catch(err => alert("Action failed: " + err.message));
+        }
+
+        // --- 9. Delete Comment ---
+        function deleteCommentJS(id, type) {
+            if(!confirm("Are you sure you want to delete this comment?")) return;
+            fetch(contextPath + '/interaction/comment/delete', {method: 'POST', body: new URLSearchParams({userId: currentUserId, commentId: id})})
+            .then(res => res.json()).then(data => {
+                if(data.success) {
+                    if(type === 'main') {
+                        document.getElementById('commentThread_' + id).remove();
+                    } else if(type === 'reply') {
+                        document.getElementById('replyNode_' + id).remove();
+                    }
+                } else {
+                    alert("Failed to delete comment.");
+                }
             }).catch(err => alert("Action failed: " + err.message));
         }
     </script>

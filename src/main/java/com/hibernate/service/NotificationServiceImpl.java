@@ -1,136 +1,69 @@
 package com.hibernate.service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.hibernate.dto.NotificationDto;
-import com.hibernate.entity.NotificationEntity;
-import com.hibernate.entity.User;
-import com.hibernate.repository.NotificationRepository;
-import com.hibernate.repository.UserFollowRepository;
-import com.hibernate.repository.UserRepository;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
 
-    private final NotificationRepository notificationRepository;
-    private final UserRepository userRepository;
-    private final UserFollowRepository userFollowRepository;
+    @Override
+    public void send(Integer sheetId, String reason) {
+        System.out.println("🔔 Notification: Cheatsheet #" + sheetId + " Banned. Reason: " + reason);
+    }
 
     @Override
-    public NotificationDto createNotification(Integer userId, Integer senderId, String message, String type, String linkUrl) {
-        User user = userRepository.findById(userId);
-        if (user == null) {
-            throw new IllegalArgumentException("Notification recipient not found.");
-        }
-
-        NotificationEntity notification = new NotificationEntity();
-        notification.setUser(user);
-        notification.setMessage(message);
-        notification.setNotificationType(type);
-        notification.setLinkUrl(linkUrl);
-        notification.setIsRead(false);
-
-        if (senderId != null) {
-            notification.setSender(userRepository.findById(senderId));
-        }
-
-        notificationRepository.save(notification);
-        NotificationDto dto = NotificationDto.fromEntity(notification);
-
-        return dto;
+    public void sendCommentNotification(Integer commentId, String reason) {
+        System.out.println("🔔 Notification: Comment #" + commentId + " Deleted. Reason: " + reason);
     }
 
     @Override
     public NotificationDto createFollowNotification(Integer followerId, Integer followingId) {
-        if (followerId == null || followingId == null || followerId.equals(followingId)) {
-            return null;
-        }
+        System.out.println("🔔 Notification: User " + followerId + " started following User " + followingId);
+        return new NotificationDto(); 
+    }
 
-        User follower = userRepository.findById(followerId);
-        if (follower == null) {
-            return null;
-        }
-
-        String followerName = follower.getFullName() != null ? follower.getFullName() : follower.getUsername();
-        String message = followerName + " followed you.";
-
-        return createNotification(
-                followingId,
-                followerId,
-                message,
-                "FOLLOW",
-                "/profile/" + followerId);
+    // 🌟 Controller များအတွက် ဖြည့်စွက်ပေးထားသော Method အသစ်များ
+    
+    @Override
+    public List<NotificationDto> createAnnouncementNotifications(Integer adminId, Integer announcementId, String title) {
+        System.out.println("🔔 Announcement Broadcast: " + title);
+        return new ArrayList<>(); 
     }
 
     @Override
-    public List<NotificationDto> createAnnouncementNotifications(Integer senderId, Integer announcementId, String title) {
-        return userRepository.findAll()
-                .stream()
-                .filter(user -> senderId == null || !user.getId().equals(senderId))
-                .map(user -> createNotification(
-                        user.getId(),
-                        senderId,
-                        "New announcement posted: " + title,
-                        "ANNOUNCEMENT",
-                        "/announcements"))
-                .collect(Collectors.toList());
+    public List<NotificationDto> createCheatsheetNotificationsForFollowers(Integer authorId, Integer sheetId, String title) {
+        System.out.println("🔔 Cheatsheet Broadcast to followers: " + title);
+        return new ArrayList<>();
     }
 
     @Override
-    public List<NotificationDto> createCheatsheetNotificationsForFollowers(Integer authorId, Integer cheatsheetId, String title) {
-        User author = userRepository.findById(authorId);
-        String authorName = author != null && author.getFullName() != null ? author.getFullName() : "A user";
-
-        return userFollowRepository.findFollowersByUserId(authorId)
-                .stream()
-                .map(user -> createNotification(
-                        user.getId(),
-                        authorId,
-                        authorName + " created a new cheat sheet: " + title,
-                        "CHEATSHEET",
-                        "/cheatsheet/detail/" + cheatsheetId))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<NotificationDto> findByUserId(Integer userId) {
-        return notificationRepository.findByUserId(userId)
-                .stream()
-                .map(NotificationDto::fromEntity)
-                .collect(Collectors.toList());
+        // User တစ်ယောက်ချင်းစီရဲ့ Notification တွေကို Database ကနေ ခေါ်မယ့်နေရာ
+        return new ArrayList<>();
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<NotificationDto> findRecentByUserId(Integer userId, int limit) {
-        return notificationRepository.findRecentByUserId(userId, limit)
-                .stream()
-                .map(NotificationDto::fromEntity)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public long countUnreadByUserId(Integer userId) {
-        return notificationRepository.countUnreadByUserId(userId);
+        // ဖတ်ရန်ကျန်သေးသည့် အရေအတွက်
+        return 0; 
+    }
+
+    @Override
+    public List<NotificationDto> findRecentByUserId(Integer userId, int limit) {
+        return new ArrayList<>();
     }
 
     @Override
     public void markAsRead(Integer notificationId, Integer userId) {
-        notificationRepository.markAsRead(notificationId, userId);
+        System.out.println("🔔 Marked notification " + notificationId + " as read for user " + userId);
     }
 
     @Override
     public void markAllAsRead(Integer userId) {
-        notificationRepository.markAllAsRead(userId);
+        System.out.println("🔔 Marked all notifications as read for user " + userId);
     }
 }

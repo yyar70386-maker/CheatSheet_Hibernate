@@ -1,26 +1,19 @@
 package com.hibernate.service;
 
 import java.util.List;
-
 import com.hibernate.dto.NotificationDto;
 
 public interface NotificationService {
-
-    NotificationDto createNotification(Integer userId, Integer senderId, String message, String type, String linkUrl);
-
+    void send(Integer sheetId, String reason);
+    void sendCommentNotification(Integer commentId, String reason);
     NotificationDto createFollowNotification(Integer followerId, Integer followingId);
-
-    List<NotificationDto> createAnnouncementNotifications(Integer senderId, Integer announcementId, String title);
-
-    List<NotificationDto> createCheatsheetNotificationsForFollowers(Integer authorId, Integer cheatsheetId, String title);
-
+    
+    // 🌟 Controller များမှ လှမ်းခေါ်နေသော Method အသစ်များ
+    List<NotificationDto> createAnnouncementNotifications(Integer adminId, Integer announcementId, String title);
+    List<NotificationDto> createCheatsheetNotificationsForFollowers(Integer authorId, Integer sheetId, String title);
     List<NotificationDto> findByUserId(Integer userId);
-
-    List<NotificationDto> findRecentByUserId(Integer userId, int limit);
-
     long countUnreadByUserId(Integer userId);
-
+    List<NotificationDto> findRecentByUserId(Integer userId, int limit);
     void markAsRead(Integer notificationId, Integer userId);
-
     void markAllAsRead(Integer userId);
 }

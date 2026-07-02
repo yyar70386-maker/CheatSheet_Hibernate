@@ -293,7 +293,15 @@
                                     <button class="btn btn-library px-4" type="submit">Search</button>
                                 </div>
                             </form>
+                            
                             <div class="d-flex flex-wrap justify-content-center justify-content-xl-start gap-2 mt-3">
+                                <%-- 🌟 Admin Panel Button (Admin အကောင့်ဖြင့် ဝင်မှသာ ပေါ်မည်) --%>
+                                <c:if test="${not empty sessionScope.currentUser && sessionScope.currentUser.role == 1}">
+                                    <a class="tag-chip shadow-sm" style="background-color: #212529; border-color: #212529; color: #ffffff;" href="${pageContext.request.contextPath}/admin/dashboard">
+                                        <i class="bi bi-shield-lock-fill text-warning"></i> Admin Panel
+                                    </a>
+                                </c:if>
+                                
                                 <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/cheatsheet/add"><i class="bi bi-plus-circle-fill text-primary"></i> Create</a>
                                 <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/announcements"><i class="bi bi-megaphone-fill text-warning"></i> Announcements</a>
                                 <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/profile"><i class="bi bi-person-circle text-info"></i> Profile</a>
@@ -325,7 +333,7 @@
     
                     <div class="col-12 col-md-4">
                         <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
-                            <div class="d-flex align-items-center">
+                             <div class="d-flex align-items-center">
                                 <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center fw-bold fs-3" 
                                      style="width: 75px; height: 75px; flex-shrink: 0;">
                                     <c:out value="${not empty totalTags ? totalTags : 0}" />
@@ -337,7 +345,7 @@
                                     </h5>
                                 </div>
                             </div>
-                        </div>
+                         </div>
                     </div>
     
                     <div class="col-12 col-md-4">
@@ -354,7 +362,7 @@
                                     </h5>
                                 </div>
                             </div>
-                        </div>
+                         </div>
                     </div>
                 </div>
             </c:if>
@@ -379,16 +387,13 @@
                         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                             <c:forEach items="${categorylist}" var="c">
                                 <div class="col">
-                                    <a href="${pageContext.request.contextPath}/cheatsheet/category/${c.id}"
-                                       class="card feature-card h-100 p-4 text-center bg-white">
+                                    <a href="${pageContext.request.contextPath}/cheatsheet/category/${c.id}" class="card feature-card h-100 p-4 text-center bg-white">
                                         <div class="icon-box">
                                             <i class="bi bi-layers-half text-primary"></i>
                                         </div>
                                         <div class="card-body p-0">
                                             <h5 class="card-title fw-bold text-dark mb-2">${c.name}</h5>
-                                            <p class="card-text text-secondary small mb-0">
-                                                Browse all cheat sheets from this category.
-                                            </p>
+                                            <p class="card-text text-secondary small mb-0">Browse all cheat sheets from this category.</p>
                                         </div>
                                     </a>
                                 </div>
@@ -423,7 +428,7 @@
                                             </div>
                                         </div>
                                     </article>
-                                </c:forEach>
+                                 </c:forEach>
                             </div>
                         </div>
                     </c:if>
@@ -485,7 +490,7 @@
                                                 <a class="btn btn-library btn-sm px-4" href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}">Open</a>
                                             </div>
                                         </div>
-                                    </article>
+                                     </article>
                                 </c:forEach>
                             </div>
 

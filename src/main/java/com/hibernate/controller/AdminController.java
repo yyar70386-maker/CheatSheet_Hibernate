@@ -1,33 +1,46 @@
 package com.hibernate.controller;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import com.hibernate.entity.User;
-import com.hibernate.service.AdminDashboardService;
-
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import com.hibernate.service.CheatsheetService;
+import com.hibernate.service.InteractionServiceImpl;
+import com.hibernate.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
+@RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminController {
 
-    private final AdminDashboardService adminDashboardService;
+    private final CheatsheetService cheatsheetService;
+    private final InteractionServiceImpl interactionService;
+    private final NotificationService notificationService;
 
-    private boolean isAdmin(User user) {
-        return user != null && user.getRole() == 1;
+    @GetMapping("/dashboard")
+    public ModelAndView dashboard(@RequestParam(required = false, defaultValue = "newest") String sheetFilter,
+                                  @RequestParam(required = false, defaultValue = "newest") String commentFilter) {
+        ModelAndView mv = new ModelAndView("admin-dashboard");
+        
+        mv.addObject("cheatsheets", cheatsheetService.findAllAdmin(sheetFilter));
+        mv.addObject("comments", interactionService.findAllAdmin(commentFilter));
+        
+        mv.addObject("currentSheetFilter", sheetFilter);
+        mv.addObject("currentCommentFilter", commentFilter);
+        return mv;
     }
 
-    @GetMapping("/admin/dashboard")
-    public String dashboard(HttpSession session, Model model) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (!isAdmin(currentUser)) {
-            return "redirect:/login";
-        }
-        model.addAttribute("summary", adminDashboardService.getSummary());
-        return "admin-dashboard";
+    @PostMapping("/cheatsheet/action")
+    public String handleSheetAction(@RequestParam Integer sheetId, @RequestParam String action, @RequestParam String reason) {
+        cheatsheetService.banCheatsheet(sheetId, reason); 
+        notificationService.send(sheetId, reason);
+        return "redirect:/admin/dashboard";
+    }
+
+    @PostMapping("/comment/action")
+    public String handleCommentAction(@RequestParam Integer commentId, @RequestParam String action, @RequestParam String reason) {
+        interactionService.deleteCommentAdmin(commentId);
+        notificationService.sendCommentNotification(commentId, reason);
+        return "redirect:/admin/dashboard";
     }
 }
