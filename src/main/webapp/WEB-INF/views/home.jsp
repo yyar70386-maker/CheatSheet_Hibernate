@@ -1,269 +1,193 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - CheatSheet Library</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
-    <style>
-        :root {
-            --page-bg: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-dark: #212529;
-            --text-muted: #6c757d;
-            --line-color: #dee2e6;
-            
-            /* Professional Developer Palette */
-            --brand-primary: #1976d2;
-            --brand-dark: #0d47a1;
-            --accent-green: #2e7d32;
-            --accent-teal: #00796b;
-            --accent-amber: #f57c00;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home - CheatSheet Library</title>
 
-        /* Prevent main window scrolling; handle scroll inside the content area */
-        html, body {
-            height: 100vh;
-            overflow: hidden; 
-            margin: 0;
-            padding: 0;
-            background-color: var(--page-bg);
-            color: var(--text-dark);
-            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-        a { color: var(--brand-primary); text-decoration: none; }
-        a:hover { color: var(--brand-dark); }
+<!-- 📊 Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        /* App Layout Containers */
-        .navbar {
-            height: 56px;
-            z-index: 1030;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
-        }
+<style>
+:root {
+    --page-bg: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-dark: #212529;
+    --text-muted: #6c757d;
+    --line-color: #dee2e6;
+    --brand-primary: #1976d2;
+    --brand-dark: #0d47a1;
+    --accent-green: #2e7d32;
+    --accent-teal: #00796b;
+    --accent-amber: #f57c00;
+}
 
-        .app-container {
-            display: flex;
-            height: calc(100vh - 56px); 
-            width: 100%;
-        }
+html, body {
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    background-color: var(--page-bg);
+    color: var(--text-dark);
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
 
-        .admin-sidebar {
-            width: 280px;
-            height: 100%;
-            flex-shrink: 0;
-            overflow-y: auto; 
-        }
+a {
+    color: var(--brand-primary);
+    text-decoration: none;
+}
 
-        .main-content-area {
-            flex-grow: 1;
-            height: 100%;
-            overflow-y: auto; 
-            min-width: 0;
-            padding: 24px;
-            background-color: var(--page-bg);
-        }
+a:hover {
+    color: var(--brand-dark);
+}
 
-        /* Hero Banner Section */
-        .hero-section {
-            background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-primary) 100%);
-            padding: 3.5rem 2rem;
-            color: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
+.app-container {
+    display: flex;
+    height: calc(100vh - 56px);
+    width: 100%;
+}
 
-        .hero-title {
-            font-size: clamp(2rem, 3.5vw, 3rem);
-            font-weight: 800;
-        }
+.main-content-area {
+    flex-grow: 1;
+    height: 100%;
+    overflow-y: auto;
+    min-width: 0;
+    padding: 24px;
+    background-color: var(--page-bg);
+}
 
-        /* Interactive Components */
-        .search-panel {
-            background: var(--card-bg);
-            border-radius: 50px;
-            padding: 0.4rem;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        }
+/* Hero Banner Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-primary) 100%);
+    padding: 3.5rem 2rem;
+    color: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
 
-        .search-input {
-            border: 0;
-            background: transparent;
-            padding-left: 1rem;
-        }
+.search-panel {
+    background: var(--card-bg);
+    border-radius: 50px;
+    padding: 0.4rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
 
-        .search-input:focus {
-            box-shadow: none;
-        }
+.search-input {
+    border: 0;
+    background: transparent;
+    padding-left: 1rem;
+}
 
-        .btn-library {
-            background-color: var(--brand-primary);
-            color: white;
-            font-weight: 600;
-            border-radius: 50px;
-            transition: all 0.2s ease;
-        }
+.search-input:focus {
+    box-shadow: none;
+}
 
-        .btn-library:hover {
-            background-color: var(--brand-dark);
-            color: white;
-        }
+.btn-library {
+    background-color: var(--brand-primary);
+    color: white;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.2s ease;
+}
 
-        /* Section Titles */
-        .section-title {
-            font-weight: 700;
-            position: relative;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            height: 3px;
-            width: 40px;
-            background-color: var(--brand-primary);
-            border-radius: 2px;
-        }
+.btn-library:hover {
+    background-color: var(--brand-dark);
+    color: white;
+}
 
-        /* Feature Cards & Tiles */
-        .feature-card, .sheet-card, .notice-card, .empty-panel {
-            border: 1px solid var(--line-color);
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-        }
+.section-title {
+    font-weight: 700;
+    position: relative;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
 
-        .feature-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            text-decoration: none;
-            display: block;
-        }
+.section-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 40px;
+    background-color: var(--brand-primary);
+    border-radius: 2px;
+}
 
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(25, 118, 210, 0.12);
-            border-color: rgba(25, 118, 210, 0.2);
-        }
+.feature-card, .sheet-card, .notice-card, .empty-panel {
+    border: 1px solid var(--line-color);
+    background: var(--card-bg);
+    border-radius: 12px;
+}
 
-        .icon-box {
-            width: 64px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background-color: #e9ecef;
-            margin: 0 auto 15px auto;
-        }
+.feature-card {
+    transition: transform 0.3s ease;
+    text-decoration: none;
+    display: block;
+}
 
-        .icon-box i {
-            font-size: 28px;
-        }
+.feature-card:hover {
+    transform: translateY(-5px);
+}
 
-        /* Sheet Cards styling */
-        .sheet-card {
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+.icon-box {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    margin: 0 auto 15px auto;
+}
 
-        .sheet-card:hover {
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            border-color: rgba(25, 118, 210, 0.2);
-        }
+.sheet-card {
+    overflow: hidden;
+}
 
-        .sheet-ribbon {
-            background: #f1f3f5;
-            border-right: 1px solid var(--line-color);
-            min-width: 85px;
-            text-align: center;
-        }
+.sheet-ribbon {
+    background: #f1f3f5;
+    border-right: 1px solid var(--line-color);
+    min-width: 85px;
+    text-align: center;
+}
 
-        .sheet-pages {
-            color: var(--brand-primary);
-            font-size: 1.75rem;
-            font-weight: 800;
-            line-height: 1;
-        }
+.sheet-pages {
+    color: var(--brand-primary);
+    font-size: 1.75rem;
+    font-weight: 800;
+}
 
-        .author-chip, .tag-chip {
-            border: 1px solid var(--line-color);
-            background: #f8f9fa;
-            border-radius: 50px;
-            color: var(--text-muted);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.82rem;
-            padding: 4px 12px;
-            text-decoration: none;
-        }
-        
-        a.author-chip:hover {
-            background-color: #e9ecef;
-            color: var(--brand-primary);
-        }
+.author-chip, .tag-chip {
+    border: 1px solid var(--line-color);
+    background: #f8f9fa;
+    border-radius: 50px;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    padding: 4px 12px;
+}
 
-        .notice-card {
-            background: #fff9db;
-            border-color: #ffe066;
-        }
-
-        .notice-mark {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--accent-amber);
-            color: white;
-            flex: 0 0 36px;
-        }
-
-        .empty-panel {
-            border: 2px dashed var(--line-color);
-            background: rgba(255,255,255,0.5);
-        }
-
-        .page-link {
-            color: var(--brand-primary);
-            border-color: var(--line-color);
-        }
-
-        .page-item.active .page-link {
-            background-color: var(--brand-primary);
-            border-color: var(--brand-primary);
-        }
-
-        .shadow-inner {
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
-        }
-
-        @media (max-width: 991.98px) {
-            .sheet-card { flex-direction: column; }
-            .sheet-ribbon {
-                border-right: 0;
-                border-bottom: 1px solid var(--line-color);
-                min-width: 100%;
-                padding: 1rem !important;
-            }
-        }
-    </style>
+/* Admin Circle Chart Box */
+.chart-box-container {
+    position: relative;
+    margin: auto;
+    height: 200px;
+    width: 200px;
+}
+</style>
 </head>
 <body>
 
     <%-- 🧩 Header Component --%>
     <jsp:include page="header.jsp" />
 
-    <%-- 🌐 Main Application View Frame Wrapper --%>
     <div class="app-container">
 
         <%-- 🛠️ Sidebar Component --%>
@@ -271,265 +195,191 @@
             <jsp:param name="activePage" value="dashboard" />
         </jsp:include>
 
-        <%-- 🌐 Scrollable Work Content Context Panel --%>
         <div class="main-content-area">
 
-            <%-- 🚀 Hero Banner Section --%>
-            <header class="hero-section mb-4">
-                <div class="container-fluid px-2">
-                    <div class="row g-4 align-items-center">
-                        <div class="col-xl-7 text-center text-xl-start">
-                            <div class="text-uppercase small fw-bold tracking-wider mb-2 opacity-75">Quick references for every topic</div>
-                            <h1 class="hero-title mb-3">Developer Cheat Sheets</h1>
-                            <p class="fs-5 opacity-90 mb-0">
-                                Browse community cheat sheets, search fast, and jump into the newest references first.
-                            </p>
-                        </div>
-                        <div class="col-xl-5">
-                            <form action="${pageContext.request.contextPath}/home" method="get" class="search-panel shadow-sm">
-                                <div class="input-group">
-                                    <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
-                                    <input type="search" class="form-control search-input" name="q" value="${searchQuery}" placeholder="Search cheat sheets...">
-                                    <button class="btn btn-library px-4" type="submit">Search</button>
+            <%-- 🔐 Role-Based Switching Logic (From main branch) --%>
+            <c:choose>
+                <%-- 🌟 ADMIN VIEW --%>
+                <c:when test="${not empty sessionScope.currentUser && sessionScope.currentUser.role == 1}">
+                    <div class="mb-5 text-center mt-3">
+                        <h2 class="fw-bold mb-2">
+                            <i class="bi bi-speedometer2 text-primary me-2"></i>Admin Overview Panel
+                        </h2>
+                        <div class="text-muted small">Real-time database system summary metrics info</div>
+                    </div>
+
+                    <div class="row g-4 justify-content-center">
+                        <!-- Total Users Circle -->
+                        <div class="col-md-4">
+                            <div class="card bg-white border-0 shadow-sm rounded-3 p-4 text-center h-100">
+                                <h6 class="text-muted fw-bold mb-3">
+                                    <i class="bi bi-people-fill me-2 text-primary"></i>Total Users
+                                </h6>
+                                <div class="chart-box-container">
+                                    <canvas id="usersCircleChart"></canvas>
                                 </div>
-                            </form>
-                            <div class="d-flex flex-wrap justify-content-center justify-content-xl-start gap-2 mt-3">
-                                <%-- 🌟 Login ဝင်ထားရင် ဆောက်တဲ့စာမျက်နှာဆီပေးသွားပြီး၊ Guest ဆိုရင် Login ဝင်ခိုင်းမည့် Dynamic Link --%>
-<c:choose>
-    <c:when test="${not empty sessionScope.currentUser}">
-        <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/cheatsheet/add">
-            <i class="bi bi-plus-circle-fill text-primary"></i> Create
-        </a>
-    </c:when>
-    <c:otherwise>
-        <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/login">
-            <i class="bi bi-plus-circle-fill text-primary"></i> Create
-        </a>
-    </c:otherwise>
-</c:choose>
-                                <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/announcements"><i class="bi bi-megaphone-fill text-warning"></i> Announcements</a>
-                                <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/profile"><i class="bi bi-person-circle text-info"></i> Profile</a>
+                                <div class="fs-4 fw-bold mt-3 text-dark">
+                                    <c:out value="${not empty totalUsers ? totalUsers : (not empty summary.totalUsers ? summary.totalUsers : 0)}" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </header>
 
-            <%-- 🔐 Admin Stat-Widgets Block --%>
-            <c:if test="${not empty sessionScope.currentUser && sessionScope.currentUser.role == 1}">
-                <div class="row g-4 mb-4">
-                    <div class="col-12 col-md-4">
-                        <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold fs-3 shadow-inner" 
-                                     style="width: 75px; height: 75px; flex-shrink: 0;">
+                        <!-- Total Categories Circle -->
+                        <div class="col-md-4">
+                            <div class="card bg-white border-0 shadow-sm rounded-3 p-4 text-center h-100">
+                                <h6 class="text-muted fw-bold mb-3">
+                                    <i class="bi bi-tags-fill me-2 text-warning"></i>Total Categories
+                                </h6>
+                                <div class="chart-box-container">
+                                    <canvas id="categoriesCircleChart"></canvas>
+                                </div>
+                                <div class="fs-4 fw-bold mt-3 text-dark">
                                     <c:out value="${not empty categorylist ? categorylist.size() : 0}" />
                                 </div>
-                                <div class="ms-3">
-                                    <div class="text-secondary small fw-bold text-uppercase tracking-wider">Categories</div>
-                                    <h5 class="fw-bold text-dark mb-0 mt-1">
-                                        <i class="bi bi-tags-fill me-1 text-primary small"></i> Total Structs
-                                    </h5>
-                                </div>
                             </div>
                         </div>
-                    </div>
-    
-                    <div class="col-12 col-md-4">
-                        <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center fw-bold fs-3" 
-                                     style="width: 75px; height: 75px; flex-shrink: 0;">
-                                    <c:out value="${not empty totalTags ? totalTags : 0}" />
-                                </div>
-                                <div class="ms-3">
-                                    <div class="text-secondary small fw-bold text-uppercase tracking-wider">Tags</div>
-                                    <h5 class="fw-bold text-dark mb-0 mt-1">
-                                        <i class="bi bi-bookmark-star-fill me-1 text-warning small"></i> Keywords
-                                    </h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
-                    <div class="col-12 col-md-4">
-                        <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center fw-bold fs-3" 
-                                     style="width: 75px; height: 75px; flex-shrink: 0;">
-                                    <c:out value="${not empty totalSheets ? totalSheets : 0}" />
-                                </div>
-                                <div class="ms-3">
-                                    <div class="text-secondary small fw-bold text-uppercase tracking-wider">Cheat Sheets</div>
-                                    <h5 class="fw-bold text-dark mb-0 mt-1">
-                                        <i class="bi bi-file-earmark-code-fill me-1 text-success small"></i> Live Codes
-                                    </h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </c:if>
 
-            <%-- 📂 Browse Categories Layout Wrapper Grid Section --%>
-            <section class="mb-5" id="categories">
-                <div class="d-flex align-items-end justify-content-between mb-4">
-                    <div>
-                        <h2 class="section-title h4 mb-1">Browse Categories</h2>
-                        <div class="text-muted small">Explore system structural references by standard topics.</div>
-                    </div>
-                </div>
-
-                <c:choose>
-                    <c:when test="${empty categorylist}">
-                        <div class="empty-panel text-center p-5 text-muted">
-                            <i class="bi bi-folder-x display-4 d-block mb-3 text-secondary"></i> 
-                            No categories available at the moment.
+                        <!-- Total CheatSheets Circle -->
+                        <div class="col-md-4">
+                            <div class="card bg-white border-0 shadow-sm rounded-3 p-4 text-center h-100">
+                                <h6 class="text-muted fw-bold mb-3">
+                                    <i class="bi bi-file-earmark-code-fill me-2 text-success"></i>Cheat Sheets
+                                </h6>
+                                <div class="chart-box-container">
+                                    <canvas id="sheetsCircleChart"></canvas>
+                                </div>
+                                <div class="fs-4 fw-bold mt-3 text-dark">
+                                    <c:out value="${not empty totalSheets ? totalSheets : (not empty summary.totalCheatsheets ? summary.totalCheatsheets : 0)}" />
+                                </div>
+                            </div>
                         </div>
-                    </c:when>
-                    <c:otherwise>
+                    </div>
+                </c:when>
+
+                <%-- 🌟 REGULAR USER / GUEST VIEW --%>
+                <c:otherwise>
+                    <%-- 🚀 Merged Hero Banner Section (With Action Buttons from HEAD branch) --%>
+                    <header class="hero-section mb-5">
+                        <div class="container-fluid px-2">
+                            <div class="row g-4 align-items-center">
+                                <div class="col-xl-7 text-center text-xl-start">
+                                    <div class="text-uppercase small fw-bold tracking-wider mb-2 opacity-75">Quick references for every topic</div>
+                                    <h1 class="hero-title mb-3">Developer Cheat Sheets</h1>
+                                    <p class="fs-5 opacity-90 mb-0">
+                                        Browse community cheat sheets, search fast, and jump into the newest references first.
+                                    </p>
+                                </div>
+                                <div class="col-xl-5">
+                                    <form action="${pageContext.request.contextPath}/home" method="get" class="search-panel shadow-sm">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+                                            <input type="search" class="form-control search-input" name="q" value="${searchQuery}" placeholder="Search cheat sheets...">
+                                            <button class="btn btn-library px-4" type="submit">Search</button>
+                                        </div>
+                                    </form>
+                                    <div class="d-flex flex-wrap justify-content-center justify-content-xl-start gap-2 mt-3">
+                                        <c:choose>
+                                            <c:when test="${not empty sessionScope.currentUser}">
+                                                <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/cheatsheet/add">
+                                                    <i class="bi bi-plus-circle-fill text-primary"></i> Create
+                                                </a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/login">
+                                                    <i class="bi bi-plus-circle-fill text-primary"></i> Create
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/announcements"><i class="bi bi-megaphone-fill text-warning"></i> Announcements</a>
+                                        <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/profile"><i class="bi bi-person-circle text-info"></i> Profile</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <%-- Browse Categories Layout --%>
+                    <section class="mb-5" id="categories">
+                        <div class="d-flex align-items-end justify-content-between mb-4">
+                            <div>
+                                <h2 class="section-title h4 mb-1">Browse Categories</h2>
+                            </div>
+                        </div>
                         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                             <c:forEach items="${categorylist}" var="c">
                                 <div class="col">
-                                    <a href="${pageContext.request.contextPath}/cheatsheet/category/${c.id}"
-                                       class="card feature-card h-100 p-4 text-center bg-white">
+                                    <a href="${pageContext.request.contextPath}/cheatsheet/category/${c.id}" class="card feature-card h-100 p-4 text-center bg-white">
                                         <div class="icon-box">
                                             <i class="bi bi-layers-half text-primary"></i>
                                         </div>
-                                        <div class="card-body p-0">
-                                            <h5 class="card-title fw-bold text-dark mb-2">${c.name}</h5>
-                                            <p class="card-text text-secondary small mb-0">
-                                                Browse all cheat sheets from this category.
-                                            </p>
-                                        </div>
+                                        <h5 class="card-title fw-bold text-dark mb-2">${c.name}</h5>
                                     </a>
                                 </div>
                             </c:forEach>
                         </div>
-                    </c:otherwise>
-                </c:choose>
-            </section>
+                    </section>
 
-            <div class="row g-4">
-                <%-- Main Feeds Left Hand Section Block --%>
-                <div class="col-lg-12">
-                    
-                    <%-- Announcements Layout List --%>
-                    <c:if test="${not empty announcements}">
-                        <div class="mb-5">
-                            <h2 class="section-title h4 mb-4">Announcements</h2>
-                            <div class="d-grid gap-3">
-                                <c:forEach items="${announcements}" var="a">
-                                    <article class="notice-card p-3">
-                                        <div class="d-flex gap-3">
-                                            <span class="notice-mark"><i class="bi bi-megaphone-fill"></i></span>
-                                            <div>
-                                                <h3 class="h6 fw-bold mb-1 text-dark">${a.title}</h3>
-                                                <p class="text-secondary small mb-2">${a.content}</p>
-                                                <div class="text-muted small style-meta">
-                                                    <i class="bi bi-person me-1"></i>
-                                                    <c:out value="${a.createdBy != null ? (a.createdBy.fullName != null ? a.createdBy.fullName : a.createdBy.username) : 'Admin'}" />
-                                                    <span class="mx-2">/</span>
-                                                    <i class="bi bi-clock me-1"></i>${a.createdAt}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </article>
-                                </c:forEach>
-                            </div>
-                        </div>
-                    </c:if>
-
-                    <%-- Latest Public Cheat Sheets Sub Grid Block --%>
+                    <%-- Cheat Sheets Latest Feed --%>
                     <div class="d-flex align-items-center justify-content-between mb-4">
-                        <div>
-                            <h2 class="section-title h4 mb-1">Latest Cheat Sheets</h2>
-                            <div class="text-muted small">Newest public references listed first.</div>
-                        </div>
-                        <span class="tag-chip bg-white fw-semibold">Page ${currentPage} of ${totalPages}</span>
+                        <h2 class="section-title h4 mb-1">Latest Cheat Sheets</h2>
+                    </div>
+                    <div class="d-grid gap-3 mb-5">
+                        <c:forEach items="${cheatsheetlist}" var="sheet">
+                            <article class="sheet-card d-flex">
+                                <div class="sheet-ribbon p-3 d-flex align-items-center justify-content-center">
+                                    <div class="sheet-pages">1</div>
+                                </div>
+                                <div class="p-3 flex-grow-1">
+                                    <h3 class="h5 fw-bold mb-2">
+                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark">${sheet.title}</a>
+                                    </h3>
+                                    <p class="text-secondary small mb-3">${sheet.description}</p>
+                                </div>
+                            </article>
+                        </c:forEach>
                     </div>
 
-                    <c:choose>
-                        <c:when test="${empty cheatsheetlist}">
-                            <div class="empty-panel text-center p-5">
-                                <i class="bi bi-journal-x display-5 d-block mb-3 text-secondary"></i>
-                                <div class="fw-bold">No cheat sheets found</div>
-                                <div class="text-muted small">Try another search keyword or browse a category.</div>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="d-grid gap-3">
-                                <c:forEach items="${cheatsheetlist}" var="sheet">
-                                    <article class="sheet-card d-flex">
-                                        <div class="sheet-ribbon p-3 d-flex flex-lg-column align-items-center justify-content-center gap-1">
-                                            <div class="sheet-pages">1</div>
-                                            <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Page</div>
-                                        </div>
-                                        <div class="p-3 p-lg-4 flex-grow-1">
-                                            <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
-                                                <c:choose>
-                                                    <c:when test="${not empty sheet.author}">
-                                                        <a class="author-chip" href="${pageContext.request.contextPath}/profile/${sheet.author.id}">
-                                                            <i class="bi bi-person-fill text-primary"></i>
-                                                            <c:out value="${sheet.author.fullName != null ? sheet.author.fullName : sheet.author.username}" />
-                                                        </a>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="author-chip"><i class="bi bi-person-fill"></i> Anonymous</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                <span class="tag-chip border-0 bg-transparent"><i class="bi bi-calendar3"></i> ${sheet.createdAt}</span>
-                                            </div>
+                    <jsp:include page="footer.jsp" />
+                </c:otherwise>
+            </c:choose>
 
-                                            <h3 class="h5 fw-bold mb-2">
-                                                <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark hover-link">
-                                                    ${sheet.title}
-                                                </a>
-                                            </h3>
-                                            <p class="text-secondary small mb-3">${sheet.description}</p>
+        </div>
+    </div>
 
-                                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top">
-                                                <div class="d-flex flex-wrap gap-1">
-                                                    <span class="tag-chip"><i class="bi bi-folder-fill text-secondary"></i> ${sheet.category.name}</span>
-                                                    <span class="tag-chip"><i class="bi bi-eye-fill text-secondary"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
-                                                    <span class="tag-chip"><i class="bi bi-download text-secondary"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
-                                                </div>
-                                                <a class="btn btn-library btn-sm px-4" href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}">Open</a>
-                                            </div>
-                                        </div>
-                                    </article>
-                                </c:forEach>
-                            </div>
-
-                            <%-- Pagination logic blocks --%>
-                            <c:if test="${totalPages > 1}">
-                                <nav class="mt-4" aria-label="Cheat sheet pagination">
-                                    <ul class="pagination justify-content-center flex-wrap">
-                                        <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
-                                            <a class="page-link" href="${pageContext.request.contextPath}/home?page=${currentPage - 1}&q=${searchQuery}">Previous</a>
-                                        </li>
-                                        <c:forEach begin="1" end="${totalPages}" var="p">
-                                            <li class="page-item ${p == currentPage ? 'active' : ''}">
-                                                <a class="page-link" href="${pageContext.request.contextPath}/home?page=${p}&q=${searchQuery}">${p}</a>
-                                            </li>
-                                        </c:forEach>
-                                        <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
-                                            <a class="page-link" href="${pageContext.request.contextPath}/home?page=${currentPage + 1}&q=${searchQuery}">Next</a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </c:if>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </div>
-
-            <%-- 🧩 Footer Component Include inside Content Area --%>
-            <jsp:include page="footer.jsp" />
-
-        </div> <%-- /main-content-area --%>
-    </div> <%-- /app-container --%>
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 📊 JavaScript for Admin Circle Charts -->
+    <c:if test="${not empty sessionScope.currentUser && sessionScope.currentUser.role == 1}">
+        <script>
+            const valUsers = ${not empty totalUsers ? totalUsers : (not empty summary.totalUsers ? summary.totalUsers : 0)};
+            const valCategories = ${not empty categorylist ? categorylist.size() : 0};
+            const valSheets = ${not empty totalSheets ? totalSheets : (not empty summary.totalCheatsheets ? summary.totalCheatsheets : 0)};
+
+            const globalChartConfig = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                cutout: '75%'
+            };
+
+            new Chart(document.getElementById('usersCircleChart'), {
+                type: 'doughnut',
+                data: { datasets: [{ data: [valUsers, valUsers == 0 ? 1 : 0], backgroundColor: ['#1976d2', '#e9ecef'], borderWidth: 0 }] },
+                options: globalChartConfig
+            });
+
+            new Chart(document.getElementById('categoriesCircleChart'), {
+                type: 'doughnut',
+                data: { datasets: [{ data: [valCategories, valCategories == 0 ? 1 : 0], backgroundColor: ['#ffc107', '#e9ecef'], borderWidth: 0 }] },
+                options: globalChartConfig
+            });
+
+            new Chart(document.getElementById('sheetsCircleChart'), {
+                type: 'doughnut',
+                data: { datasets: [{ data: [valSheets, valSheets == 0 ? 1 : 0], backgroundColor: ['#2e7d32', '#e9ecef'], borderWidth: 0 }] },
+                options: globalChartConfig
+            });
+        </script>
+    </c:if>
 </body>
 </html>
