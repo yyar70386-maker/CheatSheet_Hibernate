@@ -13,7 +13,7 @@
 
         <ul class="nav nav-pills flex-column mb-auto">
             <li>
-                <a href="${pageContext.request.contextPath}/home" 
+                <a href="${pageContext.request.contextPath}/admin/dashboard" 
                    class="nav-link text-white ${param.activePage == 'dashboard' ? 'active' : '🌟'}"> 
                     <i class="bi bi-speedometer2 me-2"></i> Dashboard
                 </a>
@@ -22,23 +22,43 @@
             <li class="text-secondary small fw-bold mt-3 mb-1 px-2 text-uppercase">Management</li>
 
             <li>
-                <a href="${pageContext.request.contextPath}/categories" 
+                <a href="${pageContext.request.contextPath}/category/list" 
                    class="nav-link text-white ${param.activePage == 'categories' ? 'active' : '🌟'}"> 
                     <i class="bi bi-tags me-2"></i> Category Management
                 </a>
             </li>
 
             <li>
-                <a href="${pageContext.request.contextPath}/tag" 
+                <a href="${pageContext.request.contextPath}/tag/list" 
                    class="nav-link text-white ${param.activePage == 'items' ? 'active' : '🌟'}"> 
                     <i class="bi bi-box-seam me-2 text-muted"></i> Tag Management
                 </a>
             </li>
 
             <li>
-                <a href="${pageContext.request.contextPath}/users" 
+                <a href="${pageContext.request.contextPath}/admin/users" 
                    class="nav-link text-white ${param.activePage == 'users' ? 'active' : '🌟'}"> 
                     <i class="bi bi-people me-2 text-muted"></i> User Management
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/admin/reports" class="nav-link text-white">
+                    <i class="bi bi-flag me-2 text-muted"></i> Reports
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/admin/announcements" class="nav-link text-white">
+                    <i class="bi bi-megaphone me-2 text-muted"></i> Announcements
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/admin/notifications" class="nav-link text-white">
+                    <i class="bi bi-bell me-2 text-muted"></i> Notifications
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/admin/audit-logs" class="nav-link text-white">
+                    <i class="bi bi-journal-text me-2 text-muted"></i> Audit Logs
                 </a>
             </li>
         </ul>

@@ -16,7 +16,11 @@ public interface AnnouncementRepository {
 
     List<AnnouncementEntity> findAllActive();
 
+    List<AnnouncementEntity> findAll();
+
     List<AnnouncementEntity> findLatest(int limit);
 
     long countAllActive();
+
+    void updateStatus(Integer id, String status);
 }

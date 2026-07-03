@@ -3,6 +3,7 @@ package com.hibernate.controller;
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.User;
 import com.hibernate.dto.NotificationDto;
+import com.hibernate.service.AuditLogService;
 import com.hibernate.service.CategoryService;
 import com.hibernate.service.AnnouncementService;
 import com.hibernate.service.CheatsheetService;
@@ -47,6 +48,9 @@ public class AuthController {
     
     @Autowired
     private NotificationSocketService notificationSocketService;
+
+    @Autowired
+    private AuditLogService auditLogService;
     
     @GetMapping("/")
     public String showHomePage(
@@ -106,11 +110,13 @@ public class AuthController {
     @PostMapping("/login")
     public String processLogin(@RequestParam("email") String email, 
                                @RequestParam("password") String password,
+                               HttpServletRequest request,
                                HttpSession session, 
                                RedirectAttributes redirectAttributes) { 
         User user = userService.authenticateByEmail(email, password);
         if (user != null) {
             session.setAttribute("currentUser", user);
+            auditLogService.log(user, "Login", "User", user.getId(), "User logged in.", request.getRemoteAddr());
             return "redirect:/home";
         } else {
             redirectAttributes.addFlashAttribute("loginError", "Invalid Email or Password!");
@@ -119,7 +125,11 @@ public class AuthController {
     }
     
     @GetMapping("/logout")
-    public String handleLogout(HttpSession session) {
+    public String handleLogout(HttpServletRequest request, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser != null) {
+            auditLogService.log(currentUser, "Logout", "User", currentUser.getId(), "User logged out.", request.getRemoteAddr());
+        }
         session.invalidate(); 
         return "redirect:/"; 
     }

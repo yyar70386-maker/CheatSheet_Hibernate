@@ -27,6 +27,9 @@ public class NotificationEntity {
     @JoinColumn(name = "sender_id")
     private User sender;
 
+    @Column(length = 150)
+    private String title;
+
     @Column(columnDefinition = "TEXT", nullable = false)
     private String message;
 

@@ -29,8 +29,17 @@ public class AuditLogEntity {
     @Column(name = "entity_name")
     private String entityName;
 
+    @Column(name = "entity_type")
+    private String entityType;
+
     @Column(name = "entity_id")
     private Integer entityId;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "ip_address", length = 45)
+    private String ipAddress;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

@@ -45,7 +45,7 @@ public class AnnouncementController {
         if (!isAdmin(currentUser)) {
             return "redirect:/login";
         }
-        model.addAttribute("announcements", announcementService.findAllActive());
+        model.addAttribute("announcements", announcementService.findAll());
         model.addAttribute("announcement", new AnnouncementEntity());
         return "announcement-list";
     }
@@ -101,6 +101,16 @@ public class AnnouncementController {
             return "redirect:/login";
         }
         announcementService.delete(id);
+        return "redirect:/admin/announcements";
+    }
+
+    @PostMapping("/admin/announcements/{id}/status/{status}")
+    public String status(@PathVariable Integer id, @PathVariable String status, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (!isAdmin(currentUser)) {
+            return "redirect:/login";
+        }
+        announcementService.updateStatus(id, status, currentUser);
         return "redirect:/admin/announcements";
     }
 }

@@ -69,6 +69,17 @@ public class AnnouncementRepositoryImpl implements AnnouncementRepository {
     }
 
     @Override
+    public List<AnnouncementEntity> findAll() {
+        return getSession()
+                .createQuery(
+                        "select a from AnnouncementEntity a "
+                      + "left join fetch a.createdBy "
+                      + "order by a.createdAt desc",
+                        AnnouncementEntity.class)
+                .list();
+    }
+
+    @Override
     public List<AnnouncementEntity> findLatest(int limit) {
         return getSession()
                 .createQuery(
@@ -87,5 +98,14 @@ public class AnnouncementRepositoryImpl implements AnnouncementRepository {
                 .createQuery("select count(a) from AnnouncementEntity a where a.status = 'active'", Long.class)
                 .uniqueResult();
         return count != null ? count : 0;
+    }
+
+    @Override
+    public void updateStatus(Integer id, String status) {
+        AnnouncementEntity announcement = findById(id);
+        if (announcement != null) {
+            announcement.setStatus(status);
+            getSession().update(announcement);
+        }
     }
 }

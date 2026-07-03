@@ -1,4 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false" %>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         body { 
-            background-color: #f8f9fa; /* Light grey background like the image */
+            background-color: #f8f9fa;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
         /* Sidebar Styling */
@@ -97,6 +99,12 @@
         <button class="nav-link text-start" id="comments-tab" data-bs-toggle="pill" data-bs-target="#comments" type="button" role="tab">
             <i class="bi bi-chat-left-text"></i> Manage Comments
         </button>
+        <a class="nav-link text-start" href="${pageContext.request.contextPath}/admin/reports">
+            <i class="bi bi-flag"></i> Reports <span class="badge bg-danger float-end">${summary.pendingReports != null ? summary.pendingReports : '0'}</span>
+        </a>
+        <a class="nav-link text-start" href="${pageContext.request.contextPath}/admin/audit-logs">
+            <i class="bi bi-journal-text"></i> Audit Logs
+        </a>
         
         <div class="mt-auto p-3">
             <a href="${pageContext.request.contextPath}/home" class="btn btn-outline-secondary w-100"><i class="bi bi-house-door"></i> Back to Home</a>
@@ -107,8 +115,14 @@
 <div class="main-content">
     
     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-        <h3 class="fw-bold m-0" id="pageTitle">Dashboard Overview</h3>
-        <div class="d-flex align-items-center">
+        <div>
+            <h3 class="fw-bold m-0" id="pageTitle">Dashboard Overview</h3>
+            <div class="text-muted small">Operational overview and moderation queue</div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="${pageContext.request.contextPath}/admin/notifications" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                <i class="bi bi-bell me-1"></i> Send Notification
+            </a>
             <a href="${pageContext.request.contextPath}/admin/announcements/add" class="btn btn-dark btn-sm rounded-pill px-3">
                 <i class="bi bi-megaphone-fill me-1"></i> New Announcement
             </a>
@@ -119,60 +133,100 @@
         
         <%-- TAB 1: OVERVIEW --%>
         <div class="tab-pane fade show active" id="overview" role="tabpanel">
-            <div class="row g-4 mb-5">
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <div class="text-muted small fw-bold text-uppercase mb-2"><i class="bi bi-people text-primary"></i> Total Users</div>
-                        <div class="fs-2 fw-bolder">${summary.totalUsers != null ? summary.totalUsers : '0'}</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <div class="text-muted small fw-bold text-uppercase mb-2"><i class="bi bi-file-earmark text-success"></i> Total Cheatsheets</div>
-                        <div class="fs-2 fw-bolder">${summary.totalCheatsheets != null ? summary.totalCheatsheets : '0'}</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <div class="text-muted small fw-bold text-uppercase mb-2"><i class="bi bi-chat-text text-info"></i> Total Comments</div>
-                        <div class="fs-2 fw-bolder">${summary.totalComments != null ? summary.totalComments : '0'}</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <div class="text-muted small fw-bold text-uppercase mb-2"><i class="bi bi-flag text-danger"></i> Pending Reports</div>
-                        <div class="fs-2 fw-bolder">${summary.totalReports != null ? summary.totalReports : '0'}</div>
-                    </div>
-                </div>
+            
+            <%-- 🌟 Merged Stat Cards (Combining both branches' data) --%>
+            <div class="row g-3 mb-5">
+                <div class="col-md-3 col-xl-2"><div class="stat-card p-3"><div class="text-muted small fw-bold text-uppercase">Users</div><div class="fs-4 fw-bold">${summary.totalUsers != null ? summary.totalUsers : '0'}</div></div></div>
+                <div class="col-md-3 col-xl-2"><div class="stat-card p-3"><div class="text-muted small fw-bold text-uppercase">Active Users</div><div class="fs-4 fw-bold text-success">${summary.activeUsers != null ? summary.activeUsers : '0'}</div></div></div>
+                <div class="col-md-3 col-xl-2"><div class="stat-card p-3"><div class="text-muted small fw-bold text-uppercase">Cheatsheets</div><div class="fs-4 fw-bold">${summary.totalCheatsheets != null ? summary.totalCheatsheets : '0'}</div></div></div>
+                <div class="col-md-3 col-xl-2"><div class="stat-card p-3"><div class="text-muted small fw-bold text-uppercase">Categories</div><div class="fs-4 fw-bold">${summary.totalCategories != null ? summary.totalCategories : '0'}</div></div></div>
+                <div class="col-md-3 col-xl-2"><div class="stat-card p-3"><div class="text-muted small fw-bold text-uppercase">Tags</div><div class="fs-4 fw-bold">${summary.totalTags != null ? summary.totalTags : '0'}</div></div></div>
+                <div class="col-md-3 col-xl-2"><div class="stat-card p-3"><div class="text-muted small fw-bold text-uppercase">Comments</div><div class="fs-4 fw-bold">${summary.totalComments != null ? summary.totalComments : '0'}</div></div></div>
+                <div class="col-md-3 col-xl-2"><div class="stat-card p-3"><div class="text-muted small fw-bold text-uppercase">Reports</div><div class="fs-4 fw-bold">${summary.totalReports != null ? summary.totalReports : '0'}</div></div></div>
+                <div class="col-md-3 col-xl-2"><div class="stat-card p-3"><div class="text-muted small fw-bold text-uppercase">Pending Reports</div><div class="fs-4 fw-bold text-danger">${summary.pendingReports != null ? summary.pendingReports : '0'}</div></div></div>
+                <div class="col-md-3 col-xl-2"><div class="stat-card p-3"><div class="text-muted small fw-bold text-uppercase">Announcements</div><div class="fs-4 fw-bold">${summary.totalAnnouncements != null ? summary.totalAnnouncements : '0'}</div></div></div>
+                <div class="col-md-3 col-xl-2"><div class="stat-card p-3"><div class="text-muted small fw-bold text-uppercase">Notifications</div><div class="fs-4 fw-bold">${summary.totalNotifications != null ? summary.totalNotifications : '0'}</div></div></div>
             </div>
 
-            <div class="content-card">
-                <h5 class="fw-bold mb-4">Recent Activities</h5>
-                <div class="list-group list-group-flush">
-                    <c:forEach items="${summary.recentActivities}" var="a">
-                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-light rounded-circle p-2 me-3"><i class="bi bi-activity text-primary"></i></div>
-                                <div>
-                                    <div class="fw-semibold text-dark">${a.action}</div>
-                                    <div class="text-muted small">${a.entityName} #${a.entityId}</div>
-                                </div>
-                            </div>
-                            <div class="text-muted small">${a.createdAt}</div>
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <div class="content-card mb-4">
+                        <h5 class="fw-bold mb-4">Recent Activities</h5>
+                        <div class="list-group list-group-flush">
+                            <c:forEach items="${summary.recentActivities}" var="a">
+                                <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-3 border-bottom" href="${pageContext.request.contextPath}/admin/audit-logs/${a.id}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle p-2 me-3"><i class="bi bi-activity text-primary"></i></div>
+                                        <div>
+                                            <div class="fw-semibold text-dark"><c:out value="${a.action}" /></div>
+                                            <div class="text-muted small"><c:out value="${a.entityName}" /> #${a.entityId}</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-muted small">${a.createdAt}</div>
+                                </a>
+                            </c:forEach>
+                            <c:if test="${empty summary.recentActivities}">
+                                <div class="text-muted text-center py-4">No recent activities found.</div>
+                            </c:if>
                         </div>
-                    </c:forEach>
-                    <c:if test="${empty summary.recentActivities}">
-                        <div class="text-muted text-center py-4">No recent activities found.</div>
-                    </c:if>
+                    </div>
+                    <div class="content-card">
+                        <h5 class="fw-bold mb-3">Latest Reports</h5>
+                        <c:forEach items="${summary.latestReports}" var="r">
+                            <div class="d-flex justify-content-between border-bottom py-2">
+                                <div><span class="badge text-bg-light border">${r.targetType}</span> <c:out value="${r.reason}" /></div>
+                                <a href="${pageContext.request.contextPath}/admin/reports/${r.id}" class="small text-decoration-none">View <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        </c:forEach>
+                        <c:if test="${empty summary.latestReports}">
+                            <div class="text-muted text-center py-3 small">No reports found.</div>
+                        </c:if>
+                    </div>
+                </div>
+
+                <%-- 🌟 Merged Sidebar Widgets from friend's code --%>
+                <div class="col-lg-5">
+                    <div class="content-card mb-4">
+                        <h5 class="fw-bold mb-3">Latest Users</h5>
+                        <c:forEach items="${summary.latestUsers}" var="u">
+                            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                <div>
+                                    <i class="bi bi-person-circle text-secondary me-1"></i>
+                                    <span class="fw-semibold"><c:out value="${u.username}" /></span>
+                                </div>
+                                <span class="badge ${u.role == 1 ? 'bg-primary' : 'bg-secondary'} small">${u.role == 1 ? 'Admin' : 'User'}</span>
+                            </div>
+                        </c:forEach>
+                        <c:if test="${empty summary.latestUsers}">
+                            <div class="text-muted text-center py-3 small">No users found.</div>
+                        </c:if>
+                    </div>
+                    <div class="content-card">
+                        <h5 class="fw-bold mb-3">Latest Cheatsheets</h5>
+                        <c:forEach items="${summary.latestCheatsheets}" var="s">
+                            <div class="border-bottom py-2">
+                                <a class="text-decoration-none fw-semibold text-dark d-block text-truncate" href="${pageContext.request.contextPath}/cheatsheet/detail/${s.id}">
+                                    <i class="bi bi-file-earmark-text text-primary me-1"></i> <c:out value="${s.title}" />
+                                </a>
+                            </div>
+                        </c:forEach>
+                        <c:if test="${empty summary.latestCheatsheets}">
+                            <div class="text-muted text-center py-3 small">No cheatsheets found.</div>
+                        </c:if>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <%-- TAB 2: MANAGE USERS (UI Placeholder for you to fill later) --%>
+        <%-- TAB 2: MANAGE USERS --%>
         <div class="tab-pane fade" id="users" role="tabpanel">
             <div class="content-card">
-                <h5 class="fw-bold mb-3">User Management</h5>
-                <p class="text-muted">You can add your User Management tables and actions here later.</p>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold m-0">User Management</h5>
+                    <a href="${pageContext.request.contextPath}/admin/users" class="btn btn-outline-primary btn-sm">Full User Directory <i class="bi bi-arrow-right"></i></a>
+                </div>
+                <p class="text-muted">Manage system users, change roles, and handle user status.</p>
+                <%-- You can implement the full user table here later --%>
             </div>
         </div>
 
@@ -275,7 +329,7 @@
                                     <td class="text-center fw-bold">${cmt.likeCount}</td>
                                     <td class="text-center fw-bold">${cmt.dislikeCount}</td>
                                     <td class="text-end">
-                                        <button type="button" class="btn btn-sm btn-outline-danger shadow-sm" onclick="openActionModal('comment', ${cmt.id}, 'delete')">
+                                        <button type="button" class="btn btn-sm btn-outline-danger shadow-sm" onclick="openActionModal('comment',${cmt.id}, 'delete')">
                                             <i class="bi bi-trash"></i> Delete
                                         </button>
                                     </td>
@@ -336,9 +390,12 @@
     document.addEventListener("DOMContentLoaded", function(){
         var activeTabId = localStorage.getItem('activeAdminTab');
         if(activeTabId){ 
-            var tab = new bootstrap.Tab(document.querySelector('#' + activeTabId)); 
-            tab.show(); 
-            document.getElementById('pageTitle').innerText = pageTitles[activeTabId];
+            var tabEl = document.querySelector('#' + activeTabId);
+            if(tabEl) {
+                var tab = new bootstrap.Tab(tabEl); 
+                tab.show(); 
+                document.getElementById('pageTitle').innerText = pageTitles[activeTabId];
+            }
         }
         
         document.querySelectorAll('button[data-bs-toggle="pill"]').forEach(function(btn){
@@ -349,7 +406,7 @@
         });
     });
 
-    // 🌟 Modal ဖွင့်ပေးမည့် Script (လက်ရှိ Backend အလုပ်လုပ်ပုံအတိုင်း)
+    // 🌟 Modal ဖွင့်ပေးမည့် Script
     function openActionModal(type, id, action) {
         const form = document.getElementById('actionForm');
         const sInput = document.getElementById('sheetIdInput');

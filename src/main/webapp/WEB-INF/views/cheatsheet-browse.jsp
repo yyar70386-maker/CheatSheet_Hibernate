@@ -12,23 +12,114 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <style>
-        body { display: flex; flex-direction: column; min-height: 100vh; }
-        .page-header-section { text-align: left; margin: 20px 0 40px 0; }
-        .cheatsheet-card { border: 1px solid #e2e8f0; border-radius: 20px; padding: 30px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: transform 0.3s ease, box-shadow 0.3s ease; height: auto; display: flex; flex-direction: column; }
-        .cheatsheet-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
-        .grid-item { align-self: start; }
-        .description-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; transition: all 0.3s ease; }
-        .description-text.expanded { display: block; -webkit-line-clamp: unset; }
-        .see-more-btn { color: #1976d2; cursor: pointer; font-weight: bold; font-size: 14px; text-decoration: none; display: inline-block; margin-top: 5px; }
-        .see-more-btn:hover { text-decoration: underline; }
-        .card-meta-item { color: #666; font-size: 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
-        .tag-badge-link { background-color: #e2e8f0; color: #333; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block; }
-        .tag-badge-link:hover { background-color: #1976d2; color: white; }
-        .stats-section { font-size: 14px; color: #555; display: flex; gap: 20px; margin-top: 15px; }
-        .tags-footer-section { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 15px; padding: 30px; margin-top: 50px; }
-        .vertical-tag-list { display: flex; flex-direction: column; gap: 12px; }
-        .vertical-tag-item { font-size: 16px; color: #0d47a1; text-decoration: none; font-weight: bold; display: inline-block; width: fit-content; }
-        .vertical-tag-item:hover { color: #1976d2; text-decoration: underline; }
+        .page-header-section {
+            text-align: left;
+            margin: 40px 0;
+        }
+        .cheatsheet-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 30px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            
+            /* 🌟 ကတ်အမြင့်များကို dynamic ဖြစ်စေရန် auto ပြောင်းလဲခြင်း */
+            height: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .cheatsheet-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        
+        /* 🌟 ကတ်တစ်ခု ရှည်ထွက်သွားလည်း ဘေးကကတ်များ လိုက်မရှည်စေရန် ထိန်းချုပ်သည့် CSS */
+        .grid-item {
+            align-self: start; 
+        }
+
+        /* 🌟 Description ကို စစချင်းမှာ ၃ ကြောင်းပဲ ဖြတ်ပြထားရန် */
+        .description-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* See More နှိပ်လိုက်သည့်အခါ စာသားအားလုံး ပေါ်လာစေရန် */
+        .description-text.expanded {
+            display: block;
+            -webkit-line-clamp: unset;
+        }
+
+        .see-more-btn {
+            color: #1976d2;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .see-more-btn:hover {
+            text-decoration: underline;
+        }
+
+        .card-meta-item {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tag-badge-link {
+            background-color: #e2e8f0;
+            color: #333;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .tag-badge-link:hover {
+            background-color: #1976d2;
+            color: white;
+        }
+        .stats-section {
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .tags-footer-section {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 50px;
+        }
+        .vertical-tag-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .vertical-tag-item {
+            font-size: 16px;
+            color: #0d47a1;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            width: fit-content;
+        }
+        .vertical-tag-item:hover {
+            color: #1976d2;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -36,12 +127,9 @@
     <%-- Include Header Component --%>
     <jsp:include page="header.jsp" />
 
-    <div class="container my-4 flex-grow-1">
+    <div class="container my-5">
         
-        <%-- Back Button --%>
-        <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> Back</a>
-        
-        <%-- Page Header --%>
+        <%-- ၁။ Dynamic Page Header --%>
         <div class="page-header-section">
             <h1 class="display-5 fw-bold text-dark">${totalCount} ${categoryName} Cheat Sheets</h1>
         </div>
@@ -55,47 +143,34 @@
             </c:when>
             <c:otherwise>
                 
-                <%-- Grid Row --%>
+                <%-- ၂။ Grid Row (ဘယ်ဘက်ကစပြီး စီရန် justify-content-start နှင့် grid alignment ပါဝင်ပါသည်) --%>
                 <div class="row g-4 justify-content-start">
                     <c:forEach items="${cheatsheetlist}" var="sheet">
+                        
+                        <%-- 🌟 grid-item class ကြောင့် ဘေးကကတ်များ လိုက်မရှည်တော့ပါ --%>
                         <div class="col-md-6 col-lg-4 grid-item">
-                            <%-- 🌟 Card တစ်ခုလုံးကို နှိပ်လို့ရအောင် onclick ထည့်ထားပါသည် --%>
-                            <div class="cheatsheet-card" style="cursor: pointer;" onclick="window.location.href='${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}'">
+                            <div class="cheatsheet-card">
                                 <div>
                                     <h3 class="fw-bold mb-2">
-                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline">
-                                            ${sheet.title}
-                                        </a>
-                                    </h3>
+									    <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline">
+									        ${sheet.title}
+									    </a>
+									</h3>
                                     
+                                    <%-- 🌟 See More စနစ်ထည့်သွင်းထားသော Description Area --%>
                                     <div class="description-container mb-3">
                                         <p class="text-secondary description-text mb-0">${sheet.description}</p>
-                                        <%-- 🌟 event.stopPropagation() ထည့်ထား၍ See More နှိပ်လျှင် Detail Page သို့မရောက်ပါ --%>
-                                        <span class="see-more-btn" onclick="event.stopPropagation(); toggleDescription(this)">See More</span>
+                                        <span class="see-more-btn" onclick="toggleDescription(this)">See More</span>
                                     </div>
                                     
-                                    <%-- <div class="card-meta-item">
-                                        <i class="bi bi-person-fill"></i> ${sheet.author != null ? sheet.author.username : 'Unknown'}
-                                    </div> --%>
-                                    
                                     <div class="card-meta-item">
-    <i class="bi bi-person-fill text-dark"></i> 
-    <c:choose>
-        <c:when test="${sheet.author != null}">
-            <a href="${pageContext.request.contextPath}/profile/${sheet.author.id}" 
-               class="text-dark fw-bold text-decoration-none" 
-               style="hover: text-decoration: underline;">
-                <c:out value="${sheet.author.username}" />
-            </a>
-        </c:when>
-        <c:otherwise>
-            <span class="text-muted fw-normal">Unknown</span>
-        </c:otherwise>
-    </c:choose>
-</div>
+                                        <i class="bi bi-person-fill"></i> ${sheet.author != null ? sheet.author.username : 'Unknown'}
+                                    </div>
                                     <div class="card-meta-item">
                                         <i class="bi bi-folder-fill"></i> ${sheet.category.name} Cheat Sheets
                                     </div>
+                                    
+                                    <%-- Created At & Updated At --%>
                                     <div class="card-meta-item">
                                         <i class="bi bi-calendar-plus"></i> Created: <fmt:formatDate value="${sheet.createdAt}" pattern="yyyy-MM-dd"/>
                                     </div>
@@ -103,24 +178,38 @@
                                         <i class="bi bi-calendar-event"></i> Updated: <fmt:formatDate value="${sheet.updatedAt}" pattern="yyyy-MM-dd"/>
                                     </div>
                                     
+                                    <%-- Tag Links List --%>
                                     <div class="d-flex flex-wrap gap-2 my-3">
                                         <c:forEach items="${sheet.tags}" var="tag">
-                                            <%-- 🌟 Tags နှိပ်လျှင်လည်း Card Click မဖြစ်အောင် တားထားသည် --%>
-                                            <a href="${pageContext.request.contextPath}/cheatsheet/tag/${tag.id}" onclick="event.stopPropagation();" class="tag-badge-link">#${tag.name}</a>
+                                            <a href="${pageContext.request.contextPath}/cheatsheet/tag/${tag.id}" class="tag-badge-link">#${tag.name}</a>
                                         </c:forEach>
                                     </div>
                                 </div>
 
-                                <div class="stats-section mt-auto">
-                                    <span><i class="bi bi-eye-fill me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
-                                    <span><i class="bi bi-download me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                <%-- မူလ Stats Section နေရာတွင် ဤကုဒ်ဖြင့် အစားထိုးပြင်ဆင်ပါ --%>
+                                <div class="stats-section mt-auto d-flex justify-content-between align-items-center">
+                                    <div class="d-flex gap-3">
+                                        <span><i class="bi bi-eye-fill me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+                                        <span><i class="bi bi-download me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                    </div>
+                                    
+                                    <%-- 🌟 တိုးမြှင့်ချက်: ကတ်ပြားပေါ်မှနေ၍ PDF ကို တန်းပွင့်ကြည့်နိုင်မယ့် အိုင်ကွန်ခလုတ်လေး --%>
+                                    <div>
+                                        <a href="${pageContext.request.contextPath}/cheatsheet/view-pdf/${sheet.id}" 
+                                           target="_blank" 
+                                           class="btn btn-sm btn-outline-danger px-2 py-1 d-flex align-items-center gap-1"
+                                           style="border-radius: 6px; font-size: 12px; font-weight: bold;"
+                                           title="View PDF Document">
+                                            <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </c:forEach>
                 </div>
 
-                <%-- Pagination --%>
+                <%-- 🧭 Pagination Bar --%>
                 <nav class="d-flex justify-content-center mt-5">
                     <ul class="pagination pagination-md">
                         <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
@@ -136,10 +225,11 @@
                         </li>
                     </ul>
                 </nav>
+
             </c:otherwise>
         </c:choose>
 
-        <%-- Tags in Category --%>
+        <%-- ၅။ Bottom Section: Tags In Category (အထက်အောက်ပုံစံနှင့် Dynamic Count ပါဝင်ပါသည်) --%>
         <div class="tags-footer-section">
             <h5 class="fw-bold text-dark mb-4"><i class="bi bi-tags-fill me-2 text-primary"></i>Tag in ${categoryName} Cheat Sheets</h5>
             <div class="vertical-tag-list">
@@ -160,15 +250,19 @@
 
     </div>
 
-    <%-- Include Footer Component --%>
-    <jsp:include page="footer.jsp" />
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <%-- 🌟 JavaScript Function for See More / See Less Toggle --%>
     <script>
     function toggleDescription(btn) {
         var textEl = btn.previousElementSibling;
         textEl.classList.toggle('expanded');
-        btn.innerText = textEl.classList.contains('expanded') ? 'See Less' : 'See More';
+        
+        if (textEl.classList.contains('expanded')) {
+            btn.innerText = 'See Less';
+        } else {
+            btn.innerText = 'See More';
+        }
     }
     </script>
 </body>
