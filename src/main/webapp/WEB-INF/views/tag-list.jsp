@@ -135,7 +135,7 @@ body{
                         </a>
 
                         <a class="btn-delete"
-						   href="${pageContext.request.contextPath}/category/delete/${c.id}"
+						   href="${pageContext.request.contextPath}/category/delete/${t.id}"
 						   onclick="return confirm('Are you sure you want to delete this category?');">
 						    Delete
 						</a>

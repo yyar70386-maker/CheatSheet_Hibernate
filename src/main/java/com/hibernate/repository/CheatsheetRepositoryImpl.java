@@ -16,19 +16,15 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
 
     private final SessionFactory sessionFactory;
     
- // 🌟 စုစုပေါင်း Cheatsheets အရေအတွက်ကို ဒေတာဘေ့စ်ကနေ HQL နဲ့ လှမ်းရေတွက်မည့် မက်သတ်
     @Override
     public int getTotalSheetsCount() {
-        // 💡 မှတ်ချက်။ ။ CheatsheetEntity နေရာတွင် မိမိဆောက်ထားသော Entity Class နာမည်အတိုင်း ဖြစ်ရပါမည်
         String hql = "SELECT COUNT(c) FROM CheatsheetEntity c"; 
-        
         Long count = (Long) getSession().createQuery(hql).uniqueResult();
-        
         return count != null ? count.intValue() : 0;
     }
 
-    public Session getSession() {
-        return sessionFactory.getCurrentSession();
+    public Session getSession() { 
+        return sessionFactory.getCurrentSession(); 
     }
 
     @Override
@@ -61,7 +57,6 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
                 .uniqueResult();
     }
 
-    // 🌟 [FIXED] User ID အလိုက် အသက်ဝင်နေသော Cheatsheets အားလုံးကို ဆွဲထုတ်ပေးမည့် Query
     @Override
     public List<CheatsheetEntity> findByUserId(Integer userId) {
         String hql = "select distinct c from CheatsheetEntity c "
@@ -106,40 +101,72 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
     }
 
     @Override
-    public List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId) {
+    public List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId, String filter) {
         int offset = (page - 1) * size;
         
-        String hql = "select distinct c from CheatsheetEntity c "
-                   + "left join fetch c.tags "
-                   + "left join fetch c.author "
-                   + "where c.category.id = :catId and c.status='active' "
-                   + "and (c.visibility = 'PUBLIC' "
-                   + "     or (c.visibility = 'PRIVATE' and c.author.id = :currentUserId) "
-                   + "     or (c.visibility = 'FRIEND-ONLY' and c.author.id = :currentUserId)) " 
-                   + "order by c.id desc";
+        StringBuilder hql = new StringBuilder(
+            "select distinct c from CheatsheetEntity c "
+          + "left join fetch c.tags "
+          + "left join fetch c.author "
+          + "where c.category.id = :catId and c.status='active' and c.visibility != 'PRIVATE' "
+        );
         
-        return getSession()
-                .createQuery(hql, CheatsheetEntity.class)
-                .setParameter("catId", categoryId)
-                .setParameter("currentUserId", currentUserId)
-                .setFirstResult(offset)
-                .setMaxResults(size)
-                .list();
+        if (currentUserId == null || currentUserId == 0) {
+            hql.append("and c.visibility = 'PUBLIC' ");
+        } else {
+            hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId "
+                     + "or (c.visibility = 'FRIEND-ONLY' and c.author.id in "
+                     + "(select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))) ");
+        }
+        
+        if ("PUBLIC".equalsIgnoreCase(filter)) {
+            hql.append("and c.visibility = 'PUBLIC' ");
+        } else if ("FRIEND".equalsIgnoreCase(filter)) {
+            hql.append("and c.visibility = 'FRIEND-ONLY' ");
+        }
+        
+        hql.append("order by c.id desc");
+        
+        var query = getSession().createQuery(hql.toString(), CheatsheetEntity.class)
+                                .setParameter("catId", categoryId);
+        
+        if (currentUserId != null && currentUserId > 0) {
+            query.setParameter("currentUserId", currentUserId);
+        }
+        
+        return query.setFirstResult(offset).setMaxResults(size).list();
     }
 
     @Override
-    public long countByCategoryId(Integer categoryId, Integer currentUserId) {
-        String hql = "select count(distinct c) from CheatsheetEntity c "
-                   + "where c.category.id = :catId and c.status='active' "
-                   + "and (c.visibility = 'PUBLIC' "
-                   + "     or (c.visibility = 'PRIVATE' and c.author.id = :currentUserId) "
-                   + "     or (c.visibility = 'FRIEND-ONLY' and c.author.id = :currentUserId))";
-                   
-        return getSession()
-                .createQuery(hql, Long.class)
-                .setParameter("catId", categoryId)
-                .setParameter("currentUserId", currentUserId)
-                .uniqueResult();
+    public long countByCategoryId(Integer categoryId, Integer currentUserId, String filter) {
+        StringBuilder hql = new StringBuilder(
+            "select count(distinct c) from CheatsheetEntity c "
+          + "where c.category.id = :catId and c.status='active' and c.visibility != 'PRIVATE' "
+        );
+        
+        if (currentUserId == null || currentUserId == 0) {
+            hql.append("and c.visibility = 'PUBLIC' ");
+        } else {
+            hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId "
+                     + "or (c.visibility = 'FRIEND-ONLY' and c.author.id in "
+                     + "(select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))) ");
+        }
+        
+        if ("PUBLIC".equalsIgnoreCase(filter)) {
+            hql.append("and c.visibility = 'PUBLIC' ");
+        } else if ("FRIEND".equalsIgnoreCase(filter)) {
+            hql.append("and c.visibility = 'FRIEND-ONLY' ");
+        }
+        
+        var query = getSession().createQuery(hql.toString(), Long.class)
+                                .setParameter("catId", categoryId);
+        
+        if (currentUserId != null && currentUserId > 0) {
+            query.setParameter("currentUserId", currentUserId);
+        }
+        
+        Long count = query.uniqueResult();
+        return count != null ? count : 0;
     }
 
     @Override
@@ -154,30 +181,32 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
     }
 
     @Override
-    public List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId) {
-        return getSession()
-                .createQuery(
-                        "select t.id, count(c.id) from TagEntity t "
-                      + "left join t.cheatsheets c "
-                      + "where t.category.id = :catId and t.status = 'active' "
-                      + "and (c.id is null or (c.status = 'active' and c.visibility = 'PUBLIC')) "
-                      + "group by t.id", Object[].class)
-                .setParameter("catId", categoryId)
-                .list();
-    }
+    public List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId, Integer currentUserId) {
+        StringBuilder hql = new StringBuilder(
+            "select t.id, count(c.id) from TagEntity t "
+          + "left join t.cheatsheets c "
+          + "where t.category.id = :catId and t.status = 'active' "
+          + "and (c.id is null or (c.status = 'active' "
+        );
 
-    @Override
-    public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId) {
-        return getSession()
-                .createQuery(
-                        "select distinct c from CheatsheetEntity c "
-                      + "join c.tags t "
-                      + "left join fetch c.tags "
-                      + "left join fetch c.author "
-                      + "where t.id = :tagId and c.status = 'active' and c.visibility = 'PUBLIC' "
-                      + "order by c.id desc", CheatsheetEntity.class)
-                .setParameter("tagId", tagId)
-                .list();
+        if (currentUserId == null || currentUserId == 0) {
+            hql.append("and c.visibility = 'PUBLIC' )) ");
+        } else {
+            hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId "
+                     + "or (c.visibility = 'FRIEND-ONLY' and c.author.id in "
+                     + "(select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))))) ");
+        }
+        
+        hql.append("group by t.id");
+
+        var query = getSession().createQuery(hql.toString(), Object[].class)
+                                .setParameter("catId", categoryId);
+
+        if (currentUserId != null && currentUserId > 0) {
+            query.setParameter("currentUserId", currentUserId);
+        }
+
+        return query.list();
     }
 
     @Override
@@ -224,6 +253,80 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
         Long count = getSession()
                 .createQuery("select count(c) from CheatsheetEntity c where c.status = 'active'", Long.class)
                 .uniqueResult();
+        return count != null ? count : 0;
+    }
+
+    // ==================== 🌟 [ADDED & OVERRIDDEN] TAG BROWSE WITH DYNAMIC SCOPE & FILTER ====================
+    @Override
+    public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter) {
+        int offset = (page - 1) * size;
+        
+        StringBuilder hql = new StringBuilder(
+            "select distinct c from CheatsheetEntity c "
+          + "join c.tags t "
+          + "left join fetch c.tags "
+          + "left join fetch c.author "
+          + "where t.id = :tagId and c.status = 'active' and c.visibility != 'PRIVATE' "
+        );
+        
+        // Scope Verification (Guest vs Login)
+        if (currentUserId == null || currentUserId == 0) {
+            hql.append("and c.visibility = 'PUBLIC' ");
+        } else {
+            hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId "
+                     + "or (c.visibility = 'FRIEND-ONLY' and c.author.id in "
+                     + "(select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))) ");
+        }
+        
+        // Dropdown Filter Condition
+        if ("PUBLIC".equalsIgnoreCase(filter)) {
+            hql.append("and c.visibility = 'PUBLIC' ");
+        } else if ("FRIEND".equalsIgnoreCase(filter)) {
+            hql.append("and c.visibility = 'FRIEND-ONLY' ");
+        }
+        
+        hql.append("order by c.id desc");
+        
+        var query = getSession().createQuery(hql.toString(), CheatsheetEntity.class)
+                                .setParameter("tagId", tagId);
+                                
+        if (currentUserId != null && currentUserId > 0) {
+            query.setParameter("currentUserId", currentUserId);
+        }
+        
+        return query.setFirstResult(offset).setMaxResults(size).list();
+    }
+
+    @Override
+    public long countByTagId(Integer tagId, Integer currentUserId, String filter) {
+        StringBuilder hql = new StringBuilder(
+            "select count(distinct c) from CheatsheetEntity c "
+          + "join c.tags t "
+          + "where t.id = :tagId and c.status = 'active' and c.visibility != 'PRIVATE' "
+        );
+        
+        if (currentUserId == null || currentUserId == 0) {
+            hql.append("and c.visibility = 'PUBLIC' ");
+        } else {
+            hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId "
+                     + "or (c.visibility = 'FRIEND-ONLY' and c.author.id in "
+                     + "(select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))) ");
+        }
+        
+        if ("PUBLIC".equalsIgnoreCase(filter)) {
+            hql.append("and c.visibility = 'PUBLIC' ");
+        } else if ("FRIEND".equalsIgnoreCase(filter)) {
+            hql.append("and c.visibility = 'FRIEND-ONLY' ");
+        }
+        
+        var query = getSession().createQuery(hql.toString(), Long.class)
+                                .setParameter("tagId", tagId);
+                                
+        if (currentUserId != null && currentUserId > 0) {
+            query.setParameter("currentUserId", currentUserId);
+        }
+        
+        Long count = query.uniqueResult();
         return count != null ? count : 0;
     }
 }

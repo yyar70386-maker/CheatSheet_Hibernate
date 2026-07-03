@@ -36,13 +36,29 @@ public class CheatsheetController {
     private final NotificationService notificationService;
     private final NotificationSocketService notificationSocketService;
 
+ // ==================== 🌟 My Cheatsheets Personal List ====================
     @GetMapping("/list")
-    public ModelAndView list() {
-        return new ModelAndView("cheatsheet-list", "cheatsheetlist", cheatsheetService.findAll());
+    public ModelAndView list(HttpSession session) {
+        // [SECURITY CHECK] Login မဝင်ထားသော Guest ဖြစ်ပါက login စာမျက်နှာသို့ မောင်းထုတ်မည်
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+        
+        // 🌟 အားလုံးကို မပြတော့ဘဲ လက်ရှိ Login ဝင်ထားသော User ID ဖြင့် ကိုယ်ပိုင် Active Cheatsheets ကိုသာ ဆွဲထုတ်ခြင်း
+        List<CheatsheetEntity> mySheets = cheatsheetService.findByUserId(currentUser.getId());
+        
+        // View Name အား "mycheatsheet" (mycheatsheet.jsp) အဖြစ် ပြောင်းလဲသတ်မှတ်ခြင်း
+        return new ModelAndView("mycheatsheet", "cheatsheetlist", mySheets);
     }
 
     @GetMapping("/add")
-    public ModelAndView addForm() {
+    public ModelAndView addForm(HttpSession session) { // 🌟 Fix: Session အား Parameter တွင် ထည့်သွင်းခြင်း
+        // 🌟 [SECURITY CHECK] Guest ဖြစ်နေပါက login စာမျက်နှာသို့ မောင်းထုတ်မည်
+        if (session.getAttribute("currentUser") == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
         ModelAndView mv = new ModelAndView("cheatsheet", "cheatsheet", new CheatsheetEntity());
         mv.addObject("categorylist", categoryService.findAll());
         return mv;
@@ -56,9 +72,12 @@ public class CheatsheetController {
             HttpSession session) {
 
         User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser != null) {
-            cheatsheet.setAuthor(currentUser);
+        // 🌟 [SECURITY CHECK] Data Submit လုပ်ချိန်တွင်လည်း Guest ဖြစ်နေပါက ကာကွယ်ရန်
+        if (currentUser == null) {
+            return new ModelAndView("redirect:/login");
         }
+
+        cheatsheet.setAuthor(currentUser);
 
         if (tagIds != null) {
             List<TagEntity> tags = tagService.findByIds(tagIds);
@@ -68,7 +87,8 @@ public class CheatsheetController {
         Integer id = cheatsheetService.save(cheatsheet);
         auditLogService.log(currentUser, "Create Cheatsheet", "Cheatsheet", id,
                 "Created cheatsheet: " + cheatsheet.getTitle(), request.getRemoteAddr());
-        if (currentUser != null && "PUBLIC".equalsIgnoreCase(cheatsheet.getVisibility())) {
+                
+        if ("PUBLIC".equalsIgnoreCase(cheatsheet.getVisibility())) {
             List<NotificationDto> notifications = notificationService.createCheatsheetNotificationsForFollowers(
                     currentUser.getId(), id, cheatsheet.getTitle());
             notificationSocketService.broadcastNotifications(notifications);
@@ -150,74 +170,107 @@ public class CheatsheetController {
 
 
     @GetMapping("/category/{categoryId}")
-    public ModelAndView browseByCategory(@PathVariable("categoryId") Integer categoryId, @RequestParam(value = "page", defaultValue = "1") int page, HttpSession session) {
+    public ModelAndView browseByCategory(
+            @PathVariable("categoryId") Integer categoryId, 
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "filter", defaultValue = "ALL") String filter, // 🌟 Filter Parameter လက်ခံခြင်း
+            HttpSession session) {
+            
         int pageSize = 3;
         User currentUser = (User) session.getAttribute("currentUser");
         Integer currentUserId = (currentUser != null) ? currentUser.getId() : 0;
         
-        // 🌟 [CORRECTED] Service ထဲတွင် နာမည်ပြောင်းလဲထားမှုအရ မက်သတ်အမည်များကို ညှိနှိင်းပြင်ဆင်ထားပါသည်
-        List<CheatsheetEntity> cheatsheets = cheatsheetService.findByCategoryIdWithPagination(categoryId, page, pageSize, currentUserId);
-        long totalCheatsheets = cheatsheetService.countByCategoryId(categoryId, currentUserId); 
+        // 🌟 Service မှတစ်ဆင့် Filter ပါ ပို့ပေးပြီး Data ဆွဲထုတ်ခြင်း
+        List<CheatsheetEntity> cheatsheets = cheatsheetService.findByCategoryIdWithPagination(categoryId, page, pageSize, currentUserId, filter);
+        long totalCheatsheets = cheatsheetService.countByCategoryId(categoryId, currentUserId, filter); 
         
-        // Total Pages တွက်ချက်ခြင်းကို ဤနေရာတွင် တိုက်ရိုက် Math.ceil ဖြင့် ရှင်းလင်းစွာ လုပ်ဆောင်ပေးလိုက်ပါသည်
         int totalPages = (int) Math.ceil((double) totalCheatsheets / pageSize);
         if (totalPages == 0) totalPages = 1;
         
-        List<TagEntity> categoryTags = cheatsheetService.findTagsByCategoryId(categoryId);
+     // 🌟 Fix: Service logic သစ်အတိုင်း currentUserId အား ထည့်သွင်းပေးလိုက်ပါသည်
+        List<TagEntity> categoryTags = cheatsheetService.findTagsByCategoryId(categoryId, currentUserId);
         var currentCategory = categoryService.findById(categoryId);
         String categoryName = (currentCategory != null) ? currentCategory.getName() : "Unknown";
+        
         ModelAndView mv = new ModelAndView("cheatsheet-browse");
-        mv.addObject("cheatsheetlist", cheatsheets); mv.addObject("taglist", categoryTags);
-        mv.addObject("currentPage", page); mv.addObject("totalPages", totalPages);
-        mv.addObject("categoryId", categoryId); mv.addObject("categoryName", categoryName);
+        mv.addObject("cheatsheetlist", cheatsheets); 
+        mv.addObject("taglist", categoryTags);
+        mv.addObject("currentPage", page); 
+        mv.addObject("totalPages", totalPages);
+        mv.addObject("categoryId", categoryId); 
+        mv.addObject("categoryName", categoryName);
         mv.addObject("totalCount", totalCheatsheets); 
+        mv.addObject("currentFilter", filter.toUpperCase()); // UI တွင် Active Button ပြရန်
+        
         return mv;
     }
 
+ // ==================== 🌟 Cheatsheet Detail View (With Smart View Count Logic) ====================
     @GetMapping("/detail/{id}")
-    public ModelAndView showDetail(@PathVariable("id") Integer id, HttpSession session) {
-        CheatsheetEntity cheatsheet = cheatsheetService.findById(id);
+    public ModelAndView viewDetail(@PathVariable("id") Integer id, HttpSession session) {
         
-        if (cheatsheet == null) {
-            return new ModelAndView("redirect:/home");
+        // ၁။ ဒေတာဘေ့စ်မှ Cheatsheet အား ဆွဲထုတ်ခြင်း
+        CheatsheetEntity sheet = cheatsheetService.findById(id);
+        if (sheet == null || !"active".equals(sheet.getStatus())) {
+            return new ModelAndView("redirect:/error/404"); // မရှိပါက 404 သို့ ညွှန်းမည်
         }
-        
+
+        // ၂။ လက်ရှိ Login ဝင်ထားသော User Information ကို ရယူခြင်း
         User currentUser = (User) session.getAttribute("currentUser");
         Integer currentUserId = (currentUser != null) ? currentUser.getId() : 0;
-        
-        // 🌟 Fix: cheatsheet.getAuthor() ကို null-safe ဖြစ်အောင် အရင်စစ်ဆေးခြင်း
-        boolean isOwner = cheatsheet.getAuthor() != null && 
-                          cheatsheet.getAuthor().getId() != null && 
-                          cheatsheet.getAuthor().getId().equals(currentUserId);
-                          
-        boolean isPrivate = "PRIVATE".equalsIgnoreCase(cheatsheet.getVisibility());
-        
-        // 🌟 Fix [SECURITY]: Private ဖြစ်ပြီး Owner မဟုတ်ရင် ကြည့်ခွင့်မပေးဘဲ မောင်းထုတ်ခြင်း
-        if (isPrivate && !isOwner) {
-            return new ModelAndView("redirect:/home"); 
-        }
-        
+        Integer authorId = (sheet.getAuthor() != null) ? sheet.getAuthor().getId() : -1;
+
+        // 🌟 ၃။ [SMART VIEW COUNT INCREMENT LOGIC]
+        // - PRIVATE မဟုတ်ရပါဘူး
+        // - မိမိကိုယ်တိုင် ဖန်တီးထားသော Owner မဟုတ်ရပါဘူး (Author ID နှင့် လက်ရှိ User ID မတူမှ တိုးမည်)
+        boolean isPrivate = "PRIVATE".equalsIgnoreCase(sheet.getVisibility());
+        boolean isOwner = currentUserId.equals(authorId);
+
         if (!isPrivate && !isOwner) {
-            int currentViews = cheatsheet.getViewCount() != null ? cheatsheet.getViewCount() : 0;
-            cheatsheet.setViewCount(currentViews + 1);
-            cheatsheetService.update(cheatsheet); 
+            // လက်ရှိ View Count အား ရယူ၍ ၁ တိုးမြှင့်ပြီး DB တွင် အလိုအလျောက် Update လုပ်ခြင်း
+            int currentViews = (sheet.getViewCount() != null) ? sheet.getViewCount() : 0;
+            sheet.setViewCount(currentViews + 1);
+            
+            cheatsheetService.update(sheet); // Transaction အောက်တွင် သွားရောက် သိမ်းဆည်းခြင်း
         }
+
+        // ၄။ Detail View စာမျက်နှာ (cheatsheet-detail.jsp) သို့ Data များ တွဲဖက်ပေးပို့ခြင်း
+        ModelAndView mv = new ModelAndView("cheatsheet-detail");
+        mv.addObject("sheet", sheet);
+        mv.addObject("isOwner", isOwner); // UI ဘက်တွင် Edit/Delete ခလုတ်ပြရန်/ဖျောက်ရန်
         
-        return new ModelAndView("cheatsheet-detail", "sheet", cheatsheet);
+        return mv;
     }
 
     @GetMapping("/tag/{tagId}")
-    public ModelAndView browseByTag(@PathVariable("tagId") Integer tagId) {
-        List<CheatsheetEntity> cheatsheets = cheatsheetService.getPublicCheatsheetsByTagId(tagId);
+    public ModelAndView browseByTag(
+            @PathVariable("tagId") Integer tagId,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "filter", defaultValue = "ALL") String filter,
+            HttpSession session) {
+            
+        int pageSize = 3; // သုံးခုတစ်တန်းပုံစံအတွက် Page Size သတ်မှတ်ခြင်း
+        User currentUser = (User) session.getAttribute("currentUser");
+        Integer currentUserId = (currentUser != null) ? currentUser.getId() : 0;
+        
+        // Service မှတစ်ဆင့် Filter & Pagination ဒေတာယူခြင်း
+        List<CheatsheetEntity> cheatsheets = cheatsheetService.findPublicCheatsheetsByTagId(tagId, page, pageSize, currentUserId, filter);
+        long totalCheatsheets = cheatsheetService.countByTagId(tagId, currentUserId, filter);
+        
+        int totalPages = (int) Math.ceil((double) totalCheatsheets / pageSize);
+        if (totalPages == 0) totalPages = 1;
         
         var tagObj = tagService.findById(tagId); 
         String tagName = (tagObj != null) ? tagObj.getName() : "Unknown";
-        int size = (cheatsheets != null) ? cheatsheets.size() : 0;
         
         ModelAndView mv = new ModelAndView("cheatsheet-tag-list");
         mv.addObject("cheatsheetlist", cheatsheets);
         mv.addObject("tagName", tagName);
-        mv.addObject("totalCount", size);
+        mv.addObject("totalCount", totalCheatsheets);
+        mv.addObject("currentPage", page);
+        mv.addObject("totalPages", totalPages);
+        mv.addObject("tagId", tagId);
+        mv.addObject("currentFilter", filter.toUpperCase());
         
         return mv;
     }

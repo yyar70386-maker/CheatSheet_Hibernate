@@ -14,7 +14,7 @@
     <style>
         .page-header-section {
             text-align: left;
-            margin: 40px 0;
+            margin: 40px 0 20px 0;
         }
         .cheatsheet-card {
             border: 1px solid #e2e8f0;
@@ -23,8 +23,6 @@
             background: white;
             box-shadow: 0 4px 15px rgba(0,0,0,0.02);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            
-            /* 🌟 ကတ်အမြင့်များကို dynamic ဖြစ်စေရန် auto ပြောင်းလဲခြင်း */
             height: auto;
             display: flex;
             flex-direction: column;
@@ -33,13 +31,9 @@
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
         }
-        
-        /* 🌟 ကတ်တစ်ခု ရှည်ထွက်သွားလည်း ဘေးကကတ်များ လိုက်မရှည်စေရန် ထိန်းချုပ်သည့် CSS */
         .grid-item {
             align-self: start; 
         }
-
-        /* 🌟 Description ကို စစချင်းမှာ ၃ ကြောင်းပဲ ဖြတ်ပြထားရန် */
         .description-text {
             display: -webkit-box;
             -webkit-line-clamp: 3; 
@@ -47,13 +41,10 @@
             overflow: hidden;
             transition: all 0.3s ease;
         }
-
-        /* See More နှိပ်လိုက်သည့်အခါ စာသားအားလုံး ပေါ်လာစေရန် */
         .description-text.expanded {
             display: block;
             -webkit-line-clamp: unset;
         }
-
         .see-more-btn {
             color: #1976d2;
             cursor: pointer;
@@ -66,7 +57,6 @@
         .see-more-btn:hover {
             text-decoration: underline;
         }
-
         .card-meta-item {
             color: #666;
             font-size: 14px;
@@ -120,44 +110,122 @@
             color: #1976d2;
             text-decoration: underline;
         }
+        
+        /* 🌟 Visibility Icon Tooltip Style */
+        .visibility-icon-box {
+            font-size: 18px;
+            padding: 4px;
+            border-radius: 6px;
+            cursor: help;
+        }
+        
+        /* 🌟 Dropdown Button Style */
+        .filter-dropdown-btn {
+            border: 1px solid #1976d2;
+            color: #1976d2;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 8px 16px;
+        }
+        .filter-dropdown-btn:hover, .filter-dropdown-btn:focus {
+            background-color: #1976d2;
+            color: white;
+            border-color: #1976d2;
+        }
     </style>
 </head>
 <body class="bg-light">
 
-    <%-- Include Header Component --%>
     <jsp:include page="header.jsp" />
 
     <div class="container my-5">
         
-        <%-- ၁။ Dynamic Page Header --%>
-        <div class="page-header-section">
-            <h1 class="display-5 fw-bold text-dark">${totalCount} ${categoryName} Cheat Sheets</h1>
+        <div class="d-flex flex-wrap justify-content-between align-items-center page-header-section">
+            <div>
+                <h1 class="display-5 fw-bold text-dark mb-0">${totalCount} ${categoryName} Cheat Sheets</h1>
+            </div>
+            
+            <%-- 🌟 [UPDATED] Login User ဖြစ်မှသာ Dropdown Filter အား ပြသပေးမည် (Guest ဆိုလျှင် အလိုအလျောက် ပုန်းနေမည်) --%>
+            <c:if test="${not empty sessionScope.currentUser}">
+                <div class="dropdown mt-3 mt-md-0">
+                    <button class="btn filter-dropdown-btn dropdown-toggle d-flex align-items-center gap-2" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-funnel-fill"></i> 
+                        Filter: 
+                        <c:choose>
+                            <c:when test="${currentFilter == 'PUBLIC'}">Public Only</c:when>
+                            <c:when test="${currentFilter == 'FRIEND'}">Friends Only</c:when>
+                            <c:otherwise>All</c:otherwise>
+                        </c:choose>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="filterDropdown">
+                        <li>
+                            <a class="dropdown-item ${currentFilter == 'ALL' || empty currentFilter ? 'active bg-primary' : ''}" 
+                               href="${pageContext.request.contextPath}/cheatsheet/category/${categoryId}?filter=ALL">
+                                <i class="bi bi-collection-fill me-2"></i> All
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item ${currentFilter == 'PUBLIC' ? 'active bg-primary' : ''}" 
+                               href="${pageContext.request.contextPath}/cheatsheet/category/${categoryId}?filter=PUBLIC">
+                                <i class="bi bi-globe me-2"></i> Public Only
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item ${currentFilter == 'FRIEND' ? 'active bg-primary' : ''}" 
+                               href="${pageContext.request.contextPath}/cheatsheet/category/${categoryId}?filter=FRIEND">
+                                <i class="bi bi-people-fill me-2"></i> Friends Only
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </c:if>
         </div>
 
         <c:choose>
             <c:when test="${empty cheatsheetlist}">
                 <div class="text-center text-muted fs-5 my-5 py-5">
                     <i class="bi bi-file-earmark-x display-4 d-block mb-3"></i>
-                    No cheat sheets found in this category.
+                    No cheat sheets found with the selected filter.
                 </div>
             </c:when>
             <c:otherwise>
                 
-                <%-- ၂။ Grid Row (ဘယ်ဘက်ကစပြီး စီရန် justify-content-start နှင့် grid alignment ပါဝင်ပါသည်) --%>
                 <div class="row g-4 justify-content-start">
                     <c:forEach items="${cheatsheetlist}" var="sheet">
                         
-                        <%-- 🌟 grid-item class ကြောင့် ဘေးကကတ်များ လိုက်မရှည်တော့ပါ --%>
                         <div class="col-md-6 col-lg-4 grid-item">
                             <div class="cheatsheet-card">
                                 <div>
-                                    <h3 class="fw-bold mb-2">
-									    <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline">
+                                    <h3 class="fw-bold mb-2 d-flex align-items-center justify-content-between">
+									    <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline fs-4">
 									        ${sheet.title}
 									    </a>
+                                        
+                                        <c:choose>
+                                            <%-- 🌟 Login User ဖြစ်ပါက ၎င်း၏ Visibility အလိုက် Dynamic Icons ပြောင်းလဲခြင်း --%>
+                                            <c:when test="${not empty sessionScope.currentUser}">
+                                                <c:choose>
+                                                    <c:when test="${sheet.visibility == 'PUBLIC'}">
+                                                        <span class="visibility-icon-box text-success" title="Public Cheat Sheet">
+                                                            <i class="bi bi-globe"></i>
+                                                        </span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="visibility-icon-box text-info" title="Friends Only Cheat Sheet">
+                                                            <i class="bi bi-people-fill"></i>
+                                                        </span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </c:when>
+                                            <%-- 🌟 Guest User ဖြစ်ပါက ကမ္ဘာလုံး Icon တစ်မျိုးတည်းကိုသာ ပုံသေပြသပေးခြင်း --%>
+                                            <c:otherwise>
+                                                <span class="visibility-icon-box text-success" title="Public Cheat Sheet">
+                                                    <i class="bi bi-globe"></i>
+                                                </span>
+                                            </c:otherwise>
+                                        </c:choose>
 									</h3>
                                     
-                                    <%-- 🌟 See More စနစ်ထည့်သွင်းထားသော Description Area --%>
                                     <div class="description-container mb-3">
                                         <p class="text-secondary description-text mb-0">${sheet.description}</p>
                                         <span class="see-more-btn" onclick="toggleDescription(this)">See More</span>
@@ -170,7 +238,6 @@
                                         <i class="bi bi-folder-fill"></i> ${sheet.category.name} Cheat Sheets
                                     </div>
                                     
-                                    <%-- Created At & Updated At --%>
                                     <div class="card-meta-item">
                                         <i class="bi bi-calendar-plus"></i> Created: <fmt:formatDate value="${sheet.createdAt}" pattern="yyyy-MM-dd"/>
                                     </div>
@@ -178,7 +245,6 @@
                                         <i class="bi bi-calendar-event"></i> Updated: <fmt:formatDate value="${sheet.updatedAt}" pattern="yyyy-MM-dd"/>
                                     </div>
                                     
-                                    <%-- Tag Links List --%>
                                     <div class="d-flex flex-wrap gap-2 my-3">
                                         <c:forEach items="${sheet.tags}" var="tag">
                                             <a href="${pageContext.request.contextPath}/cheatsheet/tag/${tag.id}" class="tag-badge-link">#${tag.name}</a>
@@ -186,14 +252,12 @@
                                     </div>
                                 </div>
 
-                                <%-- မူလ Stats Section နေရာတွင် ဤကုဒ်ဖြင့် အစားထိုးပြင်ဆင်ပါ --%>
                                 <div class="stats-section mt-auto d-flex justify-content-between align-items-center">
                                     <div class="d-flex gap-3">
                                         <span><i class="bi bi-eye-fill me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
                                         <span><i class="bi bi-download me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
                                     </div>
                                     
-                                    <%-- 🌟 တိုးမြှင့်ချက်: ကတ်ပြားပေါ်မှနေ၍ PDF ကို တန်းပွင့်ကြည့်နိုင်မယ့် အိုင်ကွန်ခလုတ်လေး --%>
                                     <div>
                                         <a href="${pageContext.request.contextPath}/cheatsheet/view-pdf/${sheet.id}" 
                                            target="_blank" 
@@ -213,15 +277,15 @@
                 <nav class="d-flex justify-content-center mt-5">
                     <ul class="pagination pagination-md">
                         <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                            <a class="page-link" href="${pageContext.request.contextPath}/cheatsheet/category/${categoryId}?page=${currentPage - 1}">Previous</a>
+                            <a class="page-link" href="${pageContext.request.contextPath}/cheatsheet/category/${categoryId}?page=${currentPage - 1}&filter=${currentFilter}">Previous</a>
                         </li>
                         <c:forEach begin="1" end="${totalPages}" var="i">
                             <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/cheatsheet/category/${categoryId}?page=${i}">${i}</a>
+                                <a class="page-link" href="${pageContext.request.contextPath}/cheatsheet/category/${categoryId}?page=${i}&filter=${currentFilter}">${i}</a>
                             </li>
                         </c:forEach>
                         <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                            <a class="page-link" href="${pageContext.request.contextPath}/cheatsheet/category/${categoryId}?page=${currentPage + 1}">Next</a>
+                            <a class="page-link" href="${pageContext.request.contextPath}/cheatsheet/category/${categoryId}?page=${currentPage + 1}&filter=${currentFilter}">Next</a>
                         </li>
                     </ul>
                 </nav>
@@ -229,7 +293,6 @@
             </c:otherwise>
         </c:choose>
 
-        <%-- ၅။ Bottom Section: Tags In Category (အထက်အောက်ပုံစံနှင့် Dynamic Count ပါဝင်ပါသည်) --%>
         <div class="tags-footer-section">
             <h5 class="fw-bold text-dark mb-4"><i class="bi bi-tags-fill me-2 text-primary"></i>Tag in ${categoryName} Cheat Sheets</h5>
             <div class="vertical-tag-list">
@@ -251,8 +314,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <%-- 🌟 JavaScript Function for See More / See Less Toggle --%>
     <script>
     function toggleDescription(btn) {
         var textEl = btn.previousElementSibling;

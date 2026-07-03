@@ -1,88 +1,131 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Tag Management</title>
+    <title>Add New Tag - CheatSheet Library</title>
     
+    <!-- Design & Styling အတွက် Bootstrap 5 နှင့် Icons ပေါင်းစပ်ခြင်း -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <style>
-        /* 📌 ၁။ Window Scroll မဖြစ်အောင် ချုပ်ခြင်း */
-        html, body {
-            height: 100vh;
-            overflow: hidden; 
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        body {
+            background-color: #f4f8ff;
+            font-family: Arial, sans-serif;
         }
-
-        /* 📌 ၂။ Navbar အမြင့် ပုံသေထားခြင်း */
-        .navbar {
-            height: 56px;
-            z-index: 1030;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+        .form-container {
+            max-width: 600px;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 25px rgba(21, 101, 192, 0.1);
+            margin: 60px auto;
         }
-
-        /* 📌 ၃။ Sidebar နဲ့ Content Wrapper (ဒါပါမှ ဘေးချင်းယှဉ်မှာပါ) */
-        .app-container {
+        .form-title {
+            color: #1565c0;
+            font-weight: bold;
+            margin-bottom: 25px;
             display: flex;
-            height: calc(100vh - 56px); 
-            width: 100%;
+            align-items: center;
+            gap: 10px;
         }
-
-        /* 📌 ၄။ Sidebar Width သတ်မှတ်ခြင်း */
-        .admin-sidebar {
-            width: 280px;
-            height: 100%;
-            flex-shrink: 0;
-            overflow-y: auto; 
+        .btn-submit {
+            background-color: #1976d2;
+            color: white;
+            font-weight: bold;
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            transition: background 0.2s ease;
         }
-
-        /* 📌 ၅။ ညာဘက် Content Area သီးသန့် Scroll စနစ် */
-        .main-content-area {
-            flex-grow: 1;
-            height: 100%;
-            overflow-y: auto; 
-            min-width: 0;
-            padding: 24px;
-            background-color: #f8f9fa;
+        .btn-submit:hover {
+            background-color: #0d47a1;
+            color: white;
+        }
+        .btn-cancel {
+            background-color: #f1f3f5;
+            color: #495057;
+            font-weight: bold;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.2s ease;
+        }
+        .btn-cancel:hover {
+            background-color: #e2e8f0;
+            color: #212529;
         }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-    <%-- 🧩 Navbar Include လုပ်ခြင်း --%>
+    <%-- Include Header Component (ရှိလျှင် သုံးရန်) --%>
     <jsp:include page="header.jsp" />
 
-    <%-- 🌐 App Container Wrapper --%>
-    <div class="app-container">
-
-        <%-- 🛠️ ဘယ်ဘက်ခြမ်း - SIDEBAR COMPONENT --%>
-        <jsp:include page="sidebar.jsp">
-            <jsp:param name="activePage" value="tags" />
-        </jsp:include>
-
-        <%-- 📂 ညာဘက်ခြမ်း MAIN CONTENT AREA --%>
-        <div class="main-content-area">
+    <div class="container">
+        <div class="form-container">
             
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="fw-bold text-dark m-0">Tag Management</h2>
-                    <p class="text-muted m-0 small">Manage your system tags and keywords.</p>
+            <h2 class="form-title">
+                <i class="bi bi-bookmark-plus-fill"></i> Create New Tag
+            </h2>
+            <p class="text-secondary small mb-4">Add a new keyword tag to filter and group your developer cheat sheets system structurally.</p>
+            
+            <hr class="mb-4" style="color: #dee2e6;">
+
+            <!-- Controller ၏ /tag/save POST mapping သို့ ဒေတာလှမ်းပို့မည့် Form -->
+            <form action="${pageContext.request.contextPath}/tag/save" method="post">
+                
+                <!-- ၁။ Tag Name Input Field -->
+                <div class="mb-4">
+                    <label for="tagName" class="form-label fw-bold text-dark">Tag Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-secondary"><i class="bi bi-hash"></i></span>
+                        <input type="text" 
+                               class="form-control" 
+                               id="tagName" 
+                               name="name" 
+                               placeholder="e.g., spring-boot, exception-handling" 
+                               required>
+                    </div>
+                    <div class="form-text text-muted">Use clear, short keywords (preferably lower-case with dashes).</div>
                 </div>
-            </div>
 
-            <%-- Tag ပြသမည့် နေရာ (ဒီအောက်မှာ Table ကုဒ်တွေ ဆက်ရေးလို့ရပါပြီ) --%>
-            <div class="card border-0 shadow-sm rounded-3 p-4">
-                <p class="text-muted">You can manage tags right here.</p>
-            </div>
-            
-        </div> <%-- /main-content-area --%>
-    </div> <%-- /app-container --%>
+                <!-- ၂။ Category Selection Dropdown -->
+                <div class="mb-4">
+                    <label for="categorySelect" class="form-label fw-bold text-dark">Assign Category</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-secondary"><i class="bi bi-layers-half"></i></span>
+                        <select class="form-select" id="categorySelect" name="category.id" required>
+                            <option value="" disabled selected>-- Select Target Category --</option>
+                            <c:forEach items="${categorylist}" var="cat">
+                                <option value="${cat.id}">${cat.name}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                    <div class="form-text text-muted">Select which structural category this tag belongs to.</div>
+                </div>
+
+                <!-- ၃။ Status Static Value (Default as Active) -->
+                <input type="hidden" name="status" value="active">
+
+                <hr class="mt-5 mb-4" style="color: #dee2e6;">
+
+                <!-- Form Action Buttons -->
+                <div class="d-flex justify-content-end gap-3">
+                    <a href="${pageContext.request.contextPath}/tag/list" class="btn btn-cancel d-flex align-items-center gap-1">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-submit d-flex align-items-center gap-1">
+                        <i class="bi bi-check-circle-fill"></i> Save Tag
+                    </button>
+                </div>
+                
+            </form>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

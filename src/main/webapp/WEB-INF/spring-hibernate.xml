@@ -19,7 +19,7 @@
   <property name="url"
    value="jdbc:mysql://localhost:3306/cheat_sheetsdb" />
   <property name="username" value="root" />
-  <property name="password" value="root" />
+  <property name="password" value="12345678" />
  </bean>
 
  <!-- Hibernate SessionFactory -->

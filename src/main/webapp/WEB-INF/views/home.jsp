@@ -294,7 +294,19 @@
                                 </div>
                             </form>
                             <div class="d-flex flex-wrap justify-content-center justify-content-xl-start gap-2 mt-3">
-                                <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/cheatsheet/add"><i class="bi bi-plus-circle-fill text-primary"></i> Create</a>
+                                <%-- 🌟 Login ဝင်ထားရင် ဆောက်တဲ့စာမျက်နှာဆီပေးသွားပြီး၊ Guest ဆိုရင် Login ဝင်ခိုင်းမည့် Dynamic Link --%>
+<c:choose>
+    <c:when test="${not empty sessionScope.currentUser}">
+        <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/cheatsheet/add">
+            <i class="bi bi-plus-circle-fill text-primary"></i> Create
+        </a>
+    </c:when>
+    <c:otherwise>
+        <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/login">
+            <i class="bi bi-plus-circle-fill text-primary"></i> Create
+        </a>
+    </c:otherwise>
+</c:choose>
                                 <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/announcements"><i class="bi bi-megaphone-fill text-warning"></i> Announcements</a>
                                 <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/profile"><i class="bi bi-person-circle text-info"></i> Profile</a>
                             </div>

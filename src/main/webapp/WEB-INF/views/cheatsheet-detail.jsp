@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,13 +44,16 @@
 
     <jsp:include page="header.jsp" />
 
+    <%-- 🌟 [UPDATED] ပုံသေသတ်မှတ်ထားသော လင့်ခ်အစား ရှေ့က View သို့ ပြန်လှည့်သွားမည့် Dynamic Back Button စနစ် --%>
     <div class="container mt-4">
-        <a href="${pageContext.request.contextPath}/cheatsheet/list" class="btn btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> Back to List</a>
+        <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
     </div>
 
     <div class="detail-container">
         
-        <%-- 🌟 Title & Author (Profile Link + View Count အပြည့်အစုံ ပေါင်းစပ်ပြီး) --%>
+        <%-- Title & Author --%>
         <div>
             <h1 class="sheet-title">${sheet.title}</h1>
             <span class="author-text">by 
@@ -69,7 +73,7 @@
             </span>
         </div>
  
-        <%-- 🌟 Description Section --%>
+        <%-- Description Section --%>
         <p class="description-text">
             ${sheet.description}
         </p>
@@ -84,7 +88,7 @@
             </c:forEach>
         </div>
 
-        <%-- 🌟 INTERACTION BAR (AJAX Seamless) --%>
+        <%-- INTERACTION BAR (AJAX Seamless) --%>
         <div class="interaction-bar">
             <c:choose>
                 <c:when test="${not empty sessionScope.currentUser}">
@@ -128,7 +132,7 @@
             </c:choose>
         </div>
 
-        <%-- 🌟 COMMENTS SECTION --%>
+        <%-- COMMENTS SECTION --%>
         <div class="comment-section">
             <h3 class="mb-4"><i class="bi bi-chat-dots-fill text-primary"></i> Comments</h3>
 
@@ -213,7 +217,7 @@
     <jsp:include page="footer.jsp" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <%-- 🌟 JAVASCRIPT FOR SEAMLESS UI (NO REFRESH) --%>
+    <%-- JAVASCRIPT FOR SEAMLESS UI --%>
     <script>
         const currentUserId = parseInt('${sessionScope.currentUser != null ? sessionScope.currentUser.id : 0}') || 0;
         const currentUserName = "${sessionScope.currentUser != null ? sessionScope.currentUser.username : 'Guest'}";

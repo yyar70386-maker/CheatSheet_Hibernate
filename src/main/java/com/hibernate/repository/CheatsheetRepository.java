@@ -12,18 +12,19 @@ public interface CheatsheetRepository {
     void update(CheatsheetEntity cheatsheet);
     void delete(Integer id);
 
-    // 🌟 Visibility System ပါဝင်သော ပုံစံသစ်များ
-    List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId);
-    long countByCategoryId(Integer categoryId, Integer currentUserId);
+    List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId, String filter);
+    long countByCategoryId(Integer categoryId, Integer currentUserId, String filter);
     
     List<TagEntity> findTagsByCategoryId(Integer categoryId);
-    List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId);
-    List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId);
- // 💡 CheatsheetRepository.java ရဲ့ အောက်ဆုံးနားတွင် ထည့်ရန်
+    List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId, Integer currentUserId);
+    
+    // 🌟 Tag Detail အတွက် အသုံးပြုမည့် Pagination + Filter စနစ်သစ်
+    List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter);
+    long countByTagId(Integer tagId, Integer currentUserId, String filter);
+    
     List<CheatsheetEntity> findByUserId(Integer userId);
     List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size);
     long countLatestPublic(String keyword);
     long countAllActive();
-
-	int getTotalSheetsCount();
+    int getTotalSheetsCount();
 }
