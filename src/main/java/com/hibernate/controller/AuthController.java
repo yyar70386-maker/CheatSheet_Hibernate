@@ -362,21 +362,46 @@ public class AuthController {
                                 @RequestParam("bio") String bio,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
+        
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
             return "redirect:/login";
         }
-        try {
-            currentUser.setFullName(fullName);
-            currentUser.setEmail(email);
-            currentUser.setBio(bio);
 
-            userService.updateUser(currentUser);
-            session.setAttribute("currentUser", currentUser);
-            redirectAttributes.addFlashAttribute("message", "Profile updated successfully!");
+       
+        boolean isChanged = false;
+
+        
+        if (!fullName.equals(currentUser.getFullName())) {
+            currentUser.setFullName(fullName);
+            isChanged = true;
+        }
+
+        
+        if (!email.equals(currentUser.getEmail())) {
+            currentUser.setEmail(email);
+            isChanged = true;
+        }
+
+        
+        if (bio != null && !bio.equals(currentUser.getBio())) {
+            currentUser.setBio(bio);
+            isChanged = true;
+        }
+
+        try {
+            if (isChanged) {
+                
+                userService.updateUser(currentUser);
+                session.setAttribute("currentUser", currentUser);
+                redirectAttributes.addFlashAttribute("message", "Profile updated successfully!");
+            } else {
+               
+                redirectAttributes.addFlashAttribute("message", "No changes were made.");
+            }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Failed to update profile: " + e.getMessage());
         }
+
         return "redirect:/profile";
-    }
-}
+    }}
