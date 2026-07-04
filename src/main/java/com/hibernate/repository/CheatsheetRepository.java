@@ -5,7 +5,6 @@ import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.TagEntity;
 
 public interface CheatsheetRepository {
-
     Integer save(CheatsheetEntity cheatsheet);
     List<CheatsheetEntity> findAll();
     CheatsheetEntity findById(Integer id);
@@ -16,9 +15,10 @@ public interface CheatsheetRepository {
     long countByCategoryId(Integer categoryId, Integer currentUserId, String filter);
     
     List<TagEntity> findTagsByCategoryId(Integer categoryId);
-    List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId, Integer currentUserId);
     
-    // 🌟 Tag Detail အတွက် အသုံးပြုမည့် Pagination + Filter စနစ်သစ်
+    // 🌟 [STORED PROCEDURE CALL] တီချယ်ခိုင်းသည့်အတိုင်း Native Procedure အား လှမ်းခေါ်မည့် Signature
+    List<Object[]> callStoredProcedureForTagCounts(Integer categoryId, Integer currentUserId);
+    
     List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter);
     long countByTagId(Integer tagId, Integer currentUserId, String filter);
     
