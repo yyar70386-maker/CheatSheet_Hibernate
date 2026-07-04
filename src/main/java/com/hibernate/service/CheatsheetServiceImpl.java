@@ -1,8 +1,7 @@
 package com.hibernate.service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.ArrayList;
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.TagEntity;
 import com.hibernate.repository.CheatsheetRepository;
@@ -16,6 +15,35 @@ import org.springframework.transaction.annotation.Transactional;
 public class CheatsheetServiceImpl implements CheatsheetService {
 
     private final CheatsheetRepository cheatsheetRepository;
+
+    // ==================== 🌟 [UPDATED WITH STORED PROCEDURE] ====================
+    // တီချယ်ပြောသလို စားဖိုမှူး (Service Layer) အလုပ်မရှုပ်တော့ဘဲ SQL ဘက်က တွက်ပြီးသားကို တန်းယူသုံးသည့် စနစ်သစ်
+    @Override
+    @Transactional(readOnly = true)
+    public List<TagEntity> findTagsByCategoryId(Integer categoryId, Integer currentUserId) {
+        // ၁။ Repository မှတစ်ဆင့် Database ၏ Native Stored Procedure ကို CALL ခေါ်ယူခြင်း
+        List<Object[]> spResults = cheatsheetRepository.callStoredProcedureForTagCounts(categoryId, currentUserId);
+        
+        List<TagEntity> processedTags = new ArrayList<>();
+        
+        // ၂။ Database က တွက်ချက်ပြီးသား ဟင်းချက်ရုံအသားတုံး (ရလဒ်အချော) များကို Object ထဲသို့ တိုက်ရိုက်မြေပုံညွှန်း (Mapping) လုပ်ခြင်း
+        if (spResults != null) {
+            for (Object[] row : spResults) {
+                TagEntity tag = new TagEntity();
+                tag.setId((Integer) row[0]); // tag_id
+                
+                String rawName = (String) row[1]; // tag_name
+                
+                // Stored Procedure ၏ COUNT() ရလဒ်အား BigInteger သို့မဟုတ် Long ပုံစံဖြင့် လက်ခံခြင်း
+                java.math.BigInteger count = (java.math.BigInteger) row[2]; // cheatsheet_count
+                
+                // Java ထဲတွင် Logic များ လိုက်တွက်စရာမလိုဘဲ ချက်ချင်း Name (Count) စာသား တွဲပေးလိုက်ရုံသာ
+                tag.setName(rawName + " (" + count + ")");
+                processedTags.add(tag);
+            }
+        }
+        return processedTags;
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -71,10 +99,11 @@ public class CheatsheetServiceImpl implements CheatsheetService {
         return cheatsheetRepository.countByCategoryId(categoryId, currentUserId, filter);
     }
 
+    // Legacy method Mapping -> တီချယ်ခိုင်းသည့်အမိန့်အရ Procedure ခေါ်ဆိုမှုဆီသို့ အလိုအလျောက် လွှဲပြောင်းပေးထားသည်
     @Override
     @Transactional(readOnly = true)
     public List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId, Integer currentUserId) {
-        return cheatsheetRepository.countCheatsheetsPerTagByRepository(categoryId, currentUserId);
+        return cheatsheetRepository.callStoredProcedureForTagCounts(categoryId, currentUserId);
     }
 
     @Override
@@ -95,35 +124,10 @@ public class CheatsheetServiceImpl implements CheatsheetService {
         return cheatsheetRepository.countAllActive();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<TagEntity> findTagsByCategoryId(Integer categoryId, Integer currentUserId) {
-        List<TagEntity> tags = cheatsheetRepository.findTagsByCategoryId(categoryId);
-        List<Object[]> countResults = cheatsheetRepository.countCheatsheetsPerTagByRepository(categoryId, currentUserId);
-        
-        Map<Integer, Long> countMap = new HashMap<>();
-        if (countResults != null) {
-            for (Object[] result : countResults) {
-                countMap.put((Integer) result[0], (Long) result[1]);
-            }
-        }
-        
-        if (tags != null) {
-            for (TagEntity tag : tags) {
-                if (tag != null) {
-                    long count = countMap.getOrDefault(tag.getId(), 0L);
-                    tag.setName(tag.getName() + " (" + count + ")");
-                }
-            }
-        }
-        return tags;
-    }
-
-    // ==================== 🌟 [ADDED & OVERRIDDEN] TAG BROWSE WITH FILTER AND PAGINATION ====================
+    // ==================== 🌟 TAG BROWSE WITH FILTER AND PAGINATION ====================
     @Override
     @Transactional(readOnly = true)
     public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter) {
-        // 🌟 Controller မှ ပို့လိုက်သော Pagination + Filter parameter အသစ်များအား Repository သို့ တိုက်ရိုက် ဆင့်ကဲပေးပို့ခြင်း
         return cheatsheetRepository.findPublicCheatsheetsByTagId(tagId, page, size, currentUserId, filter);
     }
 
