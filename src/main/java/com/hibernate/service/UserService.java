@@ -26,4 +26,16 @@ public interface UserService {
     
     // 🌟 Admin မှ User အား ဖျက်ရန် အသစ်ထည့်ထားသော ခေါင်းစဉ်
     void deleteUser(int id);
+
+    List<User> search(String keyword, String role, String status, int page, int size);
+
+    long countSearch(String keyword, String role, String status);
+
+    void suspendUser(int id, User admin, String ipAddress);
+
+    void unsuspendUser(int id, User admin, String ipAddress);
+
+    void unlockUser(int id, User admin, String ipAddress);
+
+    void changeUserRole(int id, int role, User admin, String ipAddress);
 }

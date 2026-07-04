@@ -329,4 +329,90 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
         Long count = query.uniqueResult();
         return count != null ? count : 0;
     }
+
+    @Override
+    public List<CheatsheetEntity> searchAll(String keyword, String categoryId, String status, String banned, int page, int size) {
+        StringBuilder hql = new StringBuilder("select distinct c from CheatsheetEntity c left join fetch c.author left join fetch c.category WHERE 1=1");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            hql.append(" AND (lower(c.title) LIKE :keyword OR lower(c.description) LIKE :keyword)");
+        }
+        if (categoryId != null && !categoryId.isEmpty()) {
+            hql.append(" AND c.category.id = :categoryId");
+        }
+        if (status != null && !status.isEmpty()) {
+            hql.append(" AND c.status = :status");
+        }
+        if (banned != null && !banned.isEmpty()) {
+            hql.append(" AND c.banned = :banned");
+        }
+        hql.append(" ORDER BY c.id DESC");
+        
+        var query = getSession().createQuery(hql.toString(), CheatsheetEntity.class);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            query.setParameter("keyword", "%" + keyword.trim().toLowerCase() + "%");
+        }
+        if (categoryId != null && !categoryId.isEmpty()) {
+            query.setParameter("categoryId", Integer.parseInt(categoryId));
+        }
+        if (status != null && !status.isEmpty()) {
+            query.setParameter("status", status);
+        }
+        if (banned != null && !banned.isEmpty()) {
+            query.setParameter("banned", Boolean.parseBoolean(banned));
+        }
+        
+        query.setFirstResult((page - 1) * size);
+        query.setMaxResults(size);
+        return query.list();
+    }
+
+    @Override
+    public long countSearchAll(String keyword, String categoryId, String status, String banned) {
+        StringBuilder hql = new StringBuilder("select count(distinct c) from CheatsheetEntity c WHERE 1=1");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            hql.append(" AND (lower(c.title) LIKE :keyword OR lower(c.description) LIKE :keyword)");
+        }
+        if (categoryId != null && !categoryId.isEmpty()) {
+            hql.append(" AND c.category.id = :categoryId");
+        }
+        if (status != null && !status.isEmpty()) {
+            hql.append(" AND c.status = :status");
+        }
+        if (banned != null && !banned.isEmpty()) {
+            hql.append(" AND c.banned = :banned");
+        }
+        
+        var query = getSession().createQuery(hql.toString(), Long.class);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            query.setParameter("keyword", "%" + keyword.trim().toLowerCase() + "%");
+        }
+        if (categoryId != null && !categoryId.isEmpty()) {
+            query.setParameter("categoryId", Integer.parseInt(categoryId));
+        }
+        if (status != null && !status.isEmpty()) {
+            query.setParameter("status", status);
+        }
+        if (banned != null && !banned.isEmpty()) {
+            query.setParameter("banned", Boolean.parseBoolean(banned));
+        }
+        
+        Long count = query.uniqueResult();
+        return count != null ? count : 0;
+    }
+
+    @Override
+    public long countBanned() {
+        Long count = getSession()
+                .createQuery("select count(c) from CheatsheetEntity c where c.banned = true", Long.class)
+                .uniqueResult();
+        return count != null ? count : 0;
+    }
+
+    @Override
+    public long countPublished() {
+        Long count = getSession()
+                .createQuery("select count(c) from CheatsheetEntity c where c.status = 'active' and c.banned = false", Long.class)
+                .uniqueResult();
+        return count != null ? count : 0;
+    }
 }

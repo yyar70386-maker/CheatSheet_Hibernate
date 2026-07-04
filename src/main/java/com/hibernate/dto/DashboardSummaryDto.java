@@ -23,8 +23,13 @@ public class DashboardSummaryDto {
     private long totalFollowers;
     private long totalReports;
     private long pendingReports;
+    private long solvedReports;
     private long totalAnnouncements;
     private long totalNotifications;
+    private long suspendedUsers;
+    private long publishedCheatsheets;
+    private long bannedCheatsheets;
+    private long bannedComments;
     private List<AuditLogEntity> recentActivities;
     private List<User> latestUsers;
     private List<CheatsheetEntity> latestCheatsheets;

@@ -107,20 +107,26 @@ public class AuthController {
         return "login"; 
     }
 
+
     @PostMapping("/login")
     public String processLogin(@RequestParam("email") String email, 
                                @RequestParam("password") String password,
                                HttpServletRequest request,
                                HttpSession session, 
                                RedirectAttributes redirectAttributes) { 
-        User user = userService.authenticateByEmail(email, password);
-        if (user != null) {
-            session.setAttribute("currentUser", user);
-            auditLogService.log(user, "Login", "User", user.getId(), "User logged in.", request.getRemoteAddr());
-            return "redirect:/home";
-        } else {
-            redirectAttributes.addFlashAttribute("loginError", "Invalid Email or Password!");
-            return "redirect:/login"; 
+        try {
+            User user = userService.authenticateByEmail(email, password);
+            if (user != null) {
+                session.setAttribute("currentUser", user);
+                auditLogService.log(user, "Login", "User", user.getId(), "User logged in.", request.getRemoteAddr());
+                return "redirect:/home";
+            } else {
+                redirectAttributes.addFlashAttribute("loginError", "Invalid Email or Password!");
+                return "redirect:/login"; 
+            }
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("loginError", e.getMessage());
+            return "redirect:/login";
         }
     }
     

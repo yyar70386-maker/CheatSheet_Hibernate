@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.hibernate.dto.NotificationDto;
 import com.hibernate.entity.ReportEntity;
 import com.hibernate.entity.User;
 import com.hibernate.service.ReportService;
+import com.hibernate.websocket.NotificationSocketService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class ReportController {
 
     private final ReportService reportService;
+    private final NotificationSocketService notificationSocketService;
 
     private boolean isAdmin(User user) {
         return user != null && user.getRole() == 1;
@@ -65,7 +68,10 @@ public class ReportController {
         if (!isAdmin(currentUser)) {
             return "redirect:/login";
         }
-        reportService.updateStatus(id, status, currentUser);
+        NotificationDto notification = reportService.updateStatus(id, status, currentUser);
+        if (notification != null && notification.getUserId() != null) {
+            notificationSocketService.broadcastToUser(notification.getUserId(), notification);
+        }
         return "redirect:/admin/reports";
     }
 

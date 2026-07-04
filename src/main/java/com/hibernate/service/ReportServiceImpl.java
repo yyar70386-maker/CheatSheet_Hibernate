@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hibernate.dto.NotificationDto;
 import com.hibernate.entity.ReportEntity;
 import com.hibernate.entity.User;
 import com.hibernate.repository.ReportRepository;
@@ -68,14 +69,14 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional
-    public void updateStatus(Integer id, String status, User admin) {
+    public NotificationDto updateStatus(Integer id, String status, User admin) {
         reportRepository.updateStatus(id, status);
         ReportEntity report = reportRepository.findById(id);
         if (report != null) {
             auditLogService.log(admin, "Report Status Changed", "Report", id,
                     "Status changed to " + status + ".", null);
             if (report.getUser() != null) {
-                notificationService.createNotification(
+                return notificationService.createNotification(
                         report.getUser().getId(),
                         admin != null ? admin.getId() : null,
                         "Report status changed to " + status + ".",
@@ -83,6 +84,7 @@ public class ReportServiceImpl implements ReportService {
                         "/notifications");
             }
         }
+        return null;
     }
 
     @Override

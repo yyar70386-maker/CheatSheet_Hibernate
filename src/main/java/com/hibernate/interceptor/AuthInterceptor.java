@@ -29,7 +29,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 	    }
 
 	    
-	    if (uri.contains("/admin") && !"admin".equals(user.getRole())) {
+		    if (uri.contains("/admin") && user.getRole() != 1) {
 	        response.sendRedirect(request.getContextPath() + "/login?error=admin_only");
 	        return false;
 	    }

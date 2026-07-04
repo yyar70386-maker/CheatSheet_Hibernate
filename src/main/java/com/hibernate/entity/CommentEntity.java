@@ -42,4 +42,20 @@ public class CommentEntity {
 
     @Transient
     private Boolean currentUserReaction = null; // true = Like, false = Dislike, null = မပေးရသေး
+
+    @Column(name = "banned", nullable = false)
+    private boolean banned = false;
+
+    @Column(name = "banned_reason", length = 500)
+    private String bannedReason;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "banned_by")
+    private User bannedBy;
+
+    @Column(name = "banned_at")
+    private Timestamp bannedAt;
+
+    @Column(name = "deleted_at")
+    private Timestamp deletedAt;
 }

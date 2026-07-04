@@ -88,4 +88,82 @@ public class UserRepositoryImpl implements UserRepository {
                 .setMaxResults(limit)
                 .getResultList();
     }
+
+    @Override
+    public List<User> search(String keyword, String role, String status, int page, int size) {
+        StringBuilder hql = new StringBuilder("FROM User u WHERE 1=1");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            hql.append(" AND (u.username LIKE :keyword OR u.email LIKE :keyword OR u.fullName LIKE :keyword)");
+        }
+        if (role != null && !role.isEmpty()) {
+            hql.append(" AND u.role = :role");
+        }
+        if (status != null && !status.isEmpty()) {
+            if ("suspended".equalsIgnoreCase(status)) {
+                hql.append(" AND u.suspended = true");
+            } else if ("locked".equalsIgnoreCase(status)) {
+                hql.append(" AND u.accountLocked = true");
+            } else if ("active".equalsIgnoreCase(status)) {
+                hql.append(" AND u.suspended = false AND u.accountLocked = false");
+            }
+        }
+        hql.append(" ORDER BY u.id DESC");
+        
+        Query<User> query = sessionFactory.getCurrentSession().createQuery(hql.toString(), User.class);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            query.setParameter("keyword", "%" + keyword.trim() + "%");
+        }
+        if (role != null && !role.isEmpty()) {
+            query.setParameter("role", Integer.parseInt(role));
+        }
+        
+        query.setFirstResult((page - 1) * size);
+        query.setMaxResults(size);
+        return query.getResultList();
+    }
+
+    @Override
+    public long countSearch(String keyword, String role, String status) {
+        StringBuilder hql = new StringBuilder("SELECT COUNT(u) FROM User u WHERE 1=1");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            hql.append(" AND (u.username LIKE :keyword OR u.email LIKE :keyword OR u.fullName LIKE :keyword)");
+        }
+        if (role != null && !role.isEmpty()) {
+            hql.append(" AND u.role = :role");
+        }
+        if (status != null && !status.isEmpty()) {
+            if ("suspended".equalsIgnoreCase(status)) {
+                hql.append(" AND u.suspended = true");
+            } else if ("locked".equalsIgnoreCase(status)) {
+                hql.append(" AND u.accountLocked = true");
+            } else if ("active".equalsIgnoreCase(status)) {
+                hql.append(" AND u.suspended = false AND u.accountLocked = false");
+            }
+        }
+        
+        Query<Long> query = sessionFactory.getCurrentSession().createQuery(hql.toString(), Long.class);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            query.setParameter("keyword", "%" + keyword.trim() + "%");
+        }
+        if (role != null && !role.isEmpty()) {
+            query.setParameter("role", Integer.parseInt(role));
+        }
+        
+        Long count = query.uniqueResult();
+        return count != null ? count : 0;
+    }
+
+    @Override
+    public long countSuspended() {
+        return sessionFactory.getCurrentSession()
+                .createQuery("SELECT COUNT(u) FROM User u WHERE u.suspended = true", Long.class)
+                .uniqueResult();
+    }
+
+    @Override
+    public long countLocked() {
+        return sessionFactory.getCurrentSession()
+                .createQuery("SELECT COUNT(u) FROM User u WHERE u.accountLocked = true", Long.class)
+                .uniqueResult();
+    }
 }

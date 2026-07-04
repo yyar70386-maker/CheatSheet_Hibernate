@@ -27,4 +27,12 @@ public interface UserRepository {
     long countAll();
 
     List<User> findLatest(int limit);
+
+    List<User> search(String keyword, String role, String status, int page, int size);
+
+    long countSearch(String keyword, String role, String status);
+
+    long countSuspended();
+
+    long countLocked();
 }

@@ -3,6 +3,8 @@ package com.hibernate.service;
 import java.util.List;
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.TagEntity;
+import com.hibernate.entity.User;
+import com.hibernate.dto.NotificationDto;
 
 public interface CheatsheetService {
     Integer save(CheatsheetEntity cheatsheet);
@@ -27,4 +29,13 @@ public interface CheatsheetService {
     List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size);
     long countLatestPublic(String keyword);
     long countAllActive();
+
+    List<CheatsheetEntity> searchAll(String keyword, String categoryId, String status, String banned, int page, int size);
+    long countSearchAll(String keyword, String categoryId, String status, String banned);
+    NotificationDto banCheatsheet(Integer id, String reason, User admin, String ipAddress);
+    NotificationDto restoreCheatsheet(Integer id, User admin, String ipAddress);
+    NotificationDto approveCheatsheet(Integer id, User admin, String ipAddress);
+    NotificationDto rejectCheatsheet(Integer id, User admin, String ipAddress);
+    long countBanned();
+    long countPublished();
 }

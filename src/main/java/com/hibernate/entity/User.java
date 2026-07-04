@@ -35,4 +35,16 @@ public class User {
     private String resetToken;
     private LocalDateTime tokenExpiry;
     private String bio;
+
+    @Column(name = "failed_login_attempts", nullable = false)
+    private int failedLoginAttempts = 0;
+
+    @Column(name = "account_locked", nullable = false)
+    private boolean accountLocked = false;
+
+    @Column(name = "suspended", nullable = false)
+    private boolean suspended = false;
+
+    @Column(name = "suspended_at")
+    private LocalDateTime suspendedAt;
 }

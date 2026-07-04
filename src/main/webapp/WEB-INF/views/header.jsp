@@ -43,6 +43,43 @@
     .notification-item {
         white-space: normal;
     }
+    /* 🌟 Global Admin Layout & Theme Styles */
+    .app-container {
+        display: flex;
+        height: calc(100vh - 56px); 
+        width: 100%;
+    }
+    .admin-sidebar {
+        width: 280px;
+        height: 100%;
+        flex-shrink: 0;
+        overflow-y: auto; 
+    }
+    .main-content-area {
+        flex-grow: 1;
+        height: 100%;
+        overflow-y: auto; 
+        min-width: 0;
+        padding: 24px;
+        background-color: #f8f9fa;
+    }
+    .brand-primary {
+        color: #4f46e5 !important;
+    }
+    .bg-brand-primary {
+        background-color: #4f46e5 !important;
+        color: #fff !important;
+    }
+    .btn-brand-primary {
+        background-color: #4f46e5 !important;
+        border-color: #4f46e5 !important;
+        color: #fff !important;
+    }
+    .btn-brand-primary:hover {
+        background-color: #4338ca !important;
+        border-color: #4338ca !important;
+        color: #fff !important;
+    }
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
@@ -137,8 +174,8 @@
 
 <%-- ==================== 🌐 WEBSOCKET REAL-TIME NOTIFICATION SCRIPT ==================== --%>
 <c:if test="${not empty sessionScope.currentUser}">
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script>
         (function () {
             var contextPath = '${pageContext.request.contextPath}';
@@ -149,7 +186,7 @@
             var unreadCount = 0;
 
             function setBadge(count) {
-                unreadCount = count || 0;
+                unreadCount = parseInt(count, 10) || 0;
                 badge.textContent = unreadCount;
                 badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
             }

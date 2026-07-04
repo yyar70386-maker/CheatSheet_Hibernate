@@ -27,4 +27,9 @@ public interface CheatsheetRepository {
     long countLatestPublic(String keyword);
     long countAllActive();
     int getTotalSheetsCount();
+
+    List<CheatsheetEntity> searchAll(String keyword, String categoryId, String status, String banned, int page, int size);
+    long countSearchAll(String keyword, String categoryId, String status, String banned);
+    long countBanned();
+    long countPublished();
 }

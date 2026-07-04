@@ -50,13 +50,40 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public User authenticateByEmail(String email, String password) {
         User user = userRepository.findByEmail(email);
-        if (user != null && BCrypt.checkpw(password, user.getPassword())) {
-            return user;
+        if (user == null) {
+            throw new IllegalArgumentException("Invalid Email or Password!");
         }
-        return null;
+
+        if (user.isSuspended()) {
+            if (user.isAccountLocked()) {
+                throw new IllegalArgumentException("Your account is locked due to 5 consecutive failed login attempts. Please contact Admin.");
+            }
+            throw new IllegalArgumentException("Your account has been suspended by an administrator.");
+        }
+
+        if (BCrypt.checkpw(password, user.getPassword())) {
+            if (user.getFailedLoginAttempts() > 0) {
+                user.setFailedLoginAttempts(0);
+                userRepository.update(user);
+            }
+            return user;
+        } else {
+            int attempts = user.getFailedLoginAttempts() + 1;
+            user.setFailedLoginAttempts(attempts);
+            if (attempts >= 5) {
+                user.setAccountLocked(true);
+                user.setSuspended(true);
+                user.setSuspendedAt(LocalDateTime.now());
+                userRepository.update(user);
+                throw new IllegalArgumentException("Your account has been locked due to 5 consecutive failed login attempts. Please contact Admin.");
+            } else {
+                userRepository.update(user);
+                throw new IllegalArgumentException("Invalid Email or Password! (" + attempts + " of 5 attempts)");
+            }
+        }
     }
 
     @Override
@@ -137,5 +164,72 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(int id) {
         userRepository.deleteUser(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> search(String keyword, String role, String status, int page, int size) {
+        return userRepository.search(keyword, role, status, page, size);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countSearch(String keyword, String role, String status) {
+        return userRepository.countSearch(keyword, role, status);
+    }
+
+    @Override
+    @Transactional
+    public void suspendUser(int id, User admin, String ipAddress) {
+        User user = userRepository.findById(id);
+        if (user != null) {
+            user.setSuspended(true);
+            user.setSuspendedAt(LocalDateTime.now());
+            userRepository.update(user);
+            auditLogService.log(admin, "User Suspended", "User", id, "Suspended user: " + user.getUsername(), ipAddress);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void unsuspendUser(int id, User admin, String ipAddress) {
+        User user = userRepository.findById(id);
+        if (user != null) {
+            user.setSuspended(false);
+            user.setSuspendedAt(null);
+            if (user.isAccountLocked()) {
+                user.setAccountLocked(false);
+                user.setFailedLoginAttempts(0);
+            }
+            userRepository.update(user);
+            auditLogService.log(admin, "User Unsuspended", "User", id, "Unsuspended user: " + user.getUsername(), ipAddress);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void unlockUser(int id, User admin, String ipAddress) {
+        User user = userRepository.findById(id);
+        if (user != null) {
+            user.setAccountLocked(false);
+            user.setSuspended(false);
+            user.setSuspendedAt(null);
+            user.setFailedLoginAttempts(0);
+            userRepository.update(user);
+            auditLogService.log(admin, "Account Unlocked", "User", id, "Unlocked account for user: " + user.getUsername(), ipAddress);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void changeUserRole(int id, int role, User admin, String ipAddress) {
+        User user = userRepository.findById(id);
+        if (user != null) {
+            int oldRole = user.getRole();
+            user.setRole(role);
+            userRepository.update(user);
+            String roleName = role == 1 ? "Admin" : "User";
+            auditLogService.log(admin, "Change Role", "User", id, "Changed role of user " + user.getUsername() + " from " + (oldRole == 1 ? "Admin" : "User") + " to " + roleName, ipAddress);
+        }
     }
 }

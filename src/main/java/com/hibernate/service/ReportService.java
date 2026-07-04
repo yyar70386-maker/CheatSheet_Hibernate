@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.hibernate.entity.ReportEntity;
 import com.hibernate.entity.User;
+import com.hibernate.dto.NotificationDto;
 
 public interface ReportService {
 
@@ -17,7 +18,7 @@ public interface ReportService {
 
     ReportEntity findById(Integer id);
 
-    void updateStatus(Integer id, String status, User admin);
+    NotificationDto updateStatus(Integer id, String status, User admin);
 
     void delete(Integer id, User admin);
 

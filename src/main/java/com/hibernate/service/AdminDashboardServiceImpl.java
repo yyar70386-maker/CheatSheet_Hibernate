@@ -30,14 +30,24 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     public DashboardSummaryDto getSummary() {
         DashboardSummaryDto summary = new DashboardSummaryDto();
         summary.setTotalUsers(userRepository.countAll());
-        summary.setActiveUsers(userRepository.countAll());
-        summary.setTotalCheatsheets(cheatsheetService.countAllActive());
+        summary.setSuspendedUsers(userRepository.countSuspended());
+        summary.setActiveUsers(summary.getTotalUsers() - summary.getSuspendedUsers());
+        
+        summary.setTotalCheatsheets(cheatsheetService.getTotalSheetsCount());
+        summary.setPublishedCheatsheets(cheatsheetService.countPublished());
+        summary.setBannedCheatsheets(cheatsheetService.countBanned());
+        
         summary.setTotalCategories(categoryService.countAllActive());
         summary.setTotalTags(tagService.getTotalTagsCount());
+        
         summary.setTotalComments(commentRepository.countAll());
+        summary.setBannedComments(commentRepository.countBanned());
+        
         summary.setTotalFollowers(userFollowRepository.countAll());
         summary.setTotalReports(reportService.countAll());
         summary.setPendingReports(reportService.countByStatus("Pending"));
+        summary.setSolvedReports(reportService.countByStatus("Resolved"));
+        
         summary.setTotalAnnouncements(announcementService.countAllActive());
         summary.setTotalNotifications(notificationService.countAll());
         summary.setRecentActivities(auditLogService.findRecent(10));
