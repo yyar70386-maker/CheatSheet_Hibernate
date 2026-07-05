@@ -14,7 +14,7 @@
     }
     .dropdown-menu {
         border: none;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         border-radius: 8px;
     }
     .dropdown-item {
@@ -50,6 +50,9 @@
         z-index: 1080;
         width: min(360px, calc(100vw - 32px));
         display: none;
+        background-color: #ff3366 !important;
+        border-color: #ff3366 !important;
+        color: #fff !important;
     }
     /* 🌟 Global Admin Layout & Theme Styles */
     .app-container {
@@ -89,31 +92,51 @@
         color: #fff !important;
     }
     .btn-outline-primary {
-        color: #ff3366;
-        border-color: #ff3366;
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.6);
     }
     .btn-outline-primary:hover {
-        background-color: #ff3366;
-        color: #fff;
+        background-color: #ffffff;
+        color: #ff3366;
+        border-color: #ffffff;
     }
     .btn-primary {
-        background-color: #ff3366;
-        border-color: #ff3366;
+        background-color: #ffffff;
+        border-color: #ffffff;
+        color: #ff3366 !important;
     }
     .btn-primary:hover {
-        background-color: #e62e5c;
-        border-color: #e62e5c;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-color: rgba(255, 255, 255, 0.9);
+        color: #e62e5c !important;
     }
     .text-primary {
         color: #ff3366 !important;
     }
+    /* Custom controls for white text on pink navbar navigation link elements */
+    .custom-navbar .nav-link {
+        color: rgba(255, 255, 255, 0.85) !important;
+    }
+    .custom-navbar .nav-link.active, .custom-navbar .nav-link:hover {
+        color: #ffffff !important;
+    }
+    .custom-navbar .navbar-toggler {
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+    .custom-navbar .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
 </style>
 
-<nav class="navbar navbar-expand-lg navbar-light sticky-top" style="background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);">
+<!-- Navbar with Pink Gradient Glassmorphism -->
+<nav class="navbar navbar-expand-lg navbar-light sticky-top custom-navbar" style="background: linear-gradient(135deg, rgba(255, 51, 102, 0.9), rgba(255, 94, 132, 0.9)); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
     <div class="container">
         <a class="navbar-brand fw-bold fs-4 d-flex align-items-center" href="${pageContext.request.contextPath}/">
-            <i class="bi bi-code-square me-2 text-primary"></i> 
-            <span class="text-dark">Cheat</span><span class="text-primary">Sheet</span>
+            <!-- Brand icon box color altered to stand out nicely -->
+            <span style="background: #ffffff; width:34px; height:34px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; margin-right: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                <i class="bi bi-code-square text-primary" style="font-size: 1.1rem; line-height: 1;"></i> 
+            </span>
+            <span class="text-white">KnowledgeHub</span>
         </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -121,7 +144,7 @@
         </button>
         
         <div class="collapse navbar-collapse" id="navbarNav">
-            <!-- Left Side: Navigation Links (ထည့်ထားသမျှ Menu တွေအကုန် စုစည်းပေးထားပါတယ်) -->
+            <!-- Left Side: Navigation Links -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active" href="${pageContext.request.contextPath}/home">
@@ -145,7 +168,7 @@
                 </li>
             </ul>
             
-            <!-- Right Side: User Controls (Notification & Profile Dropdown) -->
+            <!-- Right Side: User Controls -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
                 <c:choose>
                     <%-- ==================== 🔓 CASE 1: USER IS NOT LOGGED IN ==================== --%>
@@ -156,7 +179,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-primary text-white d-flex align-items-center" href="${pageContext.request.contextPath}/register" style="border-radius: 6px; padding: 6px 16px;">
+                            <a class="btn btn-primary d-flex align-items-center" href="${pageContext.request.contextPath}/register" style="border-radius: 6px; padding: 6px 16px;">
                                 <i class="bi bi-person-plus me-1"></i> Register
                             </a>
                         </li>
@@ -172,8 +195,8 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end notification-menu" aria-labelledby="notificationDropdown">
                                 <li class="dropdown-header d-flex justify-content-between align-items-center">
-                                    <span>Notifications</span>
-                                    <a class="small text-decoration-none" href="${pageContext.request.contextPath}/notifications">View all</a>
+                                    <span class="fw-bold text-dark">Notifications</span>
+                                    <a class="small text-decoration-none text-primary" href="${pageContext.request.contextPath}/notifications">View all</a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li id="notificationEmpty" class="px-3 py-2 text-muted small">No notifications yet.</li>
@@ -189,10 +212,10 @@
                                         <img src="${pageContext.request.contextPath}/uploads/${sessionScope.currentUser.avatarPath}" class="rounded-circle me-2 nav-avatar" width="32" height="32">
                                     </c:when>
                                     <c:otherwise>
-                                        <i class="bi bi-person-circle me-2 text-secondary" style="font-size: 1.4rem;"></i>
+                                        <i class="bi bi-person-circle me-2 text-white" style="font-size: 1.4rem; opacity: 0.9;"></i>
                                     </c:otherwise>
                                 </c:choose>
-                                <span class="fw-medium">${sessionScope.currentUser.fullName}</span>
+                                <span class="fw-medium text-white">${sessionScope.currentUser.fullName}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li>
