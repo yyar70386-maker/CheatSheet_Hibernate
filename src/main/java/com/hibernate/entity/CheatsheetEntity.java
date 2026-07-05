@@ -1,3 +1,4 @@
+
 package com.hibernate.entity;
 
 import java.sql.Timestamp;
