@@ -1,16 +1,12 @@
 package com.hibernate.controller;
 
-import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.User;
-import com.hibernate.dto.NotificationDto;
 import com.hibernate.service.AuditLogService;
 import com.hibernate.service.CategoryService;
 import com.hibernate.service.AnnouncementService;
 import com.hibernate.service.CheatsheetService;
-import com.hibernate.service.UserFollowService;
 import com.hibernate.service.TagService;
 import com.hibernate.service.UserService;
-import com.hibernate.service.NotificationSocketService; // 🌟 Import missing package
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -20,13 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.File;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.Map;
 
 @Controller
 public class AuthController {
@@ -45,12 +37,6 @@ public class AuthController {
 
     @Autowired
     private AnnouncementService announcementService;
-    
-    @Autowired
-    private UserFollowService userFollowService;
-    
-    @Autowired
-    private NotificationSocketService notificationSocketService;
 
     @Autowired
     private AuditLogService auditLogService;
@@ -59,8 +45,7 @@ public class AuthController {
     private com.hibernate.repository.SharedCheatsheetRepository sharedCheatsheetRepository;
     
     @Transactional
-    @ प्रांतmapping("/")
-    @GetMapping("/")
+    @GetMapping("/") 
     public String showHomePage(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "q", defaultValue = "") String query,
@@ -177,119 +162,6 @@ public class AuthController {
         return "home";
     }
 
-    @GetMapping("/profile")
-    public String showProfile(HttpSession session, Model model) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "redirect:/login";
-        }
-
-        User user = userService.findById(currentUser.getId());
-        model.addAttribute("user", user);
-        model.addAttribute("targetUser", user); 
-
-        model.addAttribute("followersCount", userFollowService.getFollowersCount(user.getId()));
-        model.addAttribute("followingCount", userFollowService.getFollowingCount(user.getId()));
-
-        // 🌟 [FIX] "FRIEND-ONLY" အမှန်အတိုင်း Database မှ Filter လုပ်ရန် ထိန်းသိမ်းထားခြင်း
-        List<String> visibilities = List.of("PUBLIC", "FRIEND-ONLY", "PRIVATE");
-        List<CheatsheetEntity> myCheatSheets = cheatsheetService.findByUserIdAndVisibility(user.getId(), visibilities);
-        
-        model.addAttribute("cheatSheetsList", myCheatSheets);
-        model.addAttribute("cheatsheetlist", myCheatSheets);
-
-        return "profile"; 
-    }
-    
-    @GetMapping("/profile/show/followers")
-    public String showMyFollowers(HttpSession session, Model model) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "redirect:/login";
-        }
-        model.addAttribute("profileUsers", userFollowService.getFollowersForView(currentUser.getId(), currentUser.getId()));
-        model.addAttribute("listType", "followers");
-        model.addAttribute("pageTitle", "My Followers");
-        return "follow_list"; 
-    }
-
-    @GetMapping("/profile/show/following")
-    public String showMyFollowing(HttpSession session, Model model) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "redirect:/login";
-        }
-        model.addAttribute("profileUsers", userFollowService.getFollowingForView(currentUser.getId(), currentUser.getId()));
-        model.addAttribute("listType", "following");
-        model.addAttribute("pageTitle", "Following Users");
-        return "follow_list"; 
-    }
-    
-    @GetMapping("/profile/{id}")
-    public String viewTargetProfile(@PathVariable Integer id, HttpSession session, Model model) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "redirect:/login";
-        }
-
-        if (currentUser.getId().equals(id)) {
-            return "redirect:/profile";
-        }
-
-        User targetUser = userService.findById(id);
-        if (targetUser == null) {
-            return "redirect:/home"; 
-        }
-
-        model.addAttribute("targetUser", targetUser);
-        model.addAttribute("followersCount", userFollowService.getFollowersCount(id));
-        model.addAttribute("followingCount", userFollowService.getFollowingCount(id));
-        model.addAttribute("mutualFollowersCount", userFollowService.countMutualFollowers(currentUser.getId(), id));
-        
-        boolean isFollowing = userFollowService.isFollowing(currentUser.getId(), id);
-        model.addAttribute("isFollowing", isFollowing);
-
-        List<String> allowedVisibilities = new ArrayList<>();
-        allowedVisibilities.add("PUBLIC"); 
-        
-        boolean currentFollowsTarget = isFollowing;
-        boolean targetFollowsCurrent = userFollowService.isFollowing(id, currentUser.getId());
-        
-        if (currentFollowsTarget && targetFollowsCurrent) {
-            allowedVisibilities.add("FRIEND-ONLY");
-        }
-
-        List<CheatsheetEntity> targetUserCheatSheets = cheatsheetService.findByUserIdAndVisibility(id, allowedVisibilities); 
-        
-        model.addAttribute("cheatsheetlist", targetUserCheatSheets);
-        model.addAttribute("cheatSheetsList", targetUserCheatSheets); 
-
-        return "user-profile"; 
-    }
-    
-    @PostMapping("/follow/{id}")
-    public String followUser(@PathVariable Integer id, HttpSession session) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "redirect:/login";
-        }
-        NotificationDto notification = userFollowService.followUser(currentUser.getId(), id);
-        if (notification != null) {
-            notificationSocketService.broadcastToUser(id, notification);
-        }
-        return "redirect:/profile/" + id; 
-    }
-
-    @PostMapping("/unfollow/{id}")
-    public String unfollowUser(@PathVariable Integer id, HttpSession session) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "redirect:/login";
-        }
-        userFollowService.unfollowUser(currentUser.getId(), id);
-        return "redirect:/profile/" + id; 
-    }
-
     @GetMapping("/forgot-password")
     public String showForgotPasswordForm() {
         return "forgot-password"; 
@@ -329,100 +201,5 @@ public class AuthController {
             model.addAttribute("error", "The reset link is invalid or has expired.");
             return "reset-password";
         }
-    }
-    
-    @PostMapping("/profile/upload-avatar")
-    public String handleAvatarUpload(@RequestParam("avatarFile") MultipartFile file,
-                                     HttpSession session,
-                                     HttpServletRequest request,
-                                     RedirectAttributes redirectAttributes) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "redirect:/login";
-        }
-        if (!file.isEmpty()) {
-            try {
-                String uploadDir = "C:/my_project_uploads/";
-                File dir = new File(uploadDir);
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
-                String oldAvatarName = currentUser.getAvatarPath();
-                if (oldAvatarName != null && !oldAvatarName.isEmpty()) {
-                    File oldFile = new File(dir.getAbsolutePath() + File.separator + oldAvatarName);
-                    if (oldFile.exists()) {
-                        oldFile.delete(); 
-                    }
-                }
-                String originalFilename = file.getOriginalFilename();
-                String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-                String newFileName = UUID.randomUUID().toString() + extension;
-
-                File serverFile = new File(dir.getAbsolutePath() + File.separator + newFileName);
-                file.transferTo(serverFile);
-
-                currentUser.setAvatarPath(newFileName);
-                userService.updateUser(currentUser);
-                session.setAttribute("currentUser", currentUser);
-
-                redirectAttributes.addFlashAttribute("message", "Profile picture updated successfully!");
-                return "redirect:/profile";
-            } catch (Exception e) {
-                redirectAttributes.addFlashAttribute("error", "Failed to upload image: " + e.getMessage());
-                return "redirect:/profile";
-            }
-        }
-        redirectAttributes.addFlashAttribute("error", "Please select a valid file to upload.");
-        return "redirect:/profile";
-    }
-    
-    @GetMapping("/profile/avatar/{filename:.+}")
-    @ResponseBody
-    public org.springframework.core.io.Resource getAvatar(@PathVariable String filename) {
-        return new org.springframework.core.io.FileSystemResource("C:/my_project_uploads/" + filename);
-    }
-    
-    @PostMapping("/profile/update")
-    public String updateProfile(@RequestParam("fullName") String fullName,
-                                @RequestParam("email") String email,
-                                @RequestParam("bio") String bio,
-                                HttpSession session,
-                                RedirectAttributes redirectAttributes) {
-        
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "redirect:/login";
-        }
-
-        boolean isChanged = false;
-
-        if (!fullName.equals(currentUser.getFullName())) {
-            currentUser.setFullName(fullName);
-            isChanged = true;
-        }
-
-        if (!email.equals(currentUser.getEmail())) {
-            currentUser.setEmail(email);
-            isChanged = true;
-        }
-
-        if (bio != null && !bio.equals(currentUser.getBio())) {
-            currentUser.setBio(bio);
-            isChanged = true;
-        }
-
-        try {
-            if (isChanged) {
-                userService.updateUser(currentUser);
-                session.setAttribute("currentUser", currentUser);
-                redirectAttributes.addFlashAttribute("message", "Profile updated successfully!");
-            } else {
-                redirectAttributes.addFlashAttribute("message", "No changes were made.");
-            }
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Failed to update profile: " + e.getMessage());
-        }
-
-        return "redirect:/profile";
     }
 }

@@ -17,8 +17,10 @@ import com.hibernate.dto.NotificationDto;
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.SharedCheatsheetEntity;
 import com.hibernate.entity.User;
+import com.hibernate.entity.NotificationEntity;
 import com.hibernate.repository.CheatsheetRepository;
 import com.hibernate.repository.SharedCheatsheetRepository;
+import com.hibernate.repository.NotificationRepository;
 import com.hibernate.service.AuditLogService;
 import com.hibernate.service.CheatsheetService;
 import com.hibernate.service.InteractionServiceImpl;
@@ -40,7 +42,7 @@ public class InteractionController {
     
     private final SharedCheatsheetRepository sharedCheatsheetRepository;
     private final CheatsheetRepository cheatsheetRepository;
-    private final com.hibernate.repository.NotificationRepository notificationRepository;
+    private final NotificationRepository notificationRepository;
     private final org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
 
     @PostMapping(value = "/comment", produces = "application/json; charset=UTF-8")
@@ -71,6 +73,7 @@ public class InteractionController {
                     currentUser.getUsername() + " commented on your cheat sheet.",
                     parentCommentId == null ? "COMMENT" : "REPLY",
                     "/cheatsheet/detail/" + cheatSheetId);
+            
             notificationSocketService.broadcastToUser(sheet.getAuthor().getId(), notification);
         }
 
@@ -141,8 +144,12 @@ public class InteractionController {
             shared.setCheatsheet(cheatsheet);
             sharedCheatsheetRepository.save(shared);
             
-            // 2. Cheatsheet Count Update လုပ်ခြင်း
-            CheatsheetEntity originalCheatsheet = cheatsheetRepository.findById(cheatSheetId);
+            // 2. 🌟 [FIXED] Service ကို သုံးပြီး Entity ကို စိတ်ချရအောင် ဆွဲထုတ်ခြင်း (Error လုံးဝမတက်တော့ပါ)
+            CheatsheetEntity originalCheatsheet = cheatsheetService.findById(cheatSheetId);
+            if (originalCheatsheet == null) {
+                return ResponseEntity.badRequest().body("{\"message\":\"Cheatsheet not found!\"}");
+            }
+
             int currentShareCount = (originalCheatsheet.getShareCount() != null) ? originalCheatsheet.getShareCount() : 0;
             originalCheatsheet.setShareCount(currentShareCount + 1);
             cheatsheetRepository.update(originalCheatsheet);
@@ -151,8 +158,7 @@ public class InteractionController {
             if (originalCheatsheet.getAuthor() != null && 
                 !originalCheatsheet.getAuthor().getId().equals(currentUser.getId())) {
                 
-                // --- Database ထဲ သိမ်းရန် Entity အသစ်ဆောက်ပါ ---
-                com.hibernate.entity.NotificationEntity notification = new com.hibernate.entity.NotificationEntity();
+                NotificationEntity notification = new NotificationEntity();
                 notification.setMessage(currentUser.getFullName() + " shared your cheatsheet: \"" + originalCheatsheet.getTitle() + "\"");
                 notification.setNotificationType("SHARE");
                 notification.setLinkUrl("/cheatsheet/detail/" + originalCheatsheet.getId());
@@ -189,10 +195,8 @@ public class InteractionController {
         }
     }
 
-    // 🌟 SHARED FEED: Share ထားသမျှအားလုံးကို Repository မှတစ်ဆင့် တိုက်ရိုက်ပြန်ထုတ်ယူခြင်း
     @GetMapping("/shared-feed")
     public ModelAndView viewSharedFeed(HttpSession session) {
-        
         if (session.getAttribute("currentUser") == null) {
             return new ModelAndView("redirect:/login");
         }
