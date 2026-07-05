@@ -40,6 +40,17 @@
                     <h2 class="fw-bold text-dark m-0">CheatSheet Management</h2>
                     <p class="text-muted m-0 small">Review, approve, reject, ban, or delete user-submitted CheatSheets.</p>
                 </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/admin/cheatsheets/reports/weekly">
+                        <i class="bi bi-filetype-pdf me-1"></i> Weekly Report
+                    </a>
+                    <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/admin/cheatsheets/reports/monthly">
+                        <i class="bi bi-filetype-pdf me-1"></i> Monthly Report
+                    </a>
+                    <a class="btn btn-brand-primary" href="${pageContext.request.contextPath}/cheatsheet/add">
+                        <i class="bi bi-plus-circle me-1"></i> Create CheatSheet
+                    </a>
+                </div>
             </div>
 
             <%-- Alert Messages --%>
@@ -105,7 +116,7 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light text-secondary small fw-bold text-uppercase">
                                 <tr>
-                                    <th class="ps-4">ID</th>
+                                    <th class="ps-4">S.No</th>
                                     <th>CheatSheet Details</th>
                                     <th>Author</th>
                                     <th>State & Status</th>
@@ -115,9 +126,9 @@
                             <tbody>
                                 <c:choose>
                                     <c:when test="${not empty cheatsheets}">
-                                        <c:forEach var="s" items="${cheatsheets}">
+                                        <c:forEach var="s" items="${cheatsheets}" varStatus="statusLoop">
                                             <tr>
-                                                <td class="ps-4 fw-bold text-secondary">#${s.id}</td>
+                                                <td class="ps-4 fw-bold text-secondary">${((currentPage - 1) * 10) + statusLoop.index + 1}</td>
                                                 <td>
                                                     <div class="fw-semibold text-dark">
                                                         <a href="${pageContext.request.contextPath}/cheatsheet/detail/${s.id}" class="text-decoration-none text-dark hover-brand">
@@ -158,7 +169,7 @@
                                                     <div class="d-flex gap-2">
                                                         
                                                         <%-- Approve / Reject Actions for Pending --%>
-                                                        <c:if test="${s.status == 'pending'}">
+                                                        <c:if test="${s.status == 'pending' && (s.author == null || s.author.role == 1)}">
                                                             <form method="post" action="${pageContext.request.contextPath}/admin/cheatsheets/${s.id}/approve" class="d-inline">
                                                                 <button type="submit" class="btn btn-sm btn-success rounded-2 px-2.5 py-1">Approve</button>
                                                             </form>
@@ -183,12 +194,18 @@
                                                             </c:otherwise>
                                                         </c:choose>
 
-                                                        <%-- Delete Action --%>
-                                                        <form method="post" action="${pageContext.request.contextPath}/admin/cheatsheets/${s.id}/delete" class="d-inline" onsubmit="return confirm('Delete CheatSheet permanently?');">
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-2 px-3 py-1">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        </form>
+                                                        <c:choose>
+                                                            <c:when test="${s.author != null && s.author.role != 1}">
+                                                                <span class="badge text-bg-light border align-self-center">User-created: Ban/Restore only</span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <form method="post" action="${pageContext.request.contextPath}/admin/cheatsheets/${s.id}/delete" class="d-inline" onsubmit="return confirm('Delete CheatSheet permanently?');">
+                                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-2 px-3 py-1">
+                                                                        <i class="bi bi-trash"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                         
                                                     </div>
                                                 </td>

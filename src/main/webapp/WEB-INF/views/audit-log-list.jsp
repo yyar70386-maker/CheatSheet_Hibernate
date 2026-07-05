@@ -47,7 +47,7 @@
         <table class="table align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    <th>ID</th>
+                    <th>S.No</th>
                     <th>User</th>
                     <th>Action</th>
                     <th>Entity</th>
@@ -62,9 +62,9 @@
                         <tr><td colspan="7" class="text-center text-muted py-5">No audit logs found.</td></tr>
                     </c:when>
                     <c:otherwise>
-                        <c:forEach items="${logs}" var="log">
+                        <c:forEach items="${logs}" var="log" varStatus="statusLoop">
                             <tr>
-                                <td>${log.id}</td>
+                                <td>${((currentPage - 1) * 15) + statusLoop.index + 1}</td>
                                 <td><c:out value="${log.user != null ? log.user.username : 'System'}" /></td>
                                 <td><c:out value="${log.action}" /></td>
                                 <td><c:out value="${log.entityType != null ? log.entityType : log.entityName}" /> #${log.entityId}</td>

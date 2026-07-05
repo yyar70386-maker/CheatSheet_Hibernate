@@ -43,6 +43,14 @@
     .notification-item {
         white-space: normal;
     }
+    .notification-toast {
+        position: fixed;
+        top: 72px;
+        right: 24px;
+        z-index: 1080;
+        width: min(360px, calc(100vw - 32px));
+        display: none;
+    }
     /* 🌟 Global Admin Layout & Theme Styles */
     .app-container {
         display: flex;
@@ -96,8 +104,23 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" href="${pageContext.request.contextPath}/">
+                    <a class="nav-link active" href="${pageContext.request.contextPath}/home">
                         <i class="bi bi-house-door me-1"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/home#latest-sheets">
+                        <i class="bi bi-journal-code me-1"></i> CheatSheets
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/cheatsheet/list">
+                        <i class="bi bi-list-ul me-1"></i> List
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/cheatsheet/add">
+                        <i class="bi bi-plus-circle me-1"></i> Create
                     </a>
                 </li>
             </ul>
@@ -172,6 +195,16 @@
     </div>
 </nav>
 
+<div id="notificationToast" class="alert alert-primary shadow notification-toast" role="alert">
+    <div class="d-flex gap-2">
+        <i class="bi bi-bell-fill"></i>
+        <div>
+            <div class="fw-semibold" id="notificationToastTitle">New notification</div>
+            <div class="small" id="notificationToastMessage"></div>
+        </div>
+    </div>
+</div>
+
 <%-- ==================== 🌐 WEBSOCKET REAL-TIME NOTIFICATION SCRIPT ==================== --%>
 <c:if test="${not empty sessionScope.currentUser}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
@@ -213,6 +246,19 @@
                 }
             }
 
+            function showNotificationAlert(notification) {
+                var toast = document.getElementById('notificationToast');
+                var title = document.getElementById('notificationToastTitle');
+                var message = document.getElementById('notificationToastMessage');
+                title.textContent = notification.title || notification.notificationType || 'New notification';
+                message.textContent = notification.message || '';
+                toast.style.display = 'block';
+                window.clearTimeout(window.cheatSheetNotificationTimer);
+                window.cheatSheetNotificationTimer = window.setTimeout(function () {
+                    toast.style.display = 'none';
+                }, 5000);
+            }
+
             function loadRecentNotifications() {
                 fetch(contextPath + '/notifications/recent')
                     .then(function (response) { return response.json(); })
@@ -238,6 +284,7 @@
                         var notification = JSON.parse(message.body);
                         setBadge(unreadCount + 1);
                         addNotification(notification, true);
+                        showNotificationAlert(notification);
                     });
                 });
             }

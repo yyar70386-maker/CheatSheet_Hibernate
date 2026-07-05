@@ -111,6 +111,14 @@ public class AnnouncementController {
             return "redirect:/login";
         }
         announcementService.updateStatus(id, status, currentUser);
+        if ("active".equalsIgnoreCase(status)) {
+            AnnouncementEntity announcement = announcementService.findById(id);
+            if (announcement != null) {
+                List<NotificationDto> notifications = notificationService.createAnnouncementNotifications(
+                        currentUser.getId(), id, announcement.getTitle());
+                notificationSocketService.broadcastNotifications(notifications);
+            }
+        }
         return "redirect:/admin/announcements";
     }
 }

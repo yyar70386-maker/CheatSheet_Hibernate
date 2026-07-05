@@ -18,7 +18,10 @@ import com.hibernate.dto.NotificationDto;
 import com.hibernate.service.AuditLogService;
 import com.hibernate.service.CategoryService;
 import com.hibernate.service.CheatsheetService;
+import com.hibernate.service.FavoriteService;
+import com.hibernate.service.InteractionServiceImpl;
 import com.hibernate.service.NotificationService;
+import com.hibernate.service.RatingService;
 import com.hibernate.service.TagService;
 import com.hibernate.websocket.NotificationSocketService;
 
@@ -35,6 +38,9 @@ public class CheatsheetController {
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
     private final NotificationSocketService notificationSocketService;
+    private final FavoriteService favoriteService;
+    private final InteractionServiceImpl interactionService;
+    private final RatingService ratingService;
 
  // ==================== 🌟 My Cheatsheets Personal List ====================
     @GetMapping("/list")
@@ -237,6 +243,18 @@ public class CheatsheetController {
         // ၄။ Detail View စာမျက်နှာ (cheatsheet-detail.jsp) သို့ Data များ တွဲဖက်ပေးပို့ခြင်း
         ModelAndView mv = new ModelAndView("cheatsheet-detail");
         mv.addObject("sheet", sheet);
+        mv.addObject("avgRating", ratingService.getAverageRatingBySheetId(id));
+        mv.addObject("sheetLikes", interactionService.countSheetReactions(id, true));
+        mv.addObject("sheetDislikes", interactionService.countSheetReactions(id, false));
+        mv.addObject("commentsList", interactionService.getCommentsBySheetId(id, currentUserId));
+        if (currentUser != null) {
+            var favorite = favoriteService.getByUserIdAndSheetId(currentUser.getId(), id);
+            var userReaction = interactionService.getSheetReaction(currentUser.getId(), id);
+            var userRatingEntity = ratingService.getByUserAndSheetId(currentUser.getId(), id);
+            mv.addObject("isFavorited", favorite != null);
+            mv.addObject("userSheetLike", userReaction != null ? userReaction.getIsLike() : null);
+            mv.addObject("userRating", userRatingEntity != null ? userRatingEntity.getStars() : 0);
+        }
         mv.addObject("isOwner", isOwner); // UI ဘက်တွင် Edit/Delete ခလုတ်ပြရန်/ဖျောက်ရန်
         
         return mv;

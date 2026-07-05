@@ -3,8 +3,14 @@ package com.hibernate.repository;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.transform.ResultTransformer;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.LongType;
+import org.hibernate.type.StringType;
+import org.hibernate.type.TimestampType;
 import org.springframework.stereotype.Repository;
 import com.hibernate.entity.CheatsheetEntity;
+import com.hibernate.entity.CheatSheetReportEntity;
 import com.hibernate.entity.TagEntity;
 import lombok.RequiredArgsConstructor;
 
@@ -62,7 +68,14 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
     public void update(CheatsheetEntity cheatsheet) {
         CheatsheetEntity old = findById(cheatsheet.getId());
         if (old != null) {
-            old.setTitle(cheatsheet.getTitle()); old.setDescription(cheatsheet.getDescription()); old.setContent(cheatsheet.getContent()); old.setCategory(cheatsheet.getCategory()); old.setTags(cheatsheet.getTags()); old.setViewCount(cheatsheet.getViewCount()); old.setDownloadCount(cheatsheet.getDownloadCount()); old.setVisibility(cheatsheet.getVisibility()); 
+            old.setTitle(cheatsheet.getTitle()); 
+            old.setDescription(cheatsheet.getDescription()); 
+            old.setContent(cheatsheet.getContent()); 
+            old.setCategory(cheatsheet.getCategory()); 
+            old.setTags(cheatsheet.getTags()); 
+            old.setViewCount(cheatsheet.getViewCount()); 
+            old.setDownloadCount(cheatsheet.getDownloadCount()); 
+            old.setVisibility(cheatsheet.getVisibility()); 
             if (cheatsheet.getAuthor() != null) old.setAuthor(cheatsheet.getAuthor());
             getSession().update(old);
         }
@@ -72,7 +85,8 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
     public void delete(Integer id) {
         CheatsheetEntity cheatsheet = findById(id);
         if (cheatsheet != null) {
-            cheatsheet.setStatus("inactive"); getSession().update(cheatsheet);
+            cheatsheet.setStatus("inactive"); 
+            getSession().update(cheatsheet);
         }
     }
 
@@ -80,8 +94,11 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
     public List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId, String filter) {
         int offset = (page - 1) * size;
         StringBuilder hql = new StringBuilder("select distinct c from CheatsheetEntity c left join fetch c.tags left join fetch c.author where c.category.id = :catId and c.status='active' and c.visibility != 'PRIVATE' ");
-        if (currentUserId == null || currentUserId == 0) { hql.append("and c.visibility = 'PUBLIC' "); } 
-        else { hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId or (c.visibility = 'FRIEND-ONLY' and c.author.id in (select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))) "); }
+        if (currentUserId == null || currentUserId == 0) { 
+            hql.append("and c.visibility = 'PUBLIC' "); 
+        } else { 
+            hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId or (c.visibility = 'FRIEND-ONLY' and c.author.id in (select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))) "); 
+        }
         if ("PUBLIC".equalsIgnoreCase(filter)) hql.append("and c.visibility = 'PUBLIC' ");
         else if ("FRIEND".equalsIgnoreCase(filter)) hql.append("and c.visibility = 'FRIEND-ONLY' ");
         hql.append("order by c.id desc");
@@ -93,13 +110,17 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
     @Override
     public long countByCategoryId(Integer categoryId, Integer currentUserId, String filter) {
         StringBuilder hql = new StringBuilder("select count(distinct c) from CheatsheetEntity c where c.category.id = :catId and c.status='active' and c.visibility != 'PRIVATE' ");
-        if (currentUserId == null || currentUserId == 0) { hql.append("and c.visibility = 'PUBLIC' "); } 
-        else { hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId or (c.visibility = 'FRIEND-ONLY' and c.author.id in (select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))) "); }
+        if (currentUserId == null || currentUserId == 0) { 
+            hql.append("and c.visibility = 'PUBLIC' "); 
+        } else { 
+            hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId or (c.visibility = 'FRIEND-ONLY' and c.author.id in (select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))) "); 
+        }
         if ("PUBLIC".equalsIgnoreCase(filter)) hql.append("and c.visibility = 'PUBLIC' ");
         else if ("FRIEND".equalsIgnoreCase(filter)) hql.append("and c.visibility = 'FRIEND-ONLY' ");
         var query = getSession().createQuery(hql.toString(), Long.class).setParameter("catId", categoryId);
         if (currentUserId != null && currentUserId > 0) query.setParameter("currentUserId", currentUserId);
-        Long count = query.uniqueResult(); return count != null ? count : 0;
+        Long count = query.uniqueResult(); 
+        return count != null ? count : 0;
     }
 
     @Override
@@ -111,8 +132,11 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
     public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter) {
         int offset = (page - 1) * size;
         StringBuilder hql = new StringBuilder("select distinct c from CheatsheetEntity c join c.tags t left join fetch c.tags left join fetch c.author where t.id = :tagId and c.status = 'active' and c.visibility != 'PRIVATE' ");
-        if (currentUserId == null || currentUserId == 0) { hql.append("and c.visibility = 'PUBLIC' "); } 
-        else { hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId or (c.visibility = 'FRIEND-ONLY' and c.author.id in (select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))) "); }
+        if (currentUserId == null || currentUserId == 0) { 
+            hql.append("and c.visibility = 'PUBLIC' "); 
+        } else { 
+            hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId or (c.visibility = 'FRIEND-ONLY' and c.author.id in (select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))) "); 
+        }
         if ("PUBLIC".equalsIgnoreCase(filter)) hql.append("and c.visibility = 'PUBLIC' ");
         else if ("FRIEND".equalsIgnoreCase(filter)) hql.append("and c.visibility = 'FRIEND-ONLY' ");
         hql.append("order by c.id desc");
@@ -124,13 +148,17 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
     @Override
     public long countByTagId(Integer tagId, Integer currentUserId, String filter) {
         StringBuilder hql = new StringBuilder("select count(distinct c) from CheatsheetEntity c join c.tags t where t.id = :tagId and c.status = 'active' and c.visibility != 'PRIVATE' ");
-        if (currentUserId == null || currentUserId == 0) { hql.append("and c.visibility = 'PUBLIC' "); } 
-        else { hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId or (c.visibility = 'FRIEND-ONLY' and c.author.id in (select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))) "); }
+        if (currentUserId == null || currentUserId == 0) { 
+            hql.append("and c.visibility = 'PUBLIC' "); 
+        } else { 
+            hql.append("and (c.visibility = 'PUBLIC' or c.author.id = :currentUserId or (c.visibility = 'FRIEND-ONLY' and c.author.id in (select f.following.id from UserFollowEntity f where f.follower.id = :currentUserId))) "); 
+        }
         if ("PUBLIC".equalsIgnoreCase(filter)) hql.append("and c.visibility = 'PUBLIC' ");
         else if ("FRIEND".equalsIgnoreCase(filter)) hql.append("and c.visibility = 'FRIEND-ONLY' ");
         var query = getSession().createQuery(hql.toString(), Long.class).setParameter("tagId", tagId);
         if (currentUserId != null && currentUserId > 0) query.setParameter("currentUserId", currentUserId);
-        Long count = query.uniqueResult(); return count != null ? count : 0;
+        Long count = query.uniqueResult(); 
+        return count != null ? count : 0;
     }
 
     @Override
@@ -141,15 +169,45 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
     }
 
     @Override
+    public List<CheatsheetEntity> findPopularPublic(int size) {
+        String hql = "select distinct c from CheatsheetEntity c "
+                + "left join fetch c.author left join fetch c.category left join fetch c.tags "
+                + "where c.status = 'active' and c.visibility = 'PUBLIC' "
+                + "order by "
+                + "((select count(sr) from SheetReactionEntity sr where sr.cheatSheet.id = c.id and sr.isLike = true) * 3 "
+                + "+ coalesce(c.viewCount, 0) "
+                + "+ (select coalesce(avg(r.stars), 0) from RatingEntity r where r.cheatSheet.id = c.id) * 10) desc, "
+                + "c.createdAt desc, c.id desc";
+        return getSession().createQuery(hql, CheatsheetEntity.class)
+                .setMaxResults(size)
+                .list();
+    }
+
+    @Override
+    public List<CheatsheetEntity> findPublicCreatedBetween(java.sql.Timestamp start, java.sql.Timestamp end) {
+        String hql = "select distinct c from CheatsheetEntity c "
+                + "left join fetch c.author left join fetch c.category left join fetch c.tags "
+                + "where c.status = 'active' and c.visibility = 'PUBLIC' "
+                + "and c.createdAt >= :start and c.createdAt < :end "
+                + "order by c.createdAt desc, c.id desc";
+        return getSession().createQuery(hql, CheatsheetEntity.class)
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .list();
+    }
+
+    @Override
     public long countLatestPublic(String keyword) {
         String search = keyword == null ? "" : keyword.trim().toLowerCase();
         String hql = "select count(distinct c) from CheatsheetEntity c where c.status = 'active' and c.visibility = 'PUBLIC' and (:keyword = '' or lower(c.title) like :likeKeyword or lower(c.description) like :likeKeyword or lower(c.content) like :likeKeyword)";
-        Long count = getSession().createQuery(hql, Long.class).setParameter("keyword", search).setParameter("likeKeyword", "%" + search + "%").uniqueResult(); return count != null ? count : 0;
+        Long count = getSession().createQuery(hql, Long.class).setParameter("keyword", search).setParameter("likeKeyword", "%" + search + "%").uniqueResult(); 
+        return count != null ? count : 0;
     }
 
     @Override
     public long countAllActive() {
-        Long count = getSession().createQuery("select count(c) from CheatsheetEntity c where c.status = 'active'", Long.class).uniqueResult(); return count != null ? count : 0;
+        Long count = getSession().createQuery("select count(c) from CheatsheetEntity c where c.status = 'active'", Long.class).uniqueResult(); 
+        return count != null ? count : 0;
     }
 
     @Override
@@ -236,5 +294,43 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
                 .createQuery("select count(c) from CheatsheetEntity c where c.status = 'active' and c.banned = false", Long.class)
                 .uniqueResult();
         return count != null ? count : 0;
+    }
+
+    @SuppressWarnings({ "unchecked", "deprecation", "serial" })
+    @Override
+    public List<CheatSheetReportEntity> findCheatsheetReportData() {
+        return getSession()
+        		.createNativeQuery(
+        			    "SELECT c.id, c.title, u.username, c.created_at, " +
+        			    "(SELECT COUNT(*) FROM sheet_reactions sr WHERE sr.cheatsheet_id = c.id) AS reaction_count " +
+        			    "FROM cheatsheets c " +
+        			    "LEFT JOIN users u ON c.author_id = u.id " +
+        			    "WHERE c.deleted_at IS NULL " +
+        			    "ORDER BY c.created_at DESC")
+                .addScalar("id", IntegerType.INSTANCE)
+                .addScalar("title", StringType.INSTANCE)
+                .addScalar("username", StringType.INSTANCE)
+                .addScalar("created_at", TimestampType.INSTANCE)
+                .addScalar("reaction_count", LongType.INSTANCE)
+                .setResultTransformer(new ResultTransformer() {
+                    @Override
+                    public Object transformTuple(Object[] tuple, String[] aliases) {
+                        CheatSheetReportEntity report = new CheatSheetReportEntity();
+                        report.setNo(((Number) tuple[0]).intValue());
+                        report.setCheatsheetName((String) tuple[1]);
+                        report.setCreatedUser((String) tuple[2]);
+                        java.sql.Timestamp ts = (java.sql.Timestamp) tuple[3];
+                        report.setCreatedDate(ts != null ? ts.toString() : "");
+                        Number rc = (Number) tuple[4];
+                        report.setReactionCount(rc != null ? rc.longValue() : 0L);
+                        return report;
+                    }
+
+                    @Override
+                    public List transformList(List collection) {
+                        return collection;
+                    }
+                })
+                .list();
     }
 }

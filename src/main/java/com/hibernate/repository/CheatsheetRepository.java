@@ -1,6 +1,8 @@
 package com.hibernate.repository;
 
 import java.util.List;
+
+import com.hibernate.entity.CheatSheetReportEntity;
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.TagEntity;
 
@@ -24,6 +26,8 @@ public interface CheatsheetRepository {
     
     List<CheatsheetEntity> findByUserId(Integer userId);
     List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size);
+    List<CheatsheetEntity> findPopularPublic(int size);
+    List<CheatsheetEntity> findPublicCreatedBetween(java.sql.Timestamp start, java.sql.Timestamp end);
     long countLatestPublic(String keyword);
     long countAllActive();
     int getTotalSheetsCount();
@@ -32,4 +36,5 @@ public interface CheatsheetRepository {
     long countSearchAll(String keyword, String categoryId, String status, String banned);
     long countBanned();
     long countPublished();
+    List<CheatSheetReportEntity> findCheatsheetReportData();
 }

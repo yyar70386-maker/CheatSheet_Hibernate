@@ -64,6 +64,7 @@ public class AuthController {
         model.addAttribute("categorylist", categoryService.findAllActive());
         model.addAttribute("announcements", announcementService.findLatest(3));
         model.addAttribute("cheatsheetlist", cheatsheetService.findLatestPublic(query, page, pageSize));
+        model.addAttribute("popularCheatsheets", cheatsheetService.findPopularPublic(6));
         model.addAttribute("searchQuery", query);
         model.addAttribute("currentPage", page);
         
@@ -153,6 +154,7 @@ public class AuthController {
         model.addAttribute("categorylist", categoryService.findAllActive());
         model.addAttribute("announcements", announcementService.findLatest(3));
         model.addAttribute("cheatsheetlist", cheatsheetService.findLatestPublic(query, page, 6));
+        model.addAttribute("popularCheatsheets", cheatsheetService.findPopularPublic(6));
         model.addAttribute("searchQuery", query);
         model.addAttribute("currentPage", page);
         

@@ -2,6 +2,7 @@ package com.hibernate.service;
 
 import java.util.List;
 import com.hibernate.entity.CheatsheetEntity;
+import com.hibernate.entity.CheatSheetReportEntity;
 import com.hibernate.entity.TagEntity;
 import com.hibernate.entity.User;
 import com.hibernate.dto.NotificationDto;
@@ -27,6 +28,8 @@ public interface CheatsheetService {
     int getTotalSheetsCount(); 
     List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId, Integer currentUserId);
     List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size);
+    List<CheatsheetEntity> findPopularPublic(int size);
+    List<CheatsheetEntity> findPublicCreatedBetween(java.sql.Timestamp start, java.sql.Timestamp end);
     long countLatestPublic(String keyword);
     long countAllActive();
 
@@ -38,4 +41,5 @@ public interface CheatsheetService {
     NotificationDto rejectCheatsheet(Integer id, User admin, String ipAddress);
     long countBanned();
     long countPublished();
+    List<CheatSheetReportEntity> getCheatsheetReportData();
 }

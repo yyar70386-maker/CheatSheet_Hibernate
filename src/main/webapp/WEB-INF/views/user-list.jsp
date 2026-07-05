@@ -98,7 +98,7 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light text-secondary small fw-bold text-uppercase">
                                 <tr>
-                                    <th class="ps-4">ID</th>
+                                    <th class="ps-4">S.No</th>
                                     <th>User Info</th>
                                     <th>Role & Status</th>
                                     <th>Actions</th>
@@ -107,9 +107,9 @@
                             <tbody>
                                 <c:choose>
                                     <c:when test="${not empty users}">
-                                        <c:forEach var="u" items="${users}">
+                                        <c:forEach var="u" items="${users}" varStatus="statusLoop">
                                             <tr>
-                                                <td class="ps-4 fw-bold text-secondary">#${u.id}</td>
+                                                <td class="ps-4 fw-bold text-secondary">${((currentPage - 1) * 10) + statusLoop.index + 1}</td>
                                                 <td>
                                                     <div class="fw-semibold text-dark">${u.username}</div>
                                                     <div class="text-muted small">${u.email}</div>

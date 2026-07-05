@@ -135,6 +135,11 @@
     <version>6.21.0</version>
     <scope>compile</scope>
 </dependency>
+	<dependency>
+	    <groupId>net.sf.jasperreports</groupId>
+	    <artifactId>jasperreports-fonts</artifactId>
+	    <version>6.21.0</version>
+	</dependency>
 
 
 
