@@ -23,6 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
 
 @Controller
@@ -60,7 +61,6 @@ public class AuthController {
             Model model) {
         int pageSize = 6;
         
-        // Active ဖြစ်နေတဲ့ Category list ကိုသာ ဆွဲထုတ်ပြသခြင်း
         model.addAttribute("categorylist", categoryService.findAllActive());
         model.addAttribute("announcements", announcementService.findLatest(3));
         model.addAttribute("cheatsheetlist", cheatsheetService.findLatestPublic(query, page, pageSize));
@@ -71,7 +71,6 @@ public class AuthController {
         long total = cheatsheetService.countLatestPublic(query);
         model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / pageSize)));
         
-        // သူငယ်ချင်းဖြစ်သူ ထည့်သွင်းထားသော Total Count Metrics များ
         model.addAttribute("totalSheets", cheatsheetService.getTotalSheetsCount());
         model.addAttribute("totalTags", tagService.getTotalTagsCount());
         
@@ -107,7 +106,6 @@ public class AuthController {
     public String showLoginForm() {
         return "login"; 
     }
-
 
     @PostMapping("/login")
     public String processLogin(@RequestParam("email") String email, 
@@ -167,6 +165,7 @@ public class AuthController {
         return "home";
     }
 
+ // AuthController.java ၏ showProfile (/profile) မက်သတ်အတွင်း ပြင်ရန်
     @GetMapping("/profile")
     public String showProfile(HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
@@ -181,7 +180,9 @@ public class AuthController {
         model.addAttribute("followersCount", userFollowService.getFollowersCount(user.getId()));
         model.addAttribute("followingCount", userFollowService.getFollowingCount(user.getId()));
 
-        List<CheatsheetEntity> myCheatSheets = cheatsheetService.findByUserId(user.getId());
+        // 🌟 [FIX] "FRIEND" နေရာတွင် Database တန်ဖိုးအမှန်ဖြစ်သော "FRIEND-ONLY" သို့ လဲလှယ်လိုက်ခြင်း
+        List<String> visibilities = List.of("PUBLIC", "FRIEND-ONLY", "PRIVATE");
+        List<CheatsheetEntity> myCheatSheets = cheatsheetService.findByUserIdAndVisibility(user.getId(), visibilities);
         
         model.addAttribute("cheatSheetsList", myCheatSheets);
         model.addAttribute("cheatsheetlist", myCheatSheets);
@@ -213,6 +214,7 @@ public class AuthController {
         return "follow_list"; 
     }
     
+    // 🌟 အခြားသူများ၏ Profile View (Mutual Follow မှသာ PUBLIC + FRIEND-ONLY အား Database မှ ဆွဲထုတ်မည်)
     @GetMapping("/profile/{id}")
     public String viewTargetProfile(@PathVariable Integer id, HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
@@ -237,7 +239,19 @@ public class AuthController {
         boolean isFollowing = userFollowService.isFollowing(currentUser.getId(), id);
         model.addAttribute("isFollowing", isFollowing);
 
-        List<CheatsheetEntity> targetUserCheatSheets = cheatsheetService.findByUserId(id); 
+        // 🌟 [PRIVACY VALUE FIXED]
+        List<String> allowedVisibilities = new ArrayList<>();
+        allowedVisibilities.add("PUBLIC"); 
+        
+        boolean currentFollowsTarget = isFollowing;
+        boolean targetFollowsCurrent = userFollowService.isFollowing(id, currentUser.getId());
+        
+        if (currentFollowsTarget && targetFollowsCurrent) {
+            // 🌟 [FIX] "FRIEND" အစား မင်းရဲ့ Database မူရင်းတန်ဖိုးဖြစ်သော "FRIEND-ONLY" ဟု တိတိကျကျ ပြောင်းလဲလိုက်ခြင်း
+            allowedVisibilities.add("FRIEND-ONLY");
+        }
+
+        List<CheatsheetEntity> targetUserCheatSheets = cheatsheetService.findByUserIdAndVisibility(id, allowedVisibilities); 
         
         model.addAttribute("cheatsheetlist", targetUserCheatSheets);
         model.addAttribute("cheatSheetsList", targetUserCheatSheets); 
@@ -370,22 +384,18 @@ public class AuthController {
             return "redirect:/login";
         }
 
-       
         boolean isChanged = false;
 
-        
         if (!fullName.equals(currentUser.getFullName())) {
             currentUser.setFullName(fullName);
             isChanged = true;
         }
 
-        
         if (!email.equals(currentUser.getEmail())) {
             currentUser.setEmail(email);
             isChanged = true;
         }
 
-        
         if (bio != null && !bio.equals(currentUser.getBio())) {
             currentUser.setBio(bio);
             isChanged = true;
@@ -393,12 +403,10 @@ public class AuthController {
 
         try {
             if (isChanged) {
-                
                 userService.updateUser(currentUser);
                 session.setAttribute("currentUser", currentUser);
                 redirectAttributes.addFlashAttribute("message", "Profile updated successfully!");
             } else {
-               
                 redirectAttributes.addFlashAttribute("message", "No changes were made.");
             }
         } catch (Exception e) {
@@ -406,4 +414,5 @@ public class AuthController {
         }
 
         return "redirect:/profile";
-    }}
+    }
+}

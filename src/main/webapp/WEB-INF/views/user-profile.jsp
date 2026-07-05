@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,16 +45,101 @@
             color: #64748b;
             font-weight: 600;
         }
+        
+        /* 🌟 [MERGED FROM BROWSE] CheatSheet Card Layout & Typography Styles */
         .cheatsheet-card {
             border: 1px solid #e2e8f0;
-            border-radius: 18px;
-            padding: 25px;
+            border-radius: 20px;
+            padding: 30px;
             background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.01);
-            transition: transform 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%; /* Column Stretch အလုပ်လုပ်ရန် */
+            display: flex;
+            flex-direction: column;
         }
         .cheatsheet-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        .grid-item {
+            align-self: start; 
+        }
+        .description-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .description-text.expanded {
+            display: block;
+            -webkit-line-clamp: unset;
+        }
+        .see-more-btn {
+            color: #1976d2;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .see-more-btn:hover {
+            text-decoration: underline;
+        }
+        .card-meta-item {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tag-badge-link {
+            background-color: #e2e8f0;
+            color: #333;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .tag-badge-link:hover {
+            background-color: #1976d2;
+            color: white;
+        }
+        .stats-section {
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        /* 🌟 [MERGED FROM BROWSE] Visibility Pill Badges Styles */
+        .visibility-pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: capitalize;
+        }
+        .pill-public {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        .pill-friends {
+            background-color: #cff4fc;
+            color: #055160;
+        }
+        .pill-private {
+            background-color: #f8d7da;
+            color: #842029;
         }
     </style>
 </head>
@@ -83,23 +169,23 @@
                         <h2 class="fw-bold m-0 text-dark">${targetUser.username}</h2>
                         
                         <c:if test="${sessionScope.currentUser.id != targetUser.id}">
-    <c:choose>
-        <c:when test="${isFollowing}">
-            <form action="${pageContext.request.contextPath}/unfollow/${targetUser.id}" method="POST" class="d-inline">
-                <button type="submit" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">
-                    <i class="bi bi-person-x-fill me-1"></i> Unfollow
-                </button>
-            </form>
-        </c:when>
-        <c:otherwise>
-            <form action="${pageContext.request.contextPath}/follow/${targetUser.id}" method="POST" class="d-inline">
-                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold">
-                    <i class="bi bi-person-plus-fill me-1"></i> Follow
-                </button>
-            </form>
-        </c:otherwise>
-    </c:choose>
-</c:if>
+                            <c:choose>
+                                <c:when test="${isFollowing}">
+                                    <form action="${pageContext.request.contextPath}/unfollow/${targetUser.id}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">
+                                            <i class="bi bi-person-x-fill me-1"></i> Unfollow
+                                        </button>
+                                    </form>
+                                </c:when>
+                                <c:otherwise>
+                                    <form action="${pageContext.request.contextPath}/follow/${targetUser.id}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold">
+                                            <i class="bi bi-person-plus-fill me-1"></i> Follow
+                                        </button>
+                                    </form>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:if>
                     </div>
                     
                     <p class="text-muted mb-3">@${targetUser.fullName}</p>
@@ -137,28 +223,106 @@
                 <c:when test="${empty cheatsheetlist}">
                     <div class="text-center text-muted py-5 bg-white rounded-4 border border-dashed">
                         <i class="bi bi-folder2-open display-6 d-block mb-2 text-secondary"></i>
-                        No public cheat sheets published yet.
+                        No accessible cheat sheets published yet.
                     </div>
                 </c:when>
                 <c:otherwise>
-                    <div class="row g-3">
+                    
+                    <!-- 🌟 [UPDATED LAYOUT] Browse စာမျက်နှာနှင့် တစ်ပြေးညီ Grid စနစ်ပြောင်းလဲခြင်း -->
+                    <div class="row g-4 justify-content-start">
                         <c:forEach items="${cheatsheetlist}" var="sheet">
-                            <div class="col-md-6">
-                                <div class="cheatsheet-card">
-                                    <h5 class="fw-bold">
-                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline">
-                                            ${sheet.title}
-                                        </a>
-                                    </h5>
-                                    <p class="text-secondary small text-truncate mb-2">${sheet.description}</p>
-                                    <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <span class="badge bg-light text-dark border rounded-pill">${sheet.category.name}</span>
-                                        <small class="text-muted"><i class="bi bi-eye me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</small>
+                            
+                            <!-- [UI LEVEL SECURITY SHIELD] PRIVATE ဒေတာဖြစ်ပါက ကျော်သွားမည် -->
+                            <c:if test="${sheet.visibility != 'PRIVATE'}">
+                                <div class="col-md-6 grid-item">
+                                    <div class="cheatsheet-card">
+                                        <div>
+                                            <h3 class="fw-bold mb-2 d-flex align-items-center justify-content-between">
+                                                <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline fs-4">
+                                                    ${sheet.title}
+                                                </a>
+                                                
+                                                <c:choose>
+                                                    <%-- Login User ဖြစ်ပါက Pillow Badge စနစ်ဖြင့် စနစ်တကျထုတ်ပြမည် --%>
+                                                    <c:when test="${not empty sessionScope.currentUser}">
+                                                        <c:choose>
+                                                            <c:when test="${sheet.visibility == 'PUBLIC'}">
+                                                                <span class="visibility-pill pill-public" title="Public Cheat Sheet">
+                                                                    <i class="bi bi-globe"></i> Public
+                                                                </span>
+                                                            </c:when>
+                                                            <c:when test="${sheet.visibility == 'FRIEND-ONLY'}">
+                                                                <span class="visibility-pill pill-friends" title="Friends Only Cheat Sheet">
+                                                                    <i class="bi bi-people-fill"></i> Friends
+                                                                </span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="visibility-pill pill-private" title="Private Cheat Sheet">
+                                                                    <i class="bi bi-lock-fill"></i> Private
+                                                                </span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:when>
+                                                    <%-- Guest ဖြစ်ပါက Public သာပြမည် --%>
+                                                    <c:otherwise>
+                                                        <span class="visibility-pill pill-public" title="Public Cheat Sheet">
+                                                            <i class="bi bi-globe"></i> Public
+                                                        </span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </h3>
+                                            
+                                            <!-- See More Handle -->
+                                            <div class="description-container mb-3">
+                                                <p class="text-secondary description-text mb-0">${sheet.description}</p>
+                                                <span class="see-more-btn" onclick="toggleDescription(this)">See More</span>
+                                            </div>
+                                            
+                                            <!-- Meta Items -->
+                                            <div class="card-meta-item">
+                                                <i class="bi bi-person-fill"></i> ${sheet.author != null ? sheet.author.username : 'Unknown'}
+                                            </div>
+                                            <div class="card-meta-item">
+                                                <i class="bi bi-folder-fill"></i> ${sheet.category.name} Cheat Sheets
+                                            </div>
+                                            <div class="card-meta-item">
+                                                <i class="bi bi-calendar-plus"></i> Created: <fmt:formatDate value="${sheet.createdAt}" pattern="yyyy-MM-dd"/>
+                                            </div>
+                                            <div class="card-meta-item">
+                                                <i class="bi bi-calendar-event"></i> Updated: <fmt:formatDate value="${sheet.updatedAt}" pattern="yyyy-MM-dd"/>
+                                            </div>
+                                            
+                                            <!-- Hash Tags -->
+                                            <div class="d-flex flex-wrap gap-2 my-3">
+                                                <c:forEach items="${sheet.tags}" var="tag">
+                                                    <a href="${pageContext.request.contextPath}/cheatsheet/tag/${tag.id}" class="tag-badge-link">#${tag.name}</a>
+                                                </c:forEach>
+                                            </div>
+                                        </div>
+
+                                        <!-- Bottom Metrics & PDF Button -->
+                                        <div class="stats-section mt-auto d-flex justify-content-between align-items-center">
+                                            <div class="d-flex gap-3">
+                                                <span><i class="bi bi-eye-fill me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+                                                <span><i class="bi bi-download me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                            </div>
+                                            <div>
+                                                <a href="${pageContext.request.contextPath}/cheatsheet/view-pdf/${sheet.id}" 
+                                                   target="_blank" 
+                                                   class="btn btn-sm btn-outline-danger px-2 py-1 d-flex align-items-center gap-1"
+                                                   style="border-radius: 6px; font-size: 12px; font-weight: bold;"
+                                                   title="View PDF Document">
+                                                    <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </c:if>
+                            
                         </c:forEach>
                     </div>
+                    
                 </c:otherwise>
             </c:choose>
         </div>
@@ -166,5 +330,19 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- See More/Less လုပ်ဆောင်ချက်အတွက် Javascript Function -->
+    <script>
+    function toggleDescription(btn) {
+        var textEl = btn.previousElementSibling;
+        textEl.classList.toggle('expanded');
+        
+        if (textEl.classList.contains('expanded')) {
+            btn.innerText = 'See Less';
+        } else {
+            btn.innerText = 'See More';
+        }
+    }
+    </script>
 </body>
 </html>

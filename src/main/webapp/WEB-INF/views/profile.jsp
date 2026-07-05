@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,15 +19,12 @@ body {
 	padding-top: 70px;
 }
 
-/* 🌟 Navbar Styling (Fixed & High Z-Index) */
 .custom-navbar {
 	background: #ffffff;
 	border-bottom: 1px solid #e4e6eb;
 	z-index: 1030;
-	/* Profile ပုံတွေ၊ Modal တွေရဲ့ အောက်ကို ရောက်မသွားအောင် */
 }
 
-/* 🌟 Profile Card & Cover Photo */
 .profile-card {
 	border: none;
 	border-radius: 16px;
@@ -41,13 +39,12 @@ body {
 	position: relative;
 }
 
-/* 🌟 Avatar Container */
 .profile-avatar-container {
 	position: relative;
 	width: 120px;
 	height: 120px;
 	display: inline-block;
-	margin-top: -60px; /* Pull up to overlap cover photo */
+	margin-top: -60px;
 	z-index: 2;
 }
 
@@ -89,7 +86,6 @@ body {
 	transform: scale(1.1);
 }
 
-/* 🌟 Stats Badges */
 .stat-badge {
 	background: #f8f9fa;
 	color: #495057;
@@ -106,7 +102,6 @@ body {
 	transform: translateY(-2px);
 }
 
-/* 🌟 Custom Tabs */
 .custom-tabs {
 	border-bottom: 2px solid #f0f2f5;
 	margin-bottom: 20px;
@@ -142,7 +137,6 @@ body {
 	border-radius: 3px 3px 0 0;
 }
 
-/* 🌟 Form Controls */
 .form-control {
 	border-radius: 8px;
 	padding: 10px 15px;
@@ -153,26 +147,101 @@ body {
 	box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
 }
 
-/* 🌟 CheatSheet Cards */
+/* 🌟 [MERGED FROM BROWSE] CheatSheet Card Layout & Typography Styles */
 .cheatsheet-card {
 	border: 1px solid #e2e8f0;
-	border-radius: 12px;
-	padding: 20px;
-	background: #ffffff;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-	transition: all 0.3s ease;
+	border-radius: 20px;
+	padding: 30px;
+	background: white;
+	box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
 	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+.cheatsheet-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+.description-text {
+	display: -webkit-box;
+	-webkit-line-clamp: 3; 
+	-webkit-box-orient: vertical;  
+	overflow: hidden;
+	transition: all 0.3s ease;
+}
+.description-text.expanded {
+	display: block;
+	-webkit-line-clamp: unset;
+}
+.see-more-btn {
+	color: #1976d2;
+	cursor: pointer;
+	font-weight: bold;
+	font-size: 14px;
+	text-decoration: none;
+	display: inline-block;
+	margin-top: 5px;
+}
+.see-more-btn:hover {
+	text-decoration: underline;
+}
+.card-meta-item {
+	color: #666;
+	font-size: 14px;
+	margin-bottom: 6px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.tag-badge-link {
+	background-color: #e2e8f0;
+	color: #333;
+	padding: 6px 14px;
+	border-radius: 20px;
+	font-size: 13px;
+	font-weight: bold;
+	text-decoration: none;
+	display: inline-block;
+}
+.tag-badge-link:hover {
+	background-color: #1976d2;
+	color: white;
+}
+.stats-section {
+	font-size: 14px;
+	color: #555;
+	display: flex;
+	gap: 20px;
+	margin-top: 15px;
 }
 
-.cheatsheet-card:hover {
-	transform: translateY(-4px);
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-	border-color: #0d6efd;
+/* 🌟 [MERGED FROM BROWSE] Visibility Pill Badges Styles */
+.visibility-pill {
+	font-size: 11px;
+	font-weight: 700;
+	padding: 4px 10px;
+	border-radius: 50px;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	text-transform: capitalize;
+}
+.pill-public {
+	background-color: #d1e7dd;
+	color: #0f5132;
+}
+.pill-friends {
+	background-color: #cff4fc;
+	color: #055160;
+}
+.pill-private {
+	background-color: #f8d7da;
+	color: #842029;
 }
 </style>
 </head>
 <body>
-
 
 	<nav class="navbar custom-navbar px-4 shadow-sm fixed-top">
 		<a href="${pageContext.request.contextPath}/home"
@@ -182,7 +251,6 @@ body {
 			class="btn btn-outline-secondary px-4 rounded-pill fw-bold shadow-sm d-flex align-items-center">
 			<i class="bi bi-arrow-left me-2"></i> Back to Dashboard
 		</a>
-
 	</nav>
 
 	<div class="container mb-5" style="max-width: 800px;">
@@ -279,6 +347,7 @@ body {
 						</span>
 					</c:if>
 				</div>
+                
 				<!-- 📑 Profile Tabs -->
 				<ul class="nav nav-tabs custom-tabs" id="profileTab" role="tablist">
 					<li class="nav-item" role="presentation">
@@ -333,7 +402,6 @@ body {
 								</div>
 							</div>
 
-
 							<div class="d-flex justify-content-end pt-4">
 								<button type="submit"
 									class="btn btn-primary px-4 rounded-pill fw-bold shadow-sm d-flex align-items-center">
@@ -345,8 +413,7 @@ body {
 						<!-- My Cheat Sheets Section -->
 						<div class="mt-5">
 							<h5 class="fw-bold text-dark mb-4 border-bottom pb-2">
-								<i class="bi bi-file-earmark-code-fill me-2 text-primary"></i>My
-								Published Cheat Sheets
+								<i class="bi bi-file-earmark-code-fill me-2 text-primary"></i>My Published Cheat Sheets
 							</h5>
 
 							<c:choose>
@@ -356,30 +423,93 @@ body {
 										<i
 											class="bi bi-folder2-open display-4 d-block mb-3 text-secondary opacity-50"></i>
 										<h6 class="fw-bold">No cheat sheets found</h6>
-										<p class="small mb-0">You haven't published any cheat
-											sheets yet.</p>
+										<p class="small mb-0">You haven't published any cheat sheets yet.</p>
 									</div>
 								</c:when>
 								<c:otherwise>
+									
+									<!-- 🌟 [UPDATED LAYOUT] Browse စာမျက်နှာနှင့် တစ်ပြေးညီ Grid စနစ်ပြောင်းလဲခြင်း -->
 									<div class="row g-4">
 										<c:forEach items="${cheatSheetsList}" var="sheet">
 											<div class="col-md-6">
-												<div class="cheatsheet-card d-flex flex-column">
-													<h6 class="fw-bold text-dark mb-2">${sheet.title}</h6>
-													<p class="text-secondary small mb-3 flex-grow-1">${sheet.description}</p>
-													<div
-														class="d-flex justify-content-between align-items-center pt-3 border-top">
-														<span
-															class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill px-3 py-2">
-															${sheet.category.name} </span> <span
-															class="text-muted fw-bold small"><i
-															class="bi bi-eye-fill me-1 text-secondary"></i>
-															${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+												<div class="cheatsheet-card">
+													<div>
+														<div class="d-flex justify-content-between align-items-start mb-2">
+															<h5 class="fw-bold m-0">
+																<a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline fs-5">
+																	${sheet.title}
+																</a>
+															</h5>
+                                                            
+															<!-- 🌟 [UPDATED UI] Pill Badges အရောင်ဒီဇိုင်းများ သတ်မှတ်ခြင်း -->
+															<c:choose>
+																<c:when test="${sheet.visibility == 'PUBLIC'}">
+																	<span class="visibility-pill pill-public">
+																		<i class="bi bi-globe"></i> Public
+																	</span>
+																</c:when>
+																<c:when test="${sheet.visibility == 'FRIEND-ONLY'}">
+																	<span class="visibility-pill pill-friends">
+																		<i class="bi bi-people-fill"></i> Friends
+																	</span>
+																</c:when>
+																<c:otherwise>
+																	<span class="visibility-pill pill-private">
+																		<i class="bi bi-lock-fill"></i> Private
+																	</span>
+																</c:otherwise>
+															</c:choose>
+														</div>
+                                                        
+														<!-- See More Handle -->
+														<div class="description-container mb-3">
+															<p class="text-secondary description-text mb-0">${sheet.description}</p>
+															<span class="see-more-btn" onclick="toggleDescription(this)">See More</span>
+														</div>
+                                                        
+														<!-- Meta Items -->
+														<div class="card-meta-item">
+															<i class="bi bi-person-fill"></i> ${sheet.author != null ? sheet.author.username : 'Unknown'}
+														</div>
+														<div class="card-meta-item">
+															<i class="bi bi-folder-fill"></i> ${sheet.category.name} Cheat Sheets
+														</div>
+														<div class="card-meta-item">
+															<i class="bi bi-calendar-plus"></i> Created: <fmt:formatDate value="${sheet.createdAt}" pattern="yyyy-MM-dd"/>
+														</div>
+														<div class="card-meta-item">
+															<i class="bi bi-calendar-event"></i> Updated: <fmt:formatDate value="${sheet.updatedAt}" pattern="yyyy-MM-dd"/>
+														</div>
+                                                        
+														<!-- Hash Tags -->
+														<div class="d-flex flex-wrap gap-2 my-3">
+															<c:forEach items="${sheet.tags}" var="tag">
+																<a href="${pageContext.request.contextPath}/cheatsheet/tag/${tag.id}" class="tag-badge-link">#${tag.name}</a>
+															</c:forEach>
+														</div>
+													</div>
+
+													<!-- Bottom Metrics & PDF Button -->
+													<div class="stats-section mt-auto d-flex justify-content-between align-items-center border-top pt-3">
+														<div class="d-flex gap-3">
+															<span><i class="bi bi-eye-fill me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+															<span><i class="bi bi-download me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+														</div>
+														<div>
+															<a href="${pageContext.request.contextPath}/cheatsheet/view-pdf/${sheet.id}" 
+															   target="_blank" 
+															   class="btn btn-sm btn-outline-danger px-2 py-1 d-flex align-items-center gap-1"
+															   style="border-radius: 6px; font-size: 12px; font-weight: bold;"
+															   title="View PDF Document">
+																<i class="bi bi-file-earmark-pdf-fill"></i> PDF
+															</a>
+														</div>
 													</div>
 												</div>
 											</div>
 										</c:forEach>
 									</div>
+                                    
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -394,24 +524,19 @@ body {
 							<h5 class="text-danger fw-bold mb-2">
 								<i class="bi bi-shield-lock-fill me-2"></i>Change Password
 							</h5>
-							<p class="text-muted small mb-4 pb-2 border-bottom">Ensure
-								your account is using a long, random password to stay secure.</p>
+							<p class="text-muted small mb-4 pb-2 border-bottom">Ensure your account is using a long, random password to stay secure.</p>
 
 							<form
 								action="${pageContext.request.contextPath}/profile/change-password"
 								method="POST" style="max-width: 500px;">
 								<div class="mb-3">
-									<label class="form-label text-muted small fw-bold">Current
-										Password</label> <input type="password" name="oldPassword"
-										class="form-control" placeholder="Enter current password"
-										required>
+									<label class="form-label text-muted small fw-bold">Current Password</label> 
+                                    <input type="password" name="oldPassword" class="form-control" placeholder="Enter current password" required>
 								</div>
 
 								<div class="mb-4">
-									<label class="form-label text-muted small fw-bold">New
-										Password</label> <input type="password" name="newPassword"
-										class="form-control" placeholder="At least 6 characters"
-										required>
+									<label class="form-label text-muted small fw-bold">New Password</label> 
+                                    <input type="password" name="newPassword" class="form-control" placeholder="At least 6 characters" required>
 								</div>
 
 								<div>
@@ -489,11 +614,24 @@ body {
 		setTimeout(function() {
 			const alerts = document.querySelectorAll('.alert');
 			alerts.forEach(function(alert) {
-
 				const bsAlert = new bootstrap.Alert(alert);
 				bsAlert.close();
 			});
 		}, 3000);
+	</script>
+    
+	<!-- See More/Less လုပ်ဆောင်ချက်အတွက် Javascript Function -->
+	<script>
+	function toggleDescription(btn) {
+		var textEl = btn.previousElementSibling;
+		textEl.classList.toggle('expanded');
+		
+		if (textEl.classList.contains('expanded')) {
+			btn.innerText = 'See Less';
+		} else {
+			btn.innerText = 'See More';
+		}
+	}
 	</script>
 </body>
 </html>

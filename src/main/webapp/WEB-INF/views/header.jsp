@@ -2,6 +2,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- 🌟 [FIXED] Logout SweetAlert အလုပ်လုပ်ရန် လိုအပ်သော SweetAlert2 Library အား ပြန်လည်ဖြည့်စွက်ခြင်း -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <style>
     .navbar-brand {
         font-weight: 700;
@@ -24,7 +27,7 @@
     .dropdown-item:hover {
         background-color: #f8f9fa;
     }
-    /* 🌟 Notification Custom Styles */
+    /* Notification Custom Styles */
     .notification-button {
         position: relative;
     }
@@ -51,7 +54,7 @@
         width: min(360px, calc(100vw - 32px));
         display: none;
     }
-    /* 🌟 Global Admin Layout & Theme Styles */
+    /* Global Admin Layout & Theme Styles */
     .app-container {
         display: flex;
         height: calc(100vh - 56px); 
@@ -102,16 +105,11 @@
         </button>
         
         <div class="collapse navbar-collapse" id="navbarNav">
-            <!-- Left Side: Navigation Links (ထည့်ထားသမျှ Menu တွေအကုန် စုစည်းပေးထားပါတယ်) -->
+            <!-- Left Side: Navigation Links -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active" href="${pageContext.request.contextPath}/home">
                         <i class="bi bi-house-door me-1"></i> Home
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/home#latest-sheets">
-                        <i class="bi bi-journal-code me-1"></i> CheatSheets
                     </a>
                 </li>
                 <li class="nav-item">
@@ -126,7 +124,7 @@
                 </li>
             </ul>
             
-            <!-- Right Side: User Controls (Notification & Profile Dropdown) -->
+            <!-- Right Side: User Controls -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
                 <c:choose>
                     <%-- ==================== 🔓 CASE 1: USER IS NOT LOGGED IN ==================== --%>

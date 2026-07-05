@@ -21,30 +21,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class CheatsheetServiceImpl implements CheatsheetService {
 
     private final CheatsheetRepository cheatsheetRepository;
-    
-    // 🌟 [FIXED] သူငယ်ချင်းဖြစ်သူ၏ ကုဒ်သစ်များအတွက် လိုအပ်သော Service များကို Constructor Injection ဝင်အောင် private final တပ်ပေးခြင်း
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
+
+    // ==================== 🌟 [NEW PRIVACY LOGIC IMPLEMENTATION] ====================
+    @Override
+    @Transactional(readOnly = true)
+    public List<CheatsheetEntity> findByUserIdAndVisibility(Integer userId, List<String> visibilities) {
+        // Core Hibernate Repository implementation ဆီသို့ ဒေတာစာရင်း လှမ်းပို့ပေးခြင်း
+        return cheatsheetRepository.findByUserIdAndVisibilityList(userId, visibilities);
+    }
 
     // ==================== 🌟 [STORED PROCEDURE CALL IMPLEMENTATION] ====================
     @Override
     @Transactional(readOnly = true)
     public List<TagEntity> findTagsByCategoryId(Integer categoryId, Integer currentUserId) {
-        // Repository မှတစ်ဆင့် Database ၏ Native Stored Procedure ကို CALL ခေါ်ယူခြင်း
         List<Object[]> spResults = cheatsheetRepository.callStoredProcedureForTagCounts(categoryId, currentUserId);
-        
         List<TagEntity> processedTags = new ArrayList<>();
-        
         if (spResults != null) {
             for (Object[] row : spResults) {
                 TagEntity tag = new TagEntity();
-                tag.setId((Integer) row[0]); // tag_id
-                
-                String rawName = (String) row[1]; // tag_name
-                
-                // Stored Procedure ၏ COUNT() ရလဒ်အား BigInteger သို့မဟုတ် Long ပုံစံဖြင့် လက်ခံခြင်း
-                java.math.BigInteger count = (java.math.BigInteger) row[2]; // cheatsheet_count
-                
+                tag.setId((Integer) row[0]); 
+                String rawName = (String) row[1]; 
+                java.math.BigInteger count = (java.math.BigInteger) row[2]; 
                 tag.setName(rawName + " (" + count + ")");
                 processedTags.add(tag);
             }
@@ -142,7 +141,6 @@ public class CheatsheetServiceImpl implements CheatsheetService {
         return cheatsheetRepository.countAllActive();
     }
 
-    // ==================== 🌟 TAG BROWSE WITH FILTER AND PAGINATION ====================
     @Override
     @Transactional(readOnly = true)
     public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter) {
@@ -167,7 +165,6 @@ public class CheatsheetServiceImpl implements CheatsheetService {
         return cheatsheetRepository.countSearchAll(keyword, categoryId, status, banned);
     }
 
-    // ==================== 🌟 ADMIN CONTROL PANEL LOGIC (MERGED) ====================
     @Override
     @Transactional
     public NotificationDto banCheatsheet(Integer id, String reason, User admin, String ipAddress) {
@@ -193,7 +190,8 @@ public class CheatsheetServiceImpl implements CheatsheetService {
         }
         return null;
     }
- @Override
+
+    @Override
     @Transactional
     public NotificationDto restoreCheatsheet(Integer id, User admin, String ipAddress) {
         CheatsheetEntity cheatsheet = cheatsheetRepository.findById(id);
