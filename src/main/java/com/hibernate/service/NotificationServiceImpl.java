@@ -3,6 +3,8 @@ package com.hibernate.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +25,26 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final UserFollowRepository userFollowRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
+    public void save(NotificationEntity notification) {
+        // Repository မှတစ်ဆင့် Database ထဲ သိမ်းပါ
+        notificationRepository.save(notification);
+    }
+    
+ // NotificationServiceImpl.java ထဲတွင်
+    public void createShareNotification(Integer targetUserId, Integer sharerId, String sharerName, String cheatsheetTitle, Integer cheatsheetId) {
+        String message = sharerName + " shared your cheatsheet: " + cheatsheetTitle;
+        
+        // 📌 linkUrl ကို sharerId (AyeAye ရဲ့ ID) ရဲ့ Profile သို့ လမ်းကြောင်းပေးပါ
+        String linkUrl = "/profile/" + sharerId; 
+
+        createNotification(targetUserId, sharerId, message, "SHARE", linkUrl);
+    }
+    
+    
+    
     public NotificationDto createNotification(Integer userId, Integer senderId, String message, String type, String linkUrl) {
         return createNotification(userId, senderId, type, message, type, linkUrl);
     }
@@ -50,6 +70,8 @@ public class NotificationServiceImpl implements NotificationService {
 
         notificationRepository.save(notification);
         NotificationDto dto = NotificationDto.fromEntity(notification);
+        
+        messagingTemplate.convertAndSend("/topic/notifications/" + userId, dto);
 
         return dto;
     }

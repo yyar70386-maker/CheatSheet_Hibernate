@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
@@ -8,10 +7,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Profile</title>
-<link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
 body {
     background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%);
@@ -152,7 +149,7 @@ body {
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
 }
 
-/* 🌟 [MERGED FROM BROWSE] CheatSheet Card Layout & Typography Styles */
+/* 🌟 CheatSheet Card Layout & Typography Styles */
 .cheatsheet-card {
     border: 1px solid #e2e8f0;
     border-radius: 20px;
@@ -221,7 +218,7 @@ body {
     margin-top: 15px;
 }
 
-/* 🌟 [MERGED FROM BROWSE] Visibility Pill Badges Styles */
+/* 🌟 Visibility Pill Badges Styles */
 .visibility-pill {
     font-size: 11px;
     font-weight: 700;
@@ -249,11 +246,10 @@ body {
 <body>
 
     <nav class="navbar custom-navbar px-4 shadow-sm fixed-top">
-        <a href="${pageContext.request.contextPath}/home"
-            class="navbar-brand mb-0 h1 fw-bold" style="color: #ff3366;"> <i
-            class="bi bi-code-square me-2"></i>Cheatsheet
-        </a> <a href="${pageContext.request.contextPath}/home"
-            class="btn btn-outline-secondary px-4 rounded-pill fw-bold shadow-sm d-flex align-items-center">
+        <a href="${pageContext.request.contextPath}/home" class="navbar-brand mb-0 h1 fw-bold" style="color: #ff3366;"> 
+            <i class="bi bi-code-square me-2"></i>Cheatsheet
+        </a> 
+        <a href="${pageContext.request.contextPath}/home" class="btn btn-outline-secondary px-4 rounded-pill fw-bold shadow-sm d-flex align-items-center">
             <i class="bi bi-arrow-left me-2"></i> Back to Dashboard
         </a>
     </nav>
@@ -261,21 +257,15 @@ body {
     <div class="container mb-5" style="max-width: 800px;">
 
         <c:if test="${not empty message}">
-            <div
-                class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm"
-                role="alert">
+            <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm" role="alert">
                 <i class="bi bi-check-circle-fill me-2"></i>${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                    aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </c:if>
         <c:if test="${not empty error}">
-            <div
-                class="alert alert-danger alert-dismissible fade show rounded-4 border-0 shadow-sm"
-                role="alert">
+            <div class="alert alert-danger alert-dismissible fade show rounded-4 border-0 shadow-sm" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>${error}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                    aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </c:if>
 
@@ -286,59 +276,43 @@ body {
             <div class="card-body px-4 pb-4">
 
                 <div class="d-flex justify-content-between align-items-end mb-3">
-
-                    <form id="profileAvatarForm"
-                        action="${pageContext.request.contextPath}/profile/upload-avatar"
-                        method="POST" enctype="multipart/form-data">
+                    <form id="profileAvatarForm" action="${pageContext.request.contextPath}/profile/upload-avatar" method="POST" enctype="multipart/form-data">
                         <div class="profile-avatar-container">
                             <c:choose>
                                 <c:when test="${not empty user.avatarPath}">
-                                    <img
-                                        src="${pageContext.request.contextPath}/profile/avatar/${user.avatarPath}"
-                                        class="profile-avatar-img" data-bs-toggle="modal"
-                                        data-bs-target="#avatarViewModal" style="cursor: pointer;"
-                                        title="Click to view full image">
+                                    <img src="${pageContext.request.contextPath}/profile/avatar/${user.avatarPath}"
+                                         class="profile-avatar-img" data-bs-toggle="modal" data-bs-target="#avatarViewModal" style="cursor: pointer;" title="Click to view full image">
                                 </c:when>
                                 <c:otherwise>
-                                    <img
-                                        src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                        class="profile-avatar-img" data-bs-toggle="modal"
-                                        data-bs-target="#avatarViewModal"
-                                        title="Click to view full image">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-avatar-img" data-bs-toggle="modal" data-bs-target="#avatarViewModal" title="Click to view full image">
                                 </c:otherwise>
                             </c:choose>
 
-                            <label for="avatarFile" class="camera-overlay-btn"
-                                title="Change Profile Picture"> <i
-                                class="bi bi-camera-fill text-dark fs-6"></i>
-                            </label> <input type="file" id="avatarFile" name="avatarFile"
-                                accept="image/*" style="display: none;" required>
+                            <label for="avatarFile" class="camera-overlay-btn" title="Change Profile Picture"> 
+                                <i class="bi bi-camera-fill text-dark fs-6"></i>
+                            </label> 
+                            <input type="file" id="avatarFile" name="avatarFile" accept="image/*" style="display: none;" required>
                         </div>
                     </form>
 
                     <div class="d-flex gap-2 pb-2">
-                        <a
-                            href="${pageContext.request.contextPath}/profile/show/followers"
-                            class="stat-badge"> <i
-                            class="bi bi-people-fill text-primary me-1"></i> <span
-                            class="fs-5">${followersCount != null ? followersCount : 0}</span>
+                        <a href="${pageContext.request.contextPath}/profile/show/followers" class="stat-badge"> 
+                            <i class="bi bi-people-fill text-primary me-1"></i> 
+                            <span class="fs-5">${followersCount != null ? followersCount : 0}</span>
                             <span class="text-muted small">Followers</span>
-                        </a> <a
-                            href="${pageContext.request.contextPath}/profile/show/following"
-                            class="stat-badge"> <i
-                            class="bi bi-person-plus-fill text-success me-1"></i> <span
-                            class="fs-5">${followingCount != null ? followingCount : 0}</span>
+                        </a> 
+                        <a href="${pageContext.request.contextPath}/profile/show/following" class="stat-badge"> 
+                            <i class="bi bi-person-plus-fill text-success me-1"></i> 
+                            <span class="fs-5">${followingCount != null ? followingCount : 0}</span>
                             <span class="text-muted small">Following</span>
                         </a>
                     </div>
                 </div>
 
-                <div id="fileError" class="text-danger small mb-3 fw-bold"
-                    style="display: none;"></div>
+                <div id="fileError" class="text-danger small mb-3 fw-bold" style="display: none;"></div>
 
                 <div class="mb-4">
                     <h3 class="fw-bold text-dark mb-1">${user.fullName}</h3>
-
                     <c:if test="${user.role == 1}">
                         <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm">
                             <i class="bi bi-shield-lock-fill me-1"></i> Administrator
@@ -348,18 +322,12 @@ body {
                 
                 <ul class="nav nav-tabs custom-tabs" id="profileTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button
-                            class="nav-link ${param.tab != 'security' ? 'active' : ''}"
-                            id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane"
-                            type="button" role="tab">
+                        <button class="nav-link ${param.tab != 'security' ? 'active' : ''}" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab">
                             <i class="bi bi-person-lines-fill me-2"></i>About Me
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button
-                            class="nav-link ${param.tab == 'security' ? 'active' : ''}"
-                            id="security-tab" data-bs-toggle="tab"
-                            data-bs-target="#security-pane" type="button" role="tab">
+                        <button class="nav-link ${param.tab == 'security' ? 'active' : ''}" id="security-tab" data-bs-toggle="tab" data-bs-target="#security-pane" type="button" role="tab">
                             <i class="bi bi-shield-lock-fill me-2"></i>Security
                         </button>
                     </li>
@@ -367,39 +335,29 @@ body {
 
                 <div class="tab-content" id="profileTabContent">
 
-                    <div
-                        class="tab-pane fade ${param.tab != 'security' ? 'show active' : ''}"
-                        id="info-pane" role="tabpanel">
+                    <div class="tab-pane fade ${param.tab != 'security' ? 'show active' : ''}" id="info-pane" role="tabpanel">
 
-                        <form action="${pageContext.request.contextPath}/profile/update"
-                            method="POST"
-                            class="p-4 rounded-4 mb-4 border border-white shadow-sm" style="background: rgba(255, 255, 255, 0.5);">
+                        <form action="${pageContext.request.contextPath}/profile/update" method="POST" class="p-4 rounded-4 mb-4 border border-white shadow-sm" style="background: rgba(255, 255, 255, 0.5);">
                             <h5 class="fw-bold mb-3">
                                 <i class="bi bi-pencil-square me-2 text-muted"></i>Edit Details
                             </h5>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label text-muted small fw-bold">Full
-                                        Name</label> <input type="text" name="fullName"
-                                        value="${user.fullName}" class="form-control" required>
+                                    <label class="form-label text-muted small fw-bold">Full Name</label> 
+                                    <input type="text" name="fullName" value="${user.fullName}" class="form-control" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-muted small fw-bold">Email
-                                        Address</label> <input type="email" name="email" value="${user.email}"
-                                        class="form-control" required>
+                                    <label class="form-label text-muted small fw-bold">Email Address</label> 
+                                    <input type="email" name="email" value="${user.email}" class="form-control" required>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label text-muted small fw-bold">Bio
-                                        / About Me</label>
-                                    <textarea name="bio" class="form-control" rows="3"
-                                        placeholder="Tell us about yourself..."><c:out
-                                            value="${user.bio}" /></textarea>
+                                    <label class="form-label text-muted small fw-bold">Bio / About Me</label>
+                                    <textarea name="bio" class="form-control" rows="3" placeholder="Tell us about yourself..."><c:out value="${user.bio}" /></textarea>
                                 </div>
                             </div>
 
                             <div class="d-flex justify-content-end pt-4">
-                                <button type="submit"
-                                    class="btn btn-primary px-4 rounded-pill fw-bold shadow-sm d-flex align-items-center">
+                                <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold shadow-sm d-flex align-items-center">
                                     <i class="bi bi-save me-2"></i> Save Changes
                                 </button>
                             </div>
@@ -411,18 +369,17 @@ body {
                             </h5>
 
                             <c:choose>
+                                <%-- 🎨 မင်းထည့်သွင်းထားသော အဆင့်မြင့် Glassmorphic Empty State Component --%>
                                 <c:when test="${empty cheatSheetsList}">
-                                    <div
-                                        class="text-center text-muted py-5 bg-light rounded-4 border border-dashed">
-                                        <i
-                                            class="bi bi-folder2-open display-4 d-block mb-3 text-secondary opacity-50"></i>
+                                    <div class="text-center text-muted py-5 bg-light rounded-4 border border-dashed mb-4">
+                                        <i class="bi bi-folder2-open display-4 d-block mb-3 text-secondary opacity-50"></i>
                                         <h6 class="fw-bold">No cheat sheets found</h6>
                                         <p class="small mb-0">You haven't published any cheat sheets yet.</p>
                                     </div>
                                 </c:when>
                                 <c:otherwise>
-                                    
-                                    <div class="row g-4">
+                                    <%-- 📐 မင်းရဲ့ ပိုမိုကျယ်ဝန်းတဲ့ row g-4 Grid System အား သုံးထားပါတယ် --%>
+                                    <div class="row g-4 mb-4">
                                         <c:forEach items="${cheatSheetsList}" var="sheet">
                                             <div class="col-md-6">
                                                 <div class="cheatsheet-card">
@@ -497,25 +454,57 @@ body {
                                             </div>
                                         </c:forEach>
                                     </div>
-                                    
+                                </c:otherwise>
+                            </c:choose>
+
+                            <%-- Shared Cheat Sheets Block --%>
+                            <h5 class="fw-bold text-dark mb-3 pt-3 border-top">
+                                <i class="bi bi-share-fill me-2 text-success"></i>Shared Cheat Sheets
+                            </h5>
+                            
+                            <c:choose>
+                                <c:when test="${empty sharedCheatSheetsList}">
+                                    <div class="text-center text-muted py-4 bg-white rounded-3 border border-dashed mb-4">
+                                        <i class="bi bi-share display-6 d-block mb-2 text-secondary"></i>
+                                        This place is show my share cheat sheets.
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="row g-4">
+                                        <c:forEach items="${sharedCheatSheetsList}" var="item">
+                                            <div class="col-md-6">
+                                                <div class="cheatsheet-card border-success-subtle shadow-sm">
+                                                    <h6 class="fw-bold mb-1">
+                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${item.cheatsheet.id}" class="text-decoration-none text-dark">
+                                                            <c:out value="${item.cheatsheet.title}"/>
+                                                        </a>
+                                                    </h6>
+                                                    <p class="text-secondary small text-truncate mb-2"><c:out value="${item.cheatsheet.description}"/></p>
+                                                    
+                                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
+                                                            by <c:out value="${item.cheatsheet.author.fullName}"/>
+                                                        </span>
+                                                        <small class="text-muted"><i class="bi bi-eye me-1"></i> ${item.cheatsheet.viewCount != null ? item.cheatsheet.viewCount : 0}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                    </div>
                                 </c:otherwise>
                             </c:choose>
                         </div>
                     </div>
 
-                    <div
-                        class="tab-pane fade ${param.tab == 'security' ? 'show active' : ''}"
-                        id="security-pane" role="tabpanel">
-                        <div
-                            class="p-4 rounded-4 border border-white shadow-sm mt-2" style="background: rgba(255, 255, 255, 0.5);">
+                    <%-- Security Tab Content --%>
+                    <div class="tab-pane fade ${param.tab == 'security' ? 'show active' : ''}" id="security-pane" role="tabpanel">
+                        <div class="p-4 rounded-4 border border-white shadow-sm mt-2" style="background: rgba(255, 255, 255, 0.5);">
                             <h5 class="text-danger fw-bold mb-2">
                                 <i class="bi bi-shield-lock-fill me-2"></i>Change Password
                             </h5>
                             <p class="text-muted small mb-4 pb-2 border-bottom">Ensure your account is using a long, random password to stay secure.</p>
 
-                            <form
-                                action="${pageContext.request.contextPath}/profile/change-password"
-                                method="POST" style="max-width: 500px;">
+                            <form action="${pageContext.request.contextPath}/profile/change-password" method="POST" style="max-width: 500px;">
                                 <div class="mb-3">
                                     <label class="form-label text-muted small fw-bold">Current Password</label> 
                                     <input type="password" name="oldPassword" class="form-control" placeholder="Enter current password" required>
@@ -527,8 +516,7 @@ body {
                                 </div>
 
                                 <div>
-                                    <button type="submit"
-                                        class="btn btn-dark px-4 rounded-pill fw-bold shadow-sm">
+                                    <button type="submit" class="btn btn-dark px-4 rounded-pill fw-bold shadow-sm">
                                         <i class="bi bi-key-fill me-2"></i>Update Password
                                     </button>
                                 </div>
@@ -536,31 +524,25 @@ body {
                         </div>
                     </div>
 
-                </div>
-            </div>
-        </div>
-    </div>
+                </div> <%-- /tab-content --%>
+            </div> <%-- /card-body --%>
+        </div> <%-- /profile-card --%>
+    </div> <%-- /container --%>
 
-    <div class="modal fade" id="avatarViewModal" tabindex="-1"
-        aria-hidden="true">
+    <%-- Avatar Modal --%>
+    <div class="modal fade" id="avatarViewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-transparent border-0">
                 <div class="modal-header border-0 pb-0 justify-content-end">
-                    <button type="button" class="btn-close btn-close-white fs-4"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white fs-4" data-bs-toggle="modal" data-bs-target="#avatarViewModal" aria-label="Close"></button>
                 </div>
                 <div class="modal-dialog modal-dialog-centered modal-xl">
                     <c:choose>
                         <c:when test="${not empty user.avatarPath}">
-                            <img
-                                src="${pageContext.request.contextPath}/profile/avatar/${user.avatarPath}"
-                                class="img-fluid shadow-lg rounded"
-                                style="max-width: 100%; max-height: 80vh;" alt="Profile Image">
+                            <img src="${pageContext.request.contextPath}/uploads/${user.avatarPath}" class="img-fluid shadow-lg rounded" style="max-width: 100%; max-height: 80vh;" alt="Profile Image">
                         </c:when>
                         <c:otherwise>
-                            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                class="img-fluid shadow-lg rounded"
-                                style="max-width: 100%; max-height: 80vh;" alt="Default Profile">
+                            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="img-fluid shadow-lg rounded" style="max-width: 100%; max-height: 80vh;" alt="Default Profile">
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -568,34 +550,27 @@ body {
         </div>
     </div>
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // Avatar File Upload Validation Script
-        document
-                .getElementById('avatarFile')
-                .addEventListener(
-                        'change',
-                        function() {
-                            const file = this.files[0];
-                            const errorDiv = document
-                                    .getElementById('fileError');
-                            const form = document
-                                    .getElementById('profileAvatarForm');
+        document.getElementById('avatarFile').addEventListener('change', function() {
+            const file = this.files[0];
+            const errorDiv = document.getElementById('fileError');
+            const form = document.getElementById('profileAvatarForm');
 
-                            if (file) {
-                                if (!file.type.startsWith('image/')) {
-                                    errorDiv.innerHTML = "<i class='bi bi-x-circle-fill me-1'></i> Invalid file! Please select an image file (JPG, PNG) only.";
-                                    errorDiv.style.display = "block";
-                                    this.value = "";
-                                } else {
-                                    errorDiv.style.display = "none";
-                                    form.submit();
-                                }
-                            }
-                        });
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    errorDiv.innerHTML = "<i class='bi bi-x-circle-fill me-1'></i> Invalid file! Please select an image file (JPG, PNG) only.";
+                    errorDiv.style.display = "block";
+                    this.value = "";
+                } else {
+                    errorDiv.style.display = "none";
+                    form.submit();
+                }
+            }
+        });
+
         setTimeout(function() {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(function(alert) {

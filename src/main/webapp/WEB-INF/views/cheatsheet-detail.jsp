@@ -44,7 +44,6 @@
 
     <jsp:include page="header.jsp" />
 
-    <%-- 🌟 [UPDATED] ပုံသေသတ်မှတ်ထားသော လင့်ခ်အစား ရှေ့က View သို့ ပြန်လှည့်သွားမည့် Dynamic Back Button စနစ် --%>
     <div class="container mt-4">
         <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3">
             <i class="bi bi-arrow-left"></i> Back
@@ -123,7 +122,14 @@
                         
                         <button type="button" id="rateSubmitBtn" onclick="submitRatingJS()" class="btn btn-sm btn-outline-warning text-dark fw-bold">Undo</button>
                     </div>
-                    <button type="button" class="action-btn text-danger" data-bs-toggle="modal" data-bs-target="#reportSheetModal">
+
+                    <div class="vr mx-2"></div>
+
+                    <button type="button" id="shareBtn" onclick="shareCheatsheetJS()" class="btn btn-sm btn-primary fw-bold px-3 me-2">
+                        <i class="bi bi-share-fill me-1"></i> <span id="shareBtnText">Share</span>
+                    </button>
+                    
+                    <button type="button" class="action-btn text-danger ms-auto" data-bs-toggle="modal" data-bs-target="#reportSheetModal">
                         <i class="bi bi-flag"></i> Report
                     </button>
                 </c:when>
@@ -290,6 +296,31 @@
                 btn.innerText = "Saved!"; btn.classList.replace('btn-outline-warning', 'btn-success');
                 setTimeout(() => { btn.innerText = originalText; btn.classList.replace('btn-success', 'btn-outline-warning'); }, 2000);
             }).catch(err => alert("Error: " + err.message));
+        }
+        
+        function shareCheatsheetJS() {
+            if (!checkLogin()) return; 
+            fetch(contextPath + '/interaction/share-post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ cheatSheetId: currentSheetId })
+            })
+            .then(res => {
+                if (res.status === 401) { alert("Please login first to share this post!"); return; }
+                if (!res.ok) { return res.json().then(errData => { throw new Error(errData.message); }); }
+                return res.json();
+            })
+            .then(data => {
+                const shareBtn = document.getElementById('shareBtn');
+                const shareText = document.getElementById('shareBtnText');
+                shareBtn.classList.replace('btn-primary', 'btn-success');
+                shareText.innerText = "Shared!";
+                setTimeout(() => {
+                    shareBtn.classList.replace('btn-success', 'btn-primary');
+                    shareText.innerText = "Share";
+                }, 2500);
+            })
+            .catch(err => alert(err.message));
         }
 
         function postMainCommentJS() {

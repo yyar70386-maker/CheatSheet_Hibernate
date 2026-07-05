@@ -2,8 +2,12 @@ package com.hibernate.service;
 
 import java.util.List;
 
-import com.hibernate.dto.NotificationDto;
+import org.springframework.stereotype.Service;
 
+import com.hibernate.dto.NotificationDto;
+import com.hibernate.entity.NotificationEntity;
+
+@Service
 public interface NotificationService {
 
     NotificationDto createNotification(Integer userId, Integer senderId, String message, String type, String linkUrl);
@@ -28,7 +32,11 @@ public interface NotificationService {
 
     void markAllAsRead(Integer userId);
 
+    // --- မင်းထည့်ထားတဲ့ Delete နှင့် Admin Count Methods ---
     void delete(Integer notificationId, Integer userId);
 
     long countAll();
+
+    // --- မင်းသူငယ်ချင်း ထည့်ထားတဲ့ Direct Save Method ---
+    void save(NotificationEntity notification);
 }

@@ -184,6 +184,20 @@ a:hover { color: #cc0044; }
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
 }
 
+/* 🤝 Shared Card Ribbon Custom Style */
+.sheet-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    background: white;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    transition: all 0.3s ease;
+}
+.sheet-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
 .description-text {
     display: -webkit-box;
     -webkit-line-clamp: 3; 
@@ -412,6 +426,50 @@ a:hover { color: #cc0044; }
                         </div>
                     </section>
 
+                    <%-- 🌟 [SHARED CHEAT SHEETS SECTION] မင်းသူငယ်ချင်းရဲ့ သီးသန့် Shared Post Feed --%>
+                    <c:if test="${not empty sharedPosts}">
+                        <section class="mb-5 anim-3">
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <div>
+                                    <h2 class="section-title h4 mb-1">Shared Cheat Sheets</h2>
+                                    <div class="text-muted small">Posts shared by the community.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-3">
+                                <c:forEach items="${sharedPosts}" var="share">
+                                    <article class="sheet-card d-flex border-info">
+                                        <div class="sheet-ribbon p-3 d-flex flex-lg-column align-items-center justify-content-center gap-1 bg-info bg-opacity-10 border-info">
+                                            <div class="sheet-pages"><i class="bi bi-share-fill text-info"></i></div>
+                                        </div>
+                                        <div class="p-3 p-lg-4 flex-grow-1">
+                                            <div class="mb-3 text-muted small bg-light p-2 rounded d-inline-block">
+                                                <i class="bi bi-arrow-return-right text-info"></i>
+                                                <strong class="text-dark"><c:out value="${share.user.fullName != null ? share.user.fullName : share.user.username}" /></strong> shared 
+                                                <strong><c:out value="${share.cheatsheet.author.fullName != null ? share.cheatsheet.author.fullName : share.cheatsheet.author.username}" /></strong>'s post
+                                            </div>
+                                            
+                                            <h3 class="h5 fw-bold mb-2">
+                                                <a href="${pageContext.request.contextPath}/cheatsheet/detail/${share.cheatsheet.id}" class="text-dark hover-link text-decoration-none">
+                                                    ${share.cheatsheet.title}
+                                                </a>
+                                            </h3>
+                                            <p class="text-secondary small mb-3">${share.cheatsheet.description}</p>
+
+                                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top">
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    <span class="tag-chip"><i class="bi bi-folder-fill text-secondary"></i> ${share.cheatsheet.category.name}</span>
+                                                    <span class="tag-chip"><i class="bi bi-eye-fill text-secondary"></i> ${share.cheatsheet.viewCount != null ? share.cheatsheet.viewCount : 0}</span>
+                                                </div>
+                                                <a class="btn btn-outline-info btn-sm px-4 fw-bold" href="${pageContext.request.contextPath}/cheatsheet/detail/${share.cheatsheet.id}">View Post</a>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </c:forEach>
+                            </div>
+                        </section>
+                    </c:if>
+
                     <%-- 🌟 [UPDATED SPLIT GRID] Latest Feed (ဘယ်ဘက်) နှင့် Popular Feed (ညာဘက်) စနစ် --%>
                     <div class="row g-4 mb-5 anim-3">
                         
@@ -484,16 +542,16 @@ a:hover { color: #cc0044; }
                                             </div>
 
                                             <div class="stats-section mt-auto d-flex justify-content-between align-items-center border-top pt-3">
-                                                <div class="d-flex gap-3">
-                                                    <span><i class="bi bi-eye text-muted me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
-                                                    <span><i class="bi bi-download text-muted me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    <span class="tag-chip py-1 px-2 border-0 bg-transparent fs-7"><i class="bi bi-eye text-muted me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+                                                    <span class="tag-chip py-1 px-2 border-0 bg-transparent fs-7"><i class="bi bi-download text-muted me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                                    <span class="tag-chip py-1 px-2 border-0 bg-transparent fs-7 text-success"><i class="bi bi-share-fill"></i> ${sheet.shareCount != null ? sheet.shareCount : 0}</span>
                                                 </div>
                                                 <div>
                                                     <a href="${pageContext.request.contextPath}/cheatsheet/view-pdf/${sheet.id}" 
                                                        target="_blank" 
                                                        class="btn btn-sm btn-outline-danger px-3 py-1 d-flex align-items-center gap-1 fw-bold"
-                                                       style="border-radius: 8px; font-size: 13px;"
-                                                       title="View PDF Document">
+                                                       style="border-radius: 8px; font-size: 13px;">
                                                          <i class="bi bi-file-earmark-pdf-fill"></i> PDF
                                                     </a>
                                                 </div>
@@ -573,16 +631,15 @@ a:hover { color: #cc0044; }
                                             </div>
 
                                             <div class="stats-section mt-auto d-flex justify-content-between align-items-center border-top pt-3">
-                                                <div class="d-flex gap-3">
-                                                    <span><i class="bi bi-eye text-muted me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
-                                                    <span><i class="bi bi-download text-muted me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    <span class="tag-chip py-1 px-2 border-0 bg-transparent fs-7"><i class="bi bi-eye text-muted me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+                                                    <span class="tag-chip py-1 px-2 border-0 bg-transparent fs-7"><i class="bi bi-download text-muted me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
                                                 </div>
                                                 <div>
                                                     <a href="${pageContext.request.contextPath}/cheatsheet/view-pdf/${sheet.id}" 
                                                        target="_blank" 
                                                        class="btn btn-sm btn-outline-danger px-3 py-1 d-flex align-items-center gap-1 fw-bold"
-                                                       style="border-radius: 8px; font-size: 13px;"
-                                                       title="View PDF Document">
+                                                       style="border-radius: 8px; font-size: 13px;">
                                                          <i class="bi bi-file-earmark-pdf-fill"></i> PDF
                                                     </a>
                                                 </div>
@@ -592,16 +649,34 @@ a:hover { color: #cc0044; }
                                 </c:forEach>
                             </div>
                         </div>
-                        
-                    </div>
+                    </div> <%-- /row [Split Grid] --%>
+
+                    <%-- 📄 [PAGINATION] မင်းသူငယ်ချင်းရဲ့ Pagination Logic Block --%>
+                    <c:if test="${totalPages > 1}">
+                        <nav class="mt-4 mb-5" aria-label="Cheat sheet pagination">
+                            <ul class="pagination justify-content-center flex-wrap">
+                                <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/home?page=${currentPage - 1}&q=${searchQuery}">Previous</a>
+                                </li>
+                                <c:forEach begin="1" end="${totalPages}" var="p">
+                                    <li class="page-item ${p == currentPage ? 'active' : ''}">
+                                        <a class="page-link" href="${pageContext.request.contextPath}/home?page=${p}&q=${searchQuery}">${p}</a>
+                                    </li>
+                                </c:forEach>
+                                <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/home?page=${currentPage + 1}&q=${searchQuery}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </c:if>
 
                     <jsp:include page="footer.jsp" />
                 </c:otherwise>
             </c:choose>
 
-        </div>
-    </div>
-
+        </div> <%-- /main-content-area --%>
+    </div> <%-- /app-container --%>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <%-- 🌌 Particle Canvas Effect Script --%>

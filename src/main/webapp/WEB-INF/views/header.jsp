@@ -2,7 +2,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<!-- 🌟 [FIXED] Logout SweetAlert အလုပ်လုပ်ရန် လိုအပ်သော SweetAlert2 Library အား ပြန်လည်ဖြည့်စွက်ခြင်း -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
@@ -33,10 +32,18 @@
     }
     .notification-badge {
         position: absolute;
-        top: 0;
-        right: 0;
-        transform: translate(35%, -35%);
-        display: none;
+        top: -6px;
+        right: -6px;
+        min-width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #dc3545;
+        color: white;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: bold;
     }
     .notification-menu {
         width: 320px;
@@ -131,11 +138,9 @@
     }
 </style>
 
-<!-- Navbar with Pink Gradient Glassmorphism -->
 <nav class="navbar navbar-expand-lg navbar-light sticky-top custom-navbar" style="background: linear-gradient(135deg, rgba(255, 51, 102, 0.9), rgba(255, 94, 132, 0.9)); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
     <div class="container">
         <a class="navbar-brand fw-bold fs-4 d-flex align-items-center" href="${pageContext.request.contextPath}/">
-            <!-- Brand icon box color altered to stand out nicely -->
             <span style="background: #ffffff; width:34px; height:34px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; margin-right: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
                 <i class="bi bi-code-square text-primary" style="font-size: 1.1rem; line-height: 1;"></i> 
             </span>
@@ -147,7 +152,6 @@
         </button>
         
         <div class="collapse navbar-collapse" id="navbarNav">
-            <!-- Left Side: Navigation Links -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active" href="${pageContext.request.contextPath}/home">
@@ -166,7 +170,6 @@
                 </li>
             </ul>
             
-            <!-- Right Side: User Controls -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
                 <c:choose>
                     <%-- ==================== 🔓 CASE 1: USER IS NOT LOGGED IN ==================== --%>
@@ -185,11 +188,10 @@
                     
                     <%-- ==================== 🔒 CASE 2: USER IS LOGGED IN ==================== --%>
                     <c:otherwise>
-                        <!-- Notification Dropdown -->
                         <li class="nav-item dropdown me-lg-2">
                             <a class="nav-link notification-button" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-bell fs-5"></i>
-                                <span id="notificationBadge" class="badge rounded-pill bg-danger notification-badge">0</span>
+                                <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end notification-menu" aria-labelledby="notificationDropdown">
                                 <li class="dropdown-header d-flex justify-content-between align-items-center">
@@ -202,7 +204,6 @@
                             </ul>
                         </li>
 
-                        <!-- User Profile Dropdown -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <c:choose>
@@ -246,39 +247,51 @@
     </div>
 </div>
 
-<%-- ==================== 🌐 WEBSOCKET REAL-TIME NOTIFICATION SCRIPT ==================== --%>
+<%-- ==================== 🌐 WEBSOCKET & AJAX REAL-TIME NOTIFICATION SCRIPT ==================== --%>
 <c:if test="${not empty sessionScope.currentUser}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <script>
         (function () {
             var contextPath = '${pageContext.request.contextPath}';
-            var currentUserId = '${sessionScope.currentUser.id}';
+            var currentUserId = Number('${sessionScope.currentUser.id}');
+            
+            if (!currentUserId || currentUserId === 0) return;
+
             var badge = document.getElementById('notificationBadge');
             var list = document.getElementById('notificationList');
             var empty = document.getElementById('notificationEmpty');
-            var unreadCount = 0;
+            window.myUnreadCount = 0;
 
-            function setBadge(count) {
-                unreadCount = parseInt(count, 10) || 0;
-                badge.textContent = unreadCount;
-                badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+            // XSS ကာကွယ်ရန် HTML Safe ပြုလုပ်ပေးသော စနစ်
+            function escapeHtml(string) {
+                return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+                    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '/': '&#x2F;', '=': '&#x3D;' }[s];
+                });
             }
 
-            function escapeHtml(value) {
-                var div = document.createElement('div');
-                div.textContent = value || '';
-                return div.innerHTML;
+            // Badge Display ကို အရေအတွက်အလိုက် ဖော်ပြ/ဖျောက်ပေးရန်
+            function updateBadgeDisplay() {
+                if (!badge) return;
+                console.log("Current Unread Count is:", window.myUnreadCount);
+                if (window.myUnreadCount > 0) {
+                    badge.innerText = String(window.myUnreadCount); 
+                    badge.style.display = 'flex';
+                } else {
+                    badge.innerText = '0';
+                    badge.style.display = 'none';
+                }
             }
 
-            function addNotification(notification, prepend) {
-                empty.style.display = 'none';
-
+            // Dropdown List ထဲသို့ Notification အသစ် ထည့်သွင်းရန်
+            function appendNotification(notification, prepend) {
+                if (empty) empty.style.display = "none";
+                
                 var item = document.createElement('a');
                 item.className = 'dropdown-item notification-item small';
                 item.href = notification.linkUrl ? contextPath + notification.linkUrl : contextPath + '/notifications';
                 item.innerHTML = '<div class="fw-semibold">' + escapeHtml(notification.message) + '</div>'
-                    + '<div class="text-muted">' + escapeHtml(notification.notificationType || 'NOTIFICATION') + '</div>';
+                    + '<div class="text-muted" style="font-size: 11px;">' + escapeHtml(notification.type || 'NOTIFICATION') + '</div>';
 
                 if (prepend && list.firstChild) {
                     list.insertBefore(item, list.firstChild);
@@ -287,13 +300,16 @@
                 }
             }
 
+            // မင်းရဲ့ Screen အပေါ်ထောင့်မှ Toast Alert ပေါ်စေရန်
             function showNotificationAlert(notification) {
                 var toast = document.getElementById('notificationToast');
                 var title = document.getElementById('notificationToastTitle');
                 var message = document.getElementById('notificationToastMessage');
-                var titleText = notification.title || notification.notificationType || 'New notification';
+                
+                var titleText = notification.title || notification.type || 'New notification';
                 title.textContent = titleText;
                 message.textContent = notification.message || '';
+                
                 toast.style.display = 'block';
                 window.clearTimeout(window.cheatSheetNotificationTimer);
                 window.cheatSheetNotificationTimer = window.setTimeout(function () {
@@ -301,40 +317,53 @@
                 }, 5000);
             }
 
-            function loadRecentNotifications() {
-                fetch(contextPath + '/notifications/recent')
-                    .then(function (response) { return response.json(); })
-                    .then(function (data) {
-                        list.innerHTML = '';
-                        setBadge(data.unreadCount);
-                        if (!data.notifications || data.notifications.length === 0) {
-                            empty.style.display = 'block';
-                            return;
-                        }
-                        data.notifications.forEach(function (notification) {
-                            addNotification(notification, false);
-                        });
+            // ၁။ စာမျက်နှာစဖွင့်ချိန်တွင် ဒေတာဟောင်းများကို API မှ ဆွဲဖတ်ခြင်း (AJAX Fetch)
+            fetch(contextPath + '/notifications/recent', {
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                window.myUnreadCount = Number(data.unreadCount) || 0;
+                updateBadgeDisplay();
+                
+                list.innerHTML = "";
+                if (data.notifications && data.notifications.length > 0) {
+                    if (empty) empty.style.display = "none";
+                    data.notifications.forEach(function(n) {
+                        appendNotification(n, false);
                     });
-            }
+                } else {
+                    if (empty) empty.style.display = "block";
+                }
+            }).catch(err => console.error("Error loading notifications:", err));
 
-            function connectNotificationSocket() {
-                var socket = new SockJS(contextPath + '/ws-notifications');
-                var stompClient = Stomp.over(socket);
-                stompClient.debug = null;
-                stompClient.connect({}, function () {
-                    stompClient.subscribe('/topic/notifications/' + currentUserId, function (message) {
-                        var notification = JSON.parse(message.body);
-                        setBadge(unreadCount + 1);
-                        addNotification(notification, true);
-                        showNotificationAlert(notification);
-                    });
+            // ၂။ Real-time WebSocket အား ချိတ်ဆက်ခြင်း
+            var socket = new SockJS(contextPath + '/ws-notifications');
+            var stompClient = Stomp.over(socket);
+            stompClient.debug = null; // Console မှာ Debug စာတန်းတွေ ရှုပ်မနေအောင် ပိတ်ထားခြင်း
+
+            stompClient.connect({}, function () {
+                console.log("✅ WebSocket Connected Successfully!");
+
+                stompClient.subscribe('/topic/notifications/' + currentUserId, function(message){
+                    var notification = JSON.parse(message.body);
+
+                    window.myUnreadCount++; 
+                    updateBadgeDisplay(); 
+                    appendNotification(notification, true); // အသစ်ရောက်လာတာကို ထိပ်ဆုံးကပြရန် Prepend = true
+                    showNotificationAlert(notification); // Screen ပေါ်မှာ Toast ပြရန်
+
+                    // မင်းသူငယ်ချင်းရဲ့ Flow (SHARE အမျိုးအစားဖြစ်ရင် Alert Box ပါပြရန်)
+                    if(notification.type === "SHARE"){
+                        alert(notification.message);
+                    }
                 });
-            }
-
-            loadRecentNotifications();
-            connectNotificationSocket();
+            }, function(error) {
+                console.error("WebSocket Connection Error: ", error);
+            });
         })();
 
+        // 🚪 SweetAlert Logout Confirmation Function
         function confirmLogout(event) {
             event.preventDefault(); 
             const logoutUrl = event.currentTarget.getAttribute('href'); 

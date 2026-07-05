@@ -1,10 +1,12 @@
 package com.hibernate.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,20 +45,19 @@ public class NotificationController {
         return "notifications";
     }
 
-    @GetMapping("/notifications/recent")
+    @GetMapping(value = "/notifications/recent", produces = "application/json")
     @ResponseBody
-    public Map<String, Object> recent(HttpSession session) {
+    public ResponseEntity<Map<String, Object>> getRecentNotifications(HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
-        Map<String, Object> response = new HashMap<>();
-        if (currentUser == null) {
-            response.put("unreadCount", 0);
-            response.put("notifications", java.util.Collections.emptyList());
-            return response;
-        }
+        long unread = notificationService.countUnreadByUserId(currentUser.getId());
+        List<NotificationDto> list = notificationService.findByUserId(currentUser.getId());
 
-        response.put("unreadCount", notificationService.countUnreadByUserId(currentUser.getId()));
-        response.put("notifications", notificationService.findRecentByUserId(currentUser.getId(), 5));
-        return response;
+        Map<String, Object> response = new HashMap<>();
+        // 🟢 ဤနေရာရှိ Key Name သည် ဂျာဗားစခရစ်ထဲက ဒေတာနှင့် ကွက်တိတူရပါမည်
+        response.put("unreadCount", unread); 
+        response.put("notifications", list);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/notifications/unread-count")

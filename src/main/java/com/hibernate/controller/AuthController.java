@@ -10,10 +10,12 @@ import com.hibernate.service.CheatsheetService;
 import com.hibernate.service.UserFollowService;
 import com.hibernate.service.TagService;
 import com.hibernate.service.UserService;
-import com.hibernate.websocket.NotificationSocketService;
+import com.hibernate.service.NotificationSocketService; // 🌟 Import missing package
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -52,7 +54,12 @@ public class AuthController {
 
     @Autowired
     private AuditLogService auditLogService;
+
+    @Autowired
+    private com.hibernate.repository.SharedCheatsheetRepository sharedCheatsheetRepository;
     
+    @Transactional
+    @ प्रांतmapping("/")
     @GetMapping("/")
     public String showHomePage(
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -67,6 +74,8 @@ public class AuthController {
         model.addAttribute("popularCheatsheets", cheatsheetService.findPopularPublic(6));
         model.addAttribute("searchQuery", query);
         model.addAttribute("currentPage", page);
+        
+        model.addAttribute("sharedPosts", sharedCheatsheetRepository.findAllSharedWithDetails());
         
         long total = cheatsheetService.countLatestPublic(query);
         model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / pageSize)));
@@ -139,6 +148,7 @@ public class AuthController {
         return "redirect:/"; 
     }
    
+    @Transactional
     @GetMapping("/home")
     public String showHomeDashboard(
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -156,6 +166,8 @@ public class AuthController {
         model.addAttribute("searchQuery", query);
         model.addAttribute("currentPage", page);
         
+        model.addAttribute("sharedPosts", sharedCheatsheetRepository.findAllSharedWithDetails());
+        
         long total = cheatsheetService.countLatestPublic(query);
         model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / 6)));
         
@@ -165,7 +177,6 @@ public class AuthController {
         return "home";
     }
 
- // AuthController.java ၏ showProfile (/profile) မက်သတ်အတွင်း ပြင်ရန်
     @GetMapping("/profile")
     public String showProfile(HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
@@ -180,7 +191,7 @@ public class AuthController {
         model.addAttribute("followersCount", userFollowService.getFollowersCount(user.getId()));
         model.addAttribute("followingCount", userFollowService.getFollowingCount(user.getId()));
 
-        // 🌟 [FIX] "FRIEND" နေရာတွင် Database တန်ဖိုးအမှန်ဖြစ်သော "FRIEND-ONLY" သို့ လဲလှယ်လိုက်ခြင်း
+        // 🌟 [FIX] "FRIEND-ONLY" အမှန်အတိုင်း Database မှ Filter လုပ်ရန် ထိန်းသိမ်းထားခြင်း
         List<String> visibilities = List.of("PUBLIC", "FRIEND-ONLY", "PRIVATE");
         List<CheatsheetEntity> myCheatSheets = cheatsheetService.findByUserIdAndVisibility(user.getId(), visibilities);
         
@@ -214,7 +225,6 @@ public class AuthController {
         return "follow_list"; 
     }
     
-    // 🌟 အခြားသူများ၏ Profile View (Mutual Follow မှသာ PUBLIC + FRIEND-ONLY အား Database မှ ဆွဲထုတ်မည်)
     @GetMapping("/profile/{id}")
     public String viewTargetProfile(@PathVariable Integer id, HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
@@ -239,7 +249,6 @@ public class AuthController {
         boolean isFollowing = userFollowService.isFollowing(currentUser.getId(), id);
         model.addAttribute("isFollowing", isFollowing);
 
-        // 🌟 [PRIVACY VALUE FIXED]
         List<String> allowedVisibilities = new ArrayList<>();
         allowedVisibilities.add("PUBLIC"); 
         
@@ -247,7 +256,6 @@ public class AuthController {
         boolean targetFollowsCurrent = userFollowService.isFollowing(id, currentUser.getId());
         
         if (currentFollowsTarget && targetFollowsCurrent) {
-            // 🌟 [FIX] "FRIEND" အစား မင်းရဲ့ Database မူရင်းတန်ဖိုးဖြစ်သော "FRIEND-ONLY" ဟု တိတိကျကျ ပြောင်းလဲလိုက်ခြင်း
             allowedVisibilities.add("FRIEND-ONLY");
         }
 
@@ -266,7 +274,9 @@ public class AuthController {
             return "redirect:/login";
         }
         NotificationDto notification = userFollowService.followUser(currentUser.getId(), id);
-        notificationSocketService.broadcastToUser(id, notification);
+        if (notification != null) {
+            notificationSocketService.broadcastToUser(id, notification);
+        }
         return "redirect:/profile/" + id; 
     }
 
