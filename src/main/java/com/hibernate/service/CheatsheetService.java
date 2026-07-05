@@ -16,12 +16,14 @@ public interface CheatsheetService {
     
     List<CheatsheetEntity> findByUserId(Integer userId);
 
+    // 🌟 [PRIVACY LOGIC] User ID နှင့် Target Visibility list အလိုက် ချိတ်ဆက်ဆွဲထုတ်ပေးမည့် မက်သတ်သစ်
+    List<CheatsheetEntity> findByUserIdAndVisibility(Integer userId, List<String> visibilities);
+
     List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId, String filter);
     long countByCategoryId(Integer categoryId, Integer currentUserId, String filter);
     
     List<TagEntity> findTagsByCategoryId(Integer categoryId, Integer currentUserId); 
     
-    // 🌟 [FIXED] Interface အတွင်း ထပ်နေသော မက်သတ်အဟောင်းအား ဖယ်ရှား၍ ပုံစံသစ်ကိုသာ စနစ်တကျ ထားရှိခြင်း
     List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter);
     long countByTagId(Integer tagId, Integer currentUserId, String filter);
     

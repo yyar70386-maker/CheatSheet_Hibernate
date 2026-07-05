@@ -18,13 +18,17 @@ public interface CheatsheetRepository {
     
     List<TagEntity> findTagsByCategoryId(Integer categoryId);
     
-    // 🌟 [STORED PROCEDURE CALL] တီချယ်ခိုင်းသည့်အတိုင်း Native Procedure အား လှမ်းခေါ်မည့် Signature
+    // 🌟 [STORED PROCEDURE CALL] Native Procedure Signature
     List<Object[]> callStoredProcedureForTagCounts(Integer categoryId, Integer currentUserId);
     
     List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter);
     long countByTagId(Integer tagId, Integer currentUserId, String filter);
     
     List<CheatsheetEntity> findByUserId(Integer userId);
+
+    // 🌟 [PRIVACY LOGIC] User ID နှင့် Allowed Visibilities အလိုက် စစ်ထုတ်ပေးမည့် Signature သစ်
+    List<CheatsheetEntity> findByUserIdAndVisibilityList(Integer userId, List<String> visibilities);
+
     List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size);
     List<CheatsheetEntity> findPopularPublic(int size);
     List<CheatsheetEntity> findPublicCreatedBetween(java.sql.Timestamp start, java.sql.Timestamp end);

@@ -28,11 +28,31 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> callStoredProcedureForTagCounts(Integer categoryId, Integer currentUserId) {
-        // Native Stored Procedure ကို CALL အမိန့်ဖြင့် တိုက်ရိုက် လှမ်းခေါ်ယူခြင်း
         return getSession()
                 .createNativeQuery("CALL GetActiveTagCountsWithPrivacy(:catId, :userId)")
                 .setParameter("catId", categoryId)
                 .setParameter("userId", currentUserId != null ? currentUserId : 0)
+                .list();
+    }
+
+    // 🌟 [NEW PRIVACY IMPLEMENTATION] Pure Hibernate Method
+    @Override
+    public List<CheatsheetEntity> findByUserIdAndVisibilityList(Integer userId, List<String> visibilities) {
+        if (visibilities == null || visibilities.isEmpty()) {
+            return new java.util.ArrayList<>();
+        }
+        
+        String hql = "select distinct c from CheatsheetEntity c "
+                   + "left join fetch c.tags "
+                   + "left join fetch c.author "
+                   + "where c.author.id = :userId "
+                   + "and c.visibility in (:visibilities) "
+                   + "and c.status = 'active' "
+                   + "order by c.id desc";
+                   
+        return getSession().createQuery(hql, CheatsheetEntity.class)
+                .setParameter("userId", userId)
+                .setParameterList("visibilities", visibilities)
                 .list();
     }
 
@@ -296,17 +316,17 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
         return count != null ? count : 0;
     }
 
-    @SuppressWarnings({ "unchecked", "deprecation", "serial" })
+    @SuppressWarnings({ "unchecked", "deprecation" })
     @Override
     public List<CheatSheetReportEntity> findCheatsheetReportData() {
         return getSession()
-        		.createNativeQuery(
-        			    "SELECT c.id, c.title, u.username, c.created_at, " +
-        			    "(SELECT COUNT(*) FROM sheet_reactions sr WHERE sr.cheatsheet_id = c.id) AS reaction_count " +
-        			    "FROM cheatsheets c " +
-        			    "LEFT JOIN users u ON c.author_id = u.id " +
-        			    "WHERE c.deleted_at IS NULL " +
-        			    "ORDER BY c.created_at DESC")
+                .createNativeQuery(
+                    "SELECT c.id, c.title, u.username, c.created_at, " +
+                    "(SELECT COUNT(*) FROM sheet_reactions sr WHERE sr.cheatsheet_id = c.id) AS reaction_count " +
+                    "FROM cheatsheets c " +
+                    "LEFT JOIN users u ON c.author_id = u.id " +
+                    "WHERE c.deleted_at IS NULL " +
+                    "ORDER BY c.created_at DESC")
                 .addScalar("id", IntegerType.INSTANCE)
                 .addScalar("title", StringType.INSTANCE)
                 .addScalar("username", StringType.INSTANCE)

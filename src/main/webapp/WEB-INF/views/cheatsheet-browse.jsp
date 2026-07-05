@@ -121,12 +121,28 @@
             text-decoration: underline;
         }
         
-        /* 🌟 Visibility Icon Tooltip Style */
-        .visibility-icon-box {
-            font-size: 18px;
-            padding: 4px;
-            border-radius: 6px;
-            cursor: help;
+        /* 🌟 [UPDATED] Visibility Badges Style (Screenshot 2026-07-05 at 17.20.49.png ပုံစံအတိုင်း) */
+        .visibility-pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: capitalize;
+        }
+        .pill-public {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        .pill-friends {
+            background-color: #cff4fc;
+            color: #055160;
+        }
+        .pill-private {
+            background-color: #f8d7da;
+            color: #842029;
         }
         
         /* 🌟 Dropdown Button Style */
@@ -157,7 +173,7 @@
                 <h1 class="display-5 fw-bold text-dark mb-0">${totalCount} ${categoryName} Cheat Sheets</h1>
             </div>
             
-            <%-- 🌟 [UPDATED] Login User ဖြစ်မှသာ Dropdown Filter အား ပြသပေးမည် (Guest ဆိုလျှင် အလိုအလျောက် ပုန်းနေမည်) --%>
+            <%-- 🌟 Login User ဖြစ်မှသာ Dropdown Filter အား ပြသပေးမည် --%>
             <c:if test="${not empty sessionScope.currentUser}">
                 <div class="dropdown mt-3 mt-md-0">
                     <button class="btn filter-dropdown-btn dropdown-toggle d-flex align-items-center gap-2" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -214,25 +230,30 @@
 									    </a>
                                         
                                         <c:choose>
-                                            <%-- 🌟 Login User ဖြစ်ပါက ၎င်း၏ Visibility အလိုက် Dynamic Icons ပြောင်းလဲခြင်း --%>
+                                            <%-- 🌟 [UPDATED UI] Login User ဖြစ်ပါက ၎င်း၏ Visibility အခြေအနေအလိုက် Pill Badges ပြောင်းလဲခြင်း --%>
                                             <c:when test="${not empty sessionScope.currentUser}">
                                                 <c:choose>
                                                     <c:when test="${sheet.visibility == 'PUBLIC'}">
-                                                        <span class="visibility-icon-box text-success" title="Public Cheat Sheet">
-                                                            <i class="bi bi-globe"></i>
+                                                        <span class="visibility-pill pill-public" title="Public Cheat Sheet">
+                                                            <i class="bi bi-globe"></i> Public
+                                                        </span>
+                                                    </c:when>
+                                                    <c:when test="${sheet.visibility == 'FRIEND-ONLY'}">
+                                                        <span class="visibility-pill pill-friends" title="Friends Only Cheat Sheet">
+                                                            <i class="bi bi-people-fill"></i> Friends
                                                         </span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="visibility-icon-box text-info" title="Friends Only Cheat Sheet">
-                                                            <i class="bi bi-people-fill"></i>
+                                                        <span class="visibility-pill pill-private" title="Private Cheat Sheet">
+                                                            <i class="bi bi-lock-fill"></i> Private
                                                         </span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </c:when>
-                                            <%-- 🌟 Guest User ဖြစ်ပါက ကမ္ဘာလုံး Icon တစ်မျိုးတည်းကိုသာ ပုံသေပြသပေးခြင်း --%>
+                                            <%-- 🌟 Guest User ဖြစ်ပါက ကမ္ဘာလုံး Badge တစ်မျိုးတည်းကိုသာ ပုံသေပြသပေးခြင်း --%>
                                             <c:otherwise>
-                                                <span class="visibility-icon-box text-success" title="Public Cheat Sheet">
-                                                    <i class="bi bi-globe"></i>
+                                                <span class="visibility-pill pill-public" title="Public Cheat Sheet">
+                                                    <i class="bi bi-globe"></i> Public
                                                 </span>
                                             </c:otherwise>
                                         </c:choose>

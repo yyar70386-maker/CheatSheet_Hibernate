@@ -4,7 +4,7 @@
 <%-- ADMIN SIDEBAR --%>
 <c:if test="${sessionScope.currentUser.role == 1}">
     <div class="d-flex flex-column flex-shrink-0 p-3 bg-white admin-sidebar"
-         style="box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05); height: 100%; border-right: 1px solid #e2e8f0;">
+         style="box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05); height: 100%; border-right: 1px solid #e2e8f0; position: sticky; top: 0;">
          
         <a href="${pageContext.request.contextPath}/admin/dashboard" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
             <i class="bi bi-shield-lock-fill me-2 fs-4" style="color: #ff3366;"></i>
@@ -30,9 +30,10 @@
             </li>
 
             <li>
-                <a href="${pageContext.request.contextPath}/tag/list"
-                   class="nav-link ${param.activePage == 'items' ? 'active text-white' : 'text-dark'}" style="${param.activePage == 'items' ? 'background-color: #ff3366;' : ''}">
-                    <i class="bi bi-box-seam me-2 ${param.activePage == 'items' ? 'text-white' : 'text-secondary'}"></i> Tag Management
+                <%-- 🌟 [UPDATED] Tag Management လမ်းကြောင်းအား Admin Layout ထဲသို့ ပြန်ညွှန်းထားခြင်း --%>
+                <a href="${pageContext.request.contextPath}/admin/tags"
+                   class="nav-link ${param.activePage == 'tags' ? 'active text-white' : 'text-dark'}" style="${param.activePage == 'tags' ? 'background-color: #ff3366;' : ''}">
+                    <i class="bi bi-box-seam me-2 ${param.activePage == 'tags' ? 'text-white' : 'text-secondary'}"></i> Tag Management
                 </a>
             </li>
 
@@ -64,7 +65,6 @@
                 </a>
             </li>
 
-
             <li>
                 <a href="${pageContext.request.contextPath}/admin/announcements"
                    class="nav-link ${param.activePage == 'announcements' ? 'active text-white' : 'text-dark'}" style="${param.activePage == 'announcements' ? 'background-color: #ff3366;' : ''}">
@@ -87,7 +87,6 @@
             </li>
         </ul>
 
-        <%-- 🛑 Pinned Bottom Logout Section --%>
         <hr class="mt-2 mb-2">
         <div class="mt-auto">
             <a href="${pageContext.request.contextPath}/logout" 
@@ -100,7 +99,7 @@
                 <span>Logout</span>
             </a>
         </div>
-        
+         
     </div>
 </c:if>
 
@@ -120,7 +119,6 @@
             cancelButtonColor: '#6c757d',
             confirmButtonText: 'Yes, logout!',
             cancelButtonText: 'Cancel',
-            // ဒီအချက်လေးကို ထည့်လိုက်ရင် Cancel button က ဘယ်ဘက်ကို ရောက်သွားပါမယ်
             reverseButtons: true 
         }).then((result) => {
             if (result.isConfirmed) {

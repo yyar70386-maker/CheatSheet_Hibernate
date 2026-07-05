@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false" %>
+<%@ page import="java.util.List" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,10 +25,9 @@
 }
 
 body {
-    /* Soft radial background from the new design */
     background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%);
     min-height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
     position: relative;
     color: #1a1a1a;
 }
@@ -60,7 +61,7 @@ a:hover { color: #cc0044; }
     overflow-y: auto;
     min-width: 0;
     padding: 30px;
-    background: transparent; /* Allow background to show through */
+    background: transparent;
 }
 
 /* ================= Glassmorphism Core ================= */
@@ -164,7 +165,103 @@ a:hover { color: #cc0044; }
 .marquee-item { font-size: 1.2rem; font-weight: 700; color: rgba(26, 26, 26, 0.4); margin: 0 50px; display: flex; align-items: center; gap: 12px; transition: color 0.3s ease; }
 .marquee-item:hover { color: #ff3366; }
 
-/* Admin Charts */
+/* CheatSheet Card Standardized Styles */
+.cheatsheet-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 25px;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: auto;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.cheatsheet-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.description-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3; 
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.description-text.expanded {
+    display: block;
+    -webkit-line-clamp: unset;
+}
+
+.see-more-btn {
+    color: #1976d2;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+.see-more-btn:hover {
+    text-decoration: underline;
+}
+
+.card-meta-item {
+    color: #555;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Tag Badges Styles */
+.tag-badge-link {
+    background-color: #e2e8f0;
+    color: #333;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.tag-badge-link:hover {
+    background-color: #1976d2;
+    color: white;
+}
+
+.stats-section {
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+/* Visibility Pill Badges Styles */
+.visibility-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-transform: capitalize;
+}
+
+.pill-public { background-color: #d1e7dd; color: #0f5132; }
+.pill-friends { background-color: #cff4fc; color: #055160; }
+.pill-private { background-color: #f8d7da; color: #842029; }
+
+/* Admin Charts Box */
 .chart-box-container { position: relative; margin: auto; height: 180px; width: 180px; }
 
 /* Animations */
@@ -200,6 +297,7 @@ a:hover { color: #cc0044; }
 
         <div class="main-content-area">
 
+            <%-- 🔐 Role-Based Switching Logic --%>
             <c:choose>
                 <%-- 🌟 ADMIN VIEW (Glassmorphism) --%>
                 <c:when test="${not empty sessionScope.currentUser && sessionScope.currentUser.role == 1}">
@@ -227,7 +325,9 @@ a:hover { color: #cc0044; }
                             <div class="glass-card p-4 text-center h-100">
                                 <h6 class="text-muted fw-bold mb-3"><i class="bi bi-file-earmark-code-fill me-2" style="color: #00ccff;"></i>Cheat Sheets</h6>
                                 <div class="chart-box-container"><canvas id="sheetsCircleChart"></canvas></div>
-                                <div class="fs-3 fw-bold mt-3 text-dark"><c:out value="${not empty totalSheets ? totalSheets : (not empty summary.totalCheatsheets ? summary.totalCheatsheets : 0)}" /></div>
+                                <div class="fs-3 fw-bold mt-3 text-dark">
+                                    <c:out value="${not empty totalSheets ? totalSheets : (not empty summary.totalCheatsheets ? summary.totalCheatsheets : 0)}" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -246,7 +346,7 @@ a:hover { color: #cc0044; }
                                 </p>
                                 
                                 <div class="anim-3">
-                                    <form action="${pageContext.request.contextPath}/home" method="get" class="search-panel d-flex">
+                                    <form action="${pageContext.request.contextPath}/home" method="get" class="search-panel d-flex shadow-sm">
                                         <span class="input-group-text bg-transparent border-0"><i class="bi bi-search" style="color: #ff3366;"></i></span>
                                         <input type="search" class="form-control search-input" name="q" value="${searchQuery}" placeholder="What do you want to learn today?">
                                         <button class="btn btn-library" type="submit">Search</button>
@@ -312,65 +412,188 @@ a:hover { color: #cc0044; }
                         </div>
                     </section>
 
-                    <%-- Latest Sheets (Glass Cards) --%>
-                    <section id="latest-sheets" class="mb-5 anim-3">
-                        <h2 class="section-title h4 mb-4">Latest References</h2>
-                        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-                            <c:forEach items="${cheatsheetlist}" var="sheet">
-                                <div class="col">
-                                    <div class="glass-card p-4 h-100 d-flex flex-column">
-                                        <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <div class="bg-white rounded p-2 shadow-sm text-primary"><i class="bi bi-code-square fs-5"></i></div>
-                                            <span class="badge bg-dark bg-opacity-10 text-dark rounded-pill px-3 py-1 border border-light">
-                                                ${sheet.category != null ? sheet.category.name : 'General'}
-                                            </span>
-                                        </div>
-                                        <h3 class="h5 fw-bold mb-2">
-                                            <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none">${sheet.title}</a>
-                                        </h3>
-                                        <p class="text-muted small mb-4 flex-grow-1">${sheet.description}</p>
-                                        <div class="d-flex flex-wrap justify-content-between align-items-center mt-auto border-top pt-3 border-light border-opacity-50">
-                                            <div class="small fw-semibold text-dark"><i class="bi bi-person-circle text-muted me-1"></i> ${sheet.author != null ? sheet.author.username : 'System'}</div>
-                                            <div class="d-flex gap-3 text-muted small">
-                                                <span><i class="bi bi-eye"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
-                                                <span><i class="bi bi-download"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </c:forEach>
-                        </div>
-                    </section>
+                    <%-- 🌟 [UPDATED SPLIT GRID] Latest Feed (ဘယ်ဘက်) နှင့် Popular Feed (ညာဘက်) စနစ် --%>
+                    <div class="row g-4 mb-5 anim-3">
+                        
+                        <%-- ⬅️ LEFT SIDE: LATEST CHEAT SHEETS --%>
+                        <div class="col-12 col-lg-6">
+                            <h2 class="section-title h4 mb-4">Latest Cheat Sheets</h2>
+                            <div class="row row-cols-1">
+                                <c:forEach items="${cheatsheetlist}" var="sheet">
+                                    <div class="col">
+                                        <div class="cheatsheet-card">
+                                            <div>
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h5 class="fw-bold m-0">
+                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline fs-5">
+                                                            ${sheet.title}
+                                                        </a>
+                                                    </h5>
+                                                    
+                                                    <c:choose>
+                                                        <c:when test="${not empty sessionScope.currentUser}">
+                                                            <c:choose>
+                                                                <c:when test="${sheet.visibility == 'PUBLIC'}">
+                                                                    <span class="visibility-pill pill-public">
+                                                                        <i class="bi bi-globe"></i> Public
+                                                                    </span>
+                                                                </c:when>
+                                                                <c:when test="${sheet.visibility == 'FRIEND-ONLY'}">
+                                                                    <span class="visibility-pill pill-friends">
+                                                                        <i class="bi bi-people-fill"></i> Friends
+                                                                    </span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="visibility-pill pill-private">
+                                                                        <i class="bi bi-lock-fill"></i> Private
+                                                                    </span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="visibility-pill pill-public">
+                                                                <i class="bi bi-globe"></i> Public
+                                                            </span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                                
+                                                <div class="description-container mb-3">
+                                                    <p class="text-secondary description-text mb-0">${sheet.description}</p>
+                                                    <span class="see-more-btn" onclick="toggleDescription(this)">See More</span>
+                                                </div>
+                                                
+                                                <div class="card-meta-item">
+                                                    <i class="bi bi-person text-muted"></i> ${sheet.author != null ? sheet.author.username : 'Unknown'}
+                                                </div>
+                                                <div class="card-meta-item">
+                                                    <i class="bi bi-folder text-muted"></i> ${sheet.category != null ? sheet.category.name : 'General'} Cheat Sheets
+                                                </div>
+                                                <div class="card-meta-item">
+                                                    <i class="bi bi-calendar-plus text-muted"></i> Created: <fmt:formatDate value="${sheet.createdAt}" pattern="yyyy-MM-dd"/>
+                                                </div>
+                                                <div class="card-meta-item">
+                                                    <i class="bi bi-calendar-event text-muted"></i> Updated: <fmt:formatDate value="${sheet.updatedAt}" pattern="yyyy-MM-dd"/>
+                                                </div>
 
-                    <%-- Popular Sheets (Glass Cards) --%>
-                    <section id="popular-sheets" class="mb-5 anim-3">
-                        <h2 class="section-title h4 mb-4">Popular References</h2>
-                        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-                            <c:forEach items="${popularCheatsheets}" var="sheet">
-                                <div class="col">
-                                    <div class="glass-card p-4 h-100 d-flex flex-column">
-                                        <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <div class="bg-white rounded p-2 shadow-sm text-primary"><i class="bi bi-star-fill fs-5" style="color: #ffcc00;"></i></div>
-                                            <span class="badge bg-dark bg-opacity-10 text-dark rounded-pill px-3 py-1 border border-light">
-                                                ${sheet.category != null ? sheet.category.name : 'General'}
-                                            </span>
-                                        </div>
-                                        <h3 class="h5 fw-bold mb-2">
-                                            <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none">${sheet.title}</a>
-                                        </h3>
-                                        <p class="text-muted small mb-4 flex-grow-1">${sheet.description}</p>
-                                        <div class="d-flex flex-wrap justify-content-between align-items-center mt-auto border-top pt-3 border-light border-opacity-50">
-                                            <div class="small fw-semibold text-dark"><i class="bi bi-person-circle text-muted me-1"></i> ${sheet.author != null ? sheet.author.username : 'System'}</div>
-                                            <div class="d-flex gap-3 text-muted small">
-                                                <span><i class="bi bi-eye"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
-                                                <span><i class="bi bi-download"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                                <div class="d-flex flex-wrap gap-2 my-3">
+                                                    <c:forEach items="${sheet.tags}" var="tag">
+                                                        <a href="${pageContext.request.contextPath}/cheatsheet/tag/${tag.id}" class="tag-badge-link">#${tag.name}</a>
+                                                    </c:forEach>
+                                                </div>
+                                            </div>
+
+                                            <div class="stats-section mt-auto d-flex justify-content-between align-items-center border-top pt-3">
+                                                <div class="d-flex gap-3">
+                                                    <span><i class="bi bi-eye text-muted me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+                                                    <span><i class="bi bi-download text-muted me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                                </div>
+                                                <div>
+                                                    <a href="${pageContext.request.contextPath}/cheatsheet/view-pdf/${sheet.id}" 
+                                                       target="_blank" 
+                                                       class="btn btn-sm btn-outline-danger px-3 py-1 d-flex align-items-center gap-1 fw-bold"
+                                                       style="border-radius: 8px; font-size: 13px;"
+                                                       title="View PDF Document">
+                                                         <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </c:forEach>
+                                </c:forEach>
+                            </div>
                         </div>
-                    </section>
+
+                        <%-- ➡️ RIGHT SIDE: POPULAR CHEAT SHEETS --%>
+                        <div class="col-12 col-lg-6">
+                            <h2 class="section-title h4 mb-4">Popular Cheat Sheets</h2>
+                            <div class="row row-cols-1">
+                                <c:forEach items="${popularCheatsheets}" var="sheet">
+                                    <div class="col">
+                                        <div class="cheatsheet-card">
+                                            <div>
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h5 class="fw-bold m-0">
+                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline fs-5">
+                                                            ${sheet.title}
+                                                        </a>
+                                                    </h5>
+                                                    
+                                                    <c:choose>
+                                                        <c:when test="${not empty sessionScope.currentUser}">
+                                                            <c:choose>
+                                                                <c:when test="${sheet.visibility == 'PUBLIC'}">
+                                                                    <span class="visibility-pill pill-public">
+                                                                        <i class="bi bi-globe"></i> Public
+                                                                    </span>
+                                                                </c:when>
+                                                                <c:when test="${sheet.visibility == 'FRIEND-ONLY'}">
+                                                                    <span class="visibility-pill pill-friends">
+                                                                        <i class="bi bi-people-fill"></i> Friends
+                                                                    </span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="visibility-pill pill-private">
+                                                                        <i class="bi bi-lock-fill"></i> Private
+                                                                    </span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="visibility-pill pill-public">
+                                                                <i class="bi bi-globe"></i> Public
+                                                            </span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                                
+                                                <div class="description-container mb-3">
+                                                    <p class="text-secondary description-text mb-0">${sheet.description}</p>
+                                                    <span class="see-more-btn" onclick="toggleDescription(this)">See More</span>
+                                                </div>
+                                                
+                                                <div class="card-meta-item">
+                                                    <i class="bi bi-person text-muted"></i> ${sheet.author != null ? sheet.author.username : 'Unknown'}
+                                                </div>
+                                                <div class="card-meta-item">
+                                                    <i class="bi bi-folder text-muted"></i> ${sheet.category != null ? sheet.category.name : 'General'} Cheat Sheets
+                                                </div>
+                                                <div class="card-meta-item">
+                                                    <i class="bi bi-calendar-plus text-muted"></i> Created: <fmt:formatDate value="${sheet.createdAt}" pattern="yyyy-MM-dd"/>
+                                                </div>
+                                                <div class="card-meta-item">
+                                                    <i class="bi bi-calendar-event text-muted"></i> Updated: <fmt:formatDate value="${sheet.updatedAt}" pattern="yyyy-MM-dd"/>
+                                                </div>
+
+                                                <div class="d-flex flex-wrap gap-2 my-3">
+                                                    <c:forEach items="${sheet.tags}" var="tag">
+                                                        <a href="${pageContext.request.contextPath}/cheatsheet/tag/${tag.id}" class="tag-badge-link">#${tag.name}</a>
+                                                    </c:forEach>
+                                                </div>
+                                            </div>
+
+                                            <div class="stats-section mt-auto d-flex justify-content-between align-items-center border-top pt-3">
+                                                <div class="d-flex gap-3">
+                                                    <span><i class="bi bi-eye text-muted me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+                                                    <span><i class="bi bi-download text-muted me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                                </div>
+                                                <div>
+                                                    <a href="${pageContext.request.contextPath}/cheatsheet/view-pdf/${sheet.id}" 
+                                                       target="_blank" 
+                                                       class="btn btn-sm btn-outline-danger px-3 py-1 d-flex align-items-center gap-1 fw-bold"
+                                                       style="border-radius: 8px; font-size: 13px;"
+                                                       title="View PDF Document">
+                                                         <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                        </div>
+                        
+                    </div>
 
                     <jsp:include page="footer.jsp" />
                 </c:otherwise>
@@ -381,6 +604,7 @@ a:hover { color: #cc0044; }
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    <%-- 🌌 Particle Canvas Effect Script --%>
     <script>
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
@@ -393,7 +617,7 @@ a:hover { color: #cc0044; }
         resizeCanvas();
 
         const particlesArray = [];
-        const numberOfParticles = 60; // Adjusted for better performance with glassmorphism
+        const numberOfParticles = 60; 
 
         class Particle {
             constructor() {
@@ -402,7 +626,6 @@ a:hover { color: #cc0044; }
                 this.size = Math.random() * 2.5 + 0.5; 
                 this.speedX = Math.random() * 1 - 0.5; 
                 this.speedY = Math.random() * -1.5 - 0.5; 
-                // Color matches the pink/blue theme
                 this.color = `rgba(${Math.floor(Math.random() * 100 + 155)}, ${Math.floor(Math.random() * 50 + 50)}, ${Math.floor(Math.random() * 150 + 100)}, ${Math.random() * 0.4 + 0.1})`;
             }
             update() {
@@ -436,6 +659,7 @@ a:hover { color: #cc0044; }
         animate();
     </script>
 
+    <%-- 📊 Admin Circle Charts Script --%>
     <c:if test="${not empty sessionScope.currentUser && sessionScope.currentUser.role == 1}">
         <script>
             const valUsers = ${not empty totalUsers ? totalUsers : (not empty summary.totalUsers ? summary.totalUsers : 0)};
@@ -466,5 +690,18 @@ a:hover { color: #cc0044; }
             });
         </script>
     </c:if>
+    
+    <script>
+    function toggleDescription(btn) {
+        var textEl = btn.previousElementSibling;
+        textEl.classList.toggle('expanded');
+        
+        if (textEl.classList.contains('expanded')) {
+            btn.innerText = 'See Less';
+        } else {
+            btn.innerText = 'See More';
+        }
+    }
+    </script>
 </body>
 </html>

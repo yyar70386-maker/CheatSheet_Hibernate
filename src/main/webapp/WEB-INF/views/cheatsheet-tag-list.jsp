@@ -14,21 +14,48 @@
     <style>
         body { display: flex; flex-direction: column; min-height: 100vh; background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%); color: #1a1a1a; }
         .page-header-section { text-align: left; margin: 20px 0 20px 0; }
-        .cheatsheet-card { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; height: auto; display: flex; flex-direction: column; }
-        .cheatsheet-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); }
+        
+        /* 🌟 [UPDATED] Standardized Layout from Browse/Home CSS */
+        .cheatsheet-card { 
+            border: 1px solid #e2e8f0; 
+            border-radius: 20px; 
+            padding: 30px; 
+            background: white; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .cheatsheet-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
         .grid-item { align-self: start; }
-        .description-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .description-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; transition: all 0.3s ease; }
         .description-text.expanded { display: block; -webkit-line-clamp: unset; }
-        .see-more-btn { color: #ff3366; cursor: pointer; font-weight: bold; font-size: 14px; display: inline-block; margin-top: 5px; }
-        .see-more-btn:hover { color: #e62e5c; text-decoration: underline; }
-        .card-meta-item { color: #666; font-size: 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
-        .tag-badge-link { background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.8); color: #333; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block; transition: all 0.2s ease; }
-        .tag-badge-link:hover { background-color: #1a1a1a; color: white; transform: translateY(-2px); }
+        .see-more-btn { color: #1976d2; cursor: pointer; font-weight: bold; font-size: 14px; display: inline-block; margin-top: 5px; text-decoration: none; }
+        .see-more-btn:hover { text-decoration: underline; }
+        .card-meta-item { color: #555; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        
+        .tag-badge-link { background-color: #e2e8f0; color: #333; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block; }
+        .tag-badge-link:hover { background-color: #1976d2; color: white; }
         .stats-section { font-size: 14px; color: #555; display: flex; gap: 20px; margin-top: 15px; }
         
-        .visibility-icon-box { font-size: 18px; cursor: help; }
-        .filter-dropdown-btn { border: 1px solid #ff3366; color: #ff3366; font-weight: 600; border-radius: 8px; padding: 8px 16px; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px); }
-        .filter-dropdown-btn:hover, .filter-dropdown-btn:focus { background-color: #ff3366; color: white; border-color: #ff3366; }
+        /* 🌟 [UPDATED] Visibility Pill Badges Styles */
+        .visibility-pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: capitalize;
+        }
+        .pill-public { background-color: #d1e7dd; color: #0f5132; }
+        .pill-friends { background-color: #cff4fc; color: #055160; }
+        .pill-private { background-color: #f8d7da; color: #842029; }
+
+        .filter-dropdown-btn { border: 1px solid #1976d2; color: #1976d2; font-weight: 600; border-radius: 8px; padding: 8px 16px; }
+        .filter-dropdown-btn:hover, .filter-dropdown-btn:focus { background-color: #1976d2; color: white; border-color: #1976d2; }
     </style>
 </head>
 <body style="background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%); min-height: 100vh; color: #1a1a1a;">
@@ -45,7 +72,6 @@
                 <h1 class="display-5 fw-bold text-dark mb-0">${totalCount} Cheat Sheets tagged with #${tagName}</h1>
             </div>
             
-            <%-- 🌟 Login User ဖြစ်မှသာ Dropdown Filter အား ပြသပေးမည် --%>
             <c:if test="${not empty sessionScope.currentUser}">
                 <div class="dropdown mt-3 mt-md-0">
                     <button class="btn filter-dropdown-btn dropdown-toggle d-flex align-items-center gap-2" type="button" id="tagFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -90,7 +116,6 @@
             </c:when>
             <c:otherwise>
                 
-                <%-- 🌟 သုံးခုတစ်တန်း Layout စနစ် --%>
                 <div class="row g-4 justify-content-start">
                     <c:forEach items="${cheatsheetlist}" var="sheet">
                         <div class="col-md-6 col-lg-4 grid-item">
@@ -102,25 +127,30 @@
                                             ${sheet.title}
                                         </a>
                                         
-                                        <%-- Visibility Icons --%>
+                                        <%-- 🌟 [UPDATED UI] Dynamic Pill Badge Icons --%>
                                         <c:choose>
                                             <c:when test="${not empty sessionScope.currentUser}">
                                                 <c:choose>
                                                     <c:when test="${sheet.visibility == 'PUBLIC'}">
-                                                        <span class="visibility-icon-box text-success" title="Public Cheat Sheet">
-                                                            <i class="bi bi-globe"></i>
+                                                        <span class="visibility-pill pill-public">
+                                                            <i class="bi bi-globe"></i> Public
+                                                        </span>
+                                                    </c:when>
+                                                    <c:when test="${sheet.visibility == 'FRIEND-ONLY'}">
+                                                        <span class="visibility-pill pill-friends">
+                                                            <i class="bi bi-people-fill"></i> Friends
                                                         </span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="visibility-icon-box text-info" title="Friends Only Cheat Sheet">
-                                                            <i class="bi bi-people-fill"></i>
+                                                        <span class="visibility-pill pill-private">
+                                                            <i class="bi bi-lock-fill"></i> Private
                                                         </span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </c:when>
                                             <c:otherwise>
-                                                <span class="visibility-icon-box text-success" title="Public Cheat Sheet">
-                                                    <i class="bi bi-globe"></i>
+                                                <span class="visibility-pill pill-public">
+                                                    <i class="bi bi-globe"></i> Public
                                                 </span>
                                             </c:otherwise>
                                         </c:choose>
@@ -131,17 +161,18 @@
                                         <span class="see-more-btn" onclick="event.stopPropagation(); toggleDescription(this)">See More</span>
                                     </div>
                                     
+                                    <%-- 🌟 [UPDATED] Icons matching the reference image verbatim --%>
                                     <div class="card-meta-item">
-                                        <i class="bi bi-person-fill"></i> ${sheet.author != null ? sheet.author.username : 'Unknown'}
+                                        <i class="bi bi-person text-muted"></i> ${sheet.author != null ? sheet.author.username : 'Unknown'}
                                     </div>
                                     <div class="card-meta-item">
-                                        <i class="bi bi-folder-fill"></i> ${sheet.category.name} Cheat Sheets
+                                        <i class="bi bi-folder text-muted"></i> ${sheet.category.name} Cheat Sheets
                                     </div>
                                     <div class="card-meta-item">
-                                        <i class="bi bi-calendar-plus"></i> Created: <fmt:formatDate value="${sheet.createdAt}" pattern="yyyy-MM-dd"/>
+                                        <i class="bi bi-calendar-plus text-muted"></i> Created: <fmt:formatDate value="${sheet.createdAt}" pattern="yyyy-MM-dd"/>
                                     </div>
                                     <div class="card-meta-item">
-                                        <i class="bi bi-calendar-event"></i> Updated: <fmt:formatDate value="${sheet.updatedAt}" pattern="yyyy-MM-dd"/>
+                                        <i class="bi bi-calendar-event text-muted"></i> Updated: <fmt:formatDate value="${sheet.updatedAt}" pattern="yyyy-MM-dd"/>
                                     </div>
                                     
                                     <div class="d-flex flex-wrap gap-2 my-3">
@@ -151,9 +182,23 @@
                                     </div>
                                 </div>
 
-                                <div class="stats-section mt-auto">
-                                    <span><i class="bi bi-eye-fill me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
-                                    <span><i class="bi bi-download me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                <%-- 🌟 [UPDATED UI] Icons matching the reference image verbatim for metrics --%>
+                                <div class="stats-section mt-auto d-flex justify-content-between align-items-center pt-2">
+                                    <div class="d-flex gap-3">
+                                        <span><i class="bi bi-eye text-muted me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+                                        <span><i class="bi bi-download text-muted me-1"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                    </div>
+                                    
+                                    <div>
+                                        <a href="${pageContext.request.contextPath}/cheatsheet/view-pdf/${sheet.id}" 
+                                           onclick="event.stopPropagation();"
+                                           target="_blank" 
+                                           class="btn btn-sm btn-outline-danger px-3 py-1 d-flex align-items-center gap-1 fw-bold"
+                                           style="border-radius: 8px; font-size: 13px;"
+                                           title="View PDF Document">
+                                             <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>

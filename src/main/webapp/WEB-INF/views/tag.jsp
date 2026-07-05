@@ -51,7 +51,7 @@
 
     <div class="app-container">
         <jsp:include page="sidebar.jsp">
-            <jsp:param name="activePage" value="items" />
+            <jsp:param name="activePage" value="tags" />
         </jsp:include>
         
         <div class="main-content-area">
@@ -61,7 +61,7 @@
                     <h2 class="fw-bold text-dark m-0">Add Tag</h2>
                     <p class="text-muted m-0 small">Create a new tag to organize cheatsheets.</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/tag/list" class="btn btn-outline-secondary px-3 fw-medium">
+                <a href="${pageContext.request.contextPath}/admin/tags" class="btn btn-outline-secondary px-3 fw-medium">
                     <i class="bi bi-arrow-left me-2"></i>Back to List
                 </a>
             </div>
@@ -78,9 +78,10 @@
                                        class="form-control" 
                                        id="tagName" 
                                        name="name" 
-                                       placeholder="e.g., spring-boot" 
+                                       placeholder="e.g., spring-boot, exception-handling" 
                                        required>
                             </div>
+                            <div class="form-text text-muted">Use clear, short keywords (preferably lower-case with dashes).</div>
                         </div>
 
                         <div class="mb-4">
@@ -94,6 +95,7 @@
                                     </c:forEach>
                                 </select>
                             </div>
+                            <div class="form-text text-muted">Select which structural category this tag belongs to.</div>
                         </div>
 
                         <input type="hidden" name="status" value="active">
@@ -101,7 +103,10 @@
                         <hr class="mt-4 mb-4" style="color: #e2e8f0;">
 
                         <div class="d-flex justify-content-end gap-3">
-                            <button type="submit" class="btn btn-primary d-flex align-items-center px-4 gap-2">
+                            <a href="${pageContext.request.contextPath}/admin/tags" class="btn btn-outline-secondary px-4 fw-medium">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary d-flex align-items-center px-4 gap-2 fw-medium">
                                 <i class="bi bi-check-circle-fill"></i> Save Tag
                             </button>
                         </div>

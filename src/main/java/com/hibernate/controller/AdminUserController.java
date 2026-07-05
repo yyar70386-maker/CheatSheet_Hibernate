@@ -2,6 +2,7 @@ package com.hibernate.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.hibernate.entity.User;
+import com.hibernate.entity.TagEntity;
 import com.hibernate.service.UserService;
+import com.hibernate.service.TagService; // 🌟 TagService အား Import လုပ်ခြင်း
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminUserController {
 
     private final UserService userService;
+    private final TagService tagService; // 🌟 Tag Service အား Dependency ထည့်သွင်းခြင်း
 
     private boolean isAdmin(User user) {
         return user != null && user.getRole() == 1;
@@ -50,6 +54,22 @@ public class AdminUserController {
         model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / pageSize)));
         
         return "user-list";
+    }
+
+    // 🌟🌟🌟 [NEW HANDLER] Tag Management အား Admin Layout အတွင်း ပေါင်းစပ်ပြသပေးမည့် လမ်းကြောင်းသစ်
+    @GetMapping("/admin/tags")
+    public String adminTagList(HttpSession session, Model model) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (!isAdmin(currentUser)) {
+            return "redirect:/login";
+        }
+        
+        // Tag list ဒေတာဆွဲထုတ်၍ Model ထဲထည့်ခြင်း
+        List<TagEntity> tags = tagService.findAll(); // မင်းဆီက findAll သို့မဟုတ် သက်ဆိုင်ရာ Method သုံးပေးပါ
+        model.addAttribute("taglist", tags);
+        
+        // အုပ်ချုပ်မှုဘောင် Framework အောက်က "admin-tag-list.jsp" (ဖိုင်အသစ်) သို့ ညွှန်းပို့မည်
+        return "admin-tag-list";
     }
 
     @PostMapping("/admin/users/{id}/suspend")
@@ -119,7 +139,6 @@ public class AdminUserController {
         return "redirect:/admin/users";
     }
 
-    // GET handler for legacy delete buttons/links
     @GetMapping("/admin/users/delete")
     public String deleteGet(@RequestParam("id") int id, HttpServletRequest request, HttpSession session, RedirectAttributes redirectAttributes) {
         return deletePost(id, request, session, redirectAttributes);
