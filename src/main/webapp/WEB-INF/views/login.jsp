@@ -171,12 +171,13 @@ to {
 
 		<p class="text-center subtitle">Sign in to continue</p>
 
-		<c:if test="${not empty loginError}">
-			<div class="alert alert-danger text-center">
-				<i class="bi bi-exclamation-triangle-fill"></i> ${loginError}
-			</div>
-		</c:if>
-
+	<c:if test="${not empty error}">
+    <div class="alert alert-danger text-center small fw-bold rounded-3">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> ${error}
+    </div>
+    
+    <c:remove var="error" scope="session" />
+</c:if>
 		<c:if test="${param.success == 'password_changed'}">
 			<div class="alert alert-success">
 				<i class="bi bi-check-circle-fill"></i> Password changed
