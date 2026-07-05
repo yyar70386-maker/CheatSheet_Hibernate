@@ -103,4 +103,13 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
                 .uniqueResult();
         return count != null ? count : 0;
     }
+
+    @Override
+    public List<Object[]> getMonthlyActiveUserCounts(int year) {
+        String hql = "select month(a.createdAt), count(distinct a.user.id) from AuditLogEntity a " +
+                     "where year(a.createdAt) = :year group by month(a.createdAt)";
+        return getSession().createQuery(hql, Object[].class)
+                .setParameter("year", year)
+                .list();
+    }
 }

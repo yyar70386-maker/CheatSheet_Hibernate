@@ -1,5 +1,7 @@
 package com.hibernate.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -7,6 +9,9 @@ import com.hibernate.dto.DashboardSummaryDto;
 import com.hibernate.repository.CommentRepositoryImpl;
 import com.hibernate.repository.UserFollowRepository;
 import com.hibernate.repository.UserRepository;
+
+import com.hibernate.repository.CheatsheetRepository;
+import com.hibernate.repository.AuditLogRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +22,8 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     private final UserRepository userRepository;
     private final UserFollowRepository userFollowRepository;
     private final CheatsheetService cheatsheetService;
+    private final CheatsheetRepository cheatsheetRepository;
+    private final AuditLogRepository auditLogRepository;
     private final ReportService reportService;
     private final AnnouncementService announcementService;
     private final AuditLogService auditLogService;
@@ -54,6 +61,39 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         summary.setLatestUsers(userRepository.findLatest(5));
         summary.setLatestCheatsheets(cheatsheetService.findLatestPublic("", 1, 5));
         summary.setLatestReports(reportService.findLatest(5));
+
+        List<Long> cheatsheetCounts = new java.util.ArrayList<>(java.util.Collections.nCopies(12, 0L));
+        List<Long> activeUserCounts = new java.util.ArrayList<>(java.util.Collections.nCopies(12, 0L));
+
+        int currentYear = java.time.LocalDate.now().getYear();
+
+        List<Object[]> sheetData = cheatsheetRepository.getMonthlyCheatsheetCounts(currentYear);
+        for (Object[] row : sheetData) {
+            Number monthNum = (Number) row[0];
+            Number count = (Number) row[1];
+            if (monthNum != null && count != null) {
+                int idx = monthNum.intValue() - 1;
+                if (idx >= 0 && idx < 12) {
+                    cheatsheetCounts.set(idx, count.longValue());
+                }
+            }
+        }
+
+        List<Object[]> userData = auditLogRepository.getMonthlyActiveUserCounts(currentYear);
+        for (Object[] row : userData) {
+            Number monthNum = (Number) row[0];
+            Number count = (Number) row[1];
+            if (monthNum != null && count != null) {
+                int idx = monthNum.intValue() - 1;
+                if (idx >= 0 && idx < 12) {
+                    activeUserCounts.set(idx, count.longValue());
+                }
+            }
+        }
+
+        summary.setMonthlyCheatsheetCounts(cheatsheetCounts);
+        summary.setMonthlyActiveUserCounts(activeUserCounts);
+
         return summary;
     }
 }

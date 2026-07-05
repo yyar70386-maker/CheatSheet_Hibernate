@@ -62,7 +62,7 @@
                     <h2 class="fw-bold text-dark m-0">Category List</h2>
                     <p class="text-muted m-0 small">Manage your system categories.</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/category/add" class="btn btn-primary px-3 fw-medium">
+                <a href="${pageContext.request.contextPath}/category/add" class="btn px-4 fw-medium text-white shadow-sm" style="background: linear-gradient(135deg, #7209b7, #3f37c9); border: none; border-radius: 8px;">
                     <i class="bi bi-plus-circle me-2"></i>Add New Category
                 </a>
             </div>
@@ -94,7 +94,7 @@
                                                     <a href="${pageContext.request.contextPath}/category/delete/${c.id}" 
                                                        class="btn btn-sm btn-outline-danger rounded-2" 
                                                        onclick="return confirm('Are you sure you want to delete this category?');">
-                                                        <i class="bi bi-trash"></i>
+                                                        <i class="bi bi-trash3-fill"></i>
                                                     </a>
                                                 </td>
                                             </tr>

@@ -238,7 +238,7 @@
                                     <div class="cheatsheet-card">
                                         <div>
                                             <h3 class="fw-bold mb-2 d-flex align-items-center justify-content-between">
-                                                <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline fs-4">
+                                                <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.obfuscatedId}" class="text-dark text-decoration-none hover-underline fs-4">
                                                     ${sheet.title}
                                                 </a>
                                                 

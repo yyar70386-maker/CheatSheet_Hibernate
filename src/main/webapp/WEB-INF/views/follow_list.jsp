@@ -67,7 +67,7 @@
                                     </c:otherwise>
                                 </c:choose>
                                 <div>
-                                    <a href="${pageContext.request.contextPath}/profile/${u.id}" class="text-decoration-none text-dark fw-bold fs-5">
+                                    <a href="${pageContext.request.contextPath}/profile/${u.obfuscatedId}" class="text-decoration-none text-dark fw-bold fs-5">
                                         ${u.username}
                                     </a>
                                     <div class="text-muted">${u.fullName}</div>
@@ -81,7 +81,7 @@
                             </div>
 
                             <div class="d-flex gap-2 align-items-center">
-                                <a href="${pageContext.request.contextPath}/profile/${u.id}" class="btn btn-outline-primary btn-sm">
+                                <a href="${pageContext.request.contextPath}/profile/${u.obfuscatedId}" class="btn btn-outline-primary btn-sm">
                                     View Profile
                                 </a>
                                 <c:if test="${sessionScope.currentUser.id != u.id}">

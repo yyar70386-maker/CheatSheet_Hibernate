@@ -11,7 +11,15 @@
 </head>
 <body class="bg-light">
 <jsp:include page="header.jsp" />
-<main class="container py-4" style="max-width: 980px;">
+
+<div class="app-container">
+    <c:if test="${sessionScope.currentUser.role == 1}">
+        <jsp:include page="sidebar.jsp">
+            <jsp:param name="activePage" value="announcements" />
+        </jsp:include>
+    </c:if>
+
+    <div class="${sessionScope.currentUser.role == 1 ? 'main-content-area' : 'container py-4'}" style="${sessionScope.currentUser.role != 1 ? 'max-width: 980px;' : ''}">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 class="fw-bold mb-1">Announcements</h3>
@@ -71,7 +79,8 @@
             </div>
         </c:otherwise>
     </c:choose>
-</main>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

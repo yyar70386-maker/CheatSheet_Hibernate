@@ -87,6 +87,9 @@ public class CheatsheetEntity {
     @Column(name = "deleted_at")
     private Timestamp deletedAt;
 
+    @Column(name = "image_path", length = 255)
+    private String imagePath;
+
     // 🌟 [FIXED] မင်းသူငယ်ချင်းရေးထားသော ပတ်သက်ဆက်နွယ်မှုအပိုင်းများ ပြန်လည်ဖြည့်စွက်ပေးထားသည်
     @OneToMany(mappedBy = "cheatsheet", fetch = FetchType.LAZY)
     @BatchSize(size = 20)
@@ -98,5 +101,10 @@ public class CheatsheetEntity {
             return this.sharedList.size();
         }
         return 0;
+    }
+
+    @Transient
+    public String getObfuscatedId() {
+        return com.hibernate.util.IdObfuscator.encode(this.id);
     }
 }

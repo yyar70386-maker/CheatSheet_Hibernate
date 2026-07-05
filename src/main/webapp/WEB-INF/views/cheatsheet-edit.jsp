@@ -149,7 +149,8 @@ textarea{
     <form:form
         modelAttribute="cheatsheet"
         action="${pageContext.request.contextPath}/cheatsheet/update"
-        method="post">
+        method="post"
+        enctype="multipart/form-data">
 
         <form:hidden path="id"/>
 
@@ -166,6 +167,16 @@ textarea{
         <div class="form-group">
             <label>Content</label>
             <form:textarea path="content" cssClass="form-control content-area"/>
+        </div>
+
+        <div class="form-group">
+            <label>Cover Photo</label>
+            <c:if test="${not empty cheatsheet.imagePath}">
+                <div class="mb-2">
+                    <img src="${pageContext.request.contextPath}${cheatsheet.imagePath}" style="max-height: 150px; border-radius: 8px;" alt="Current Cover"/>
+                </div>
+            </c:if>
+            <input type="file" name="imageFile" class="form-control" accept="image/*" />
         </div>
 
         <div class="form-group">

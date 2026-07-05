@@ -41,12 +41,6 @@
                     <p class="text-muted m-0 small">Review, approve, reject, ban, or delete user-submitted CheatSheets.</p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
-                    <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/admin/cheatsheets/reports/weekly">
-                        <i class="bi bi-filetype-pdf me-1"></i> Weekly Report
-                    </a>
-                    <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/admin/cheatsheets/reports/monthly">
-                        <i class="bi bi-filetype-pdf me-1"></i> Monthly Report
-                    </a>
                     <a class="btn btn-brand-primary" href="${pageContext.request.contextPath}/cheatsheet/add">
                         <i class="bi bi-plus-circle me-1"></i> Create CheatSheet
                     </a>
@@ -130,13 +124,27 @@
                                             <tr>
                                                 <td class="ps-4 fw-bold text-secondary">${((currentPage - 1) * 10) + statusLoop.index + 1}</td>
                                                 <td>
-                                                    <div class="fw-semibold text-dark">
-                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${s.id}" class="text-decoration-none text-dark hover-brand">
-                                                            <c:out value="${s.title}" />
-                                                        </a>
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <c:choose>
+                                                            <c:when test="${not empty s.imagePath}">
+                                                                <img src="${pageContext.request.contextPath}${s.imagePath}" class="rounded shadow-sm border" style="width: 50px; height: 50px; object-fit: cover;" alt="Cover" />
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <div class="rounded bg-light d-flex align-items-center justify-content-center text-muted border shadow-sm" style="width: 50px; height: 50px;">
+                                                                    <i class="bi bi-image fs-4"></i>
+                                                                </div>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                        <div>
+                                                            <div class="fw-semibold text-dark">
+                                                                <a href="${pageContext.request.contextPath}/cheatsheet/detail/${s.obfuscatedId}" class="text-decoration-none text-dark hover-brand">
+                                                                    <c:out value="${s.title}" />
+                                                                </a>
+                                                            </div>
+                                                            <div class="text-muted small">Category: <span class="badge bg-secondary-subtle text-secondary">${s.category.name}</span></div>
+                                                            <div class="text-muted small">Visibility: <span class="fw-medium">${s.visibility}</span></div>
+                                                        </div>
                                                     </div>
-                                                    <div class="text-muted small">Category: <span class="badge bg-secondary-subtle text-secondary">${s.category.name}</span></div>
-                                                    <div class="text-muted small">Visibility: <span class="fw-medium">${s.visibility}</span></div>
                                                 </td>
                                                 <td>
                                                     <div class="fw-medium text-dark">${s.author.username}</div>
@@ -201,7 +209,7 @@
                                                             <c:otherwise>
                                                                 <form method="post" action="${pageContext.request.contextPath}/admin/cheatsheets/${s.id}/delete" class="d-inline" onsubmit="return confirm('Delete CheatSheet permanently?');">
                                                                     <button type="submit" class="btn btn-sm btn-outline-danger rounded-2 px-3 py-1">
-                                                                        <i class="bi bi-trash"></i>
+                                                                        <i class="bi bi-trash3-fill"></i>
                                                                     </button>
                                                                 </form>
                                                             </c:otherwise>

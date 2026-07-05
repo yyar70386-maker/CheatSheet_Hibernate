@@ -43,5 +43,5 @@ public interface CheatsheetService {
     NotificationDto rejectCheatsheet(Integer id, User admin, String ipAddress);
     long countBanned();
     long countPublished();
-    List<CheatSheetReportEntity> getCheatsheetReportData();
+    List<CheatSheetReportEntity> getCheatsheetReportData(String startDate, String endDate);
 }

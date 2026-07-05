@@ -318,39 +318,63 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
 
     @SuppressWarnings({ "unchecked", "deprecation" })
     @Override
-    public List<CheatSheetReportEntity> findCheatsheetReportData() {
-        return getSession()
-                .createNativeQuery(
-                    "SELECT c.id, c.title, u.username, c.created_at, " +
-                    "(SELECT COUNT(*) FROM sheet_reactions sr WHERE sr.cheatsheet_id = c.id) AS reaction_count " +
-                    "FROM cheatsheets c " +
-                    "LEFT JOIN users u ON c.author_id = u.id " +
-                    "WHERE c.deleted_at IS NULL " +
-                    "ORDER BY c.created_at DESC")
+    public List<CheatSheetReportEntity> findCheatsheetReportData(String startDate, String endDate) {
+        String sql = "SELECT c.id, c.title, u.username, c.created_at, " +
+                     "(SELECT COUNT(*) FROM sheet_reactions sr WHERE sr.cheatsheet_id = c.id) AS reaction_count " +
+                     "FROM cheatsheets c " +
+                     "LEFT JOIN users u ON c.author_id = u.id " +
+                     "WHERE c.deleted_at IS NULL ";
+        
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            sql += "AND c.created_at >= :startDate ";
+        }
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            sql += "AND c.created_at <= :endDate ";
+        }
+        
+        sql += "ORDER BY c.created_at DESC";
+        
+        var query = getSession().createNativeQuery(sql)
                 .addScalar("id", IntegerType.INSTANCE)
                 .addScalar("title", StringType.INSTANCE)
                 .addScalar("username", StringType.INSTANCE)
                 .addScalar("created_at", TimestampType.INSTANCE)
-                .addScalar("reaction_count", LongType.INSTANCE)
-                .setResultTransformer(new ResultTransformer() {
-                    @Override
-                    public Object transformTuple(Object[] tuple, String[] aliases) {
-                        CheatSheetReportEntity report = new CheatSheetReportEntity();
-                        report.setNo(((Number) tuple[0]).intValue());
-                        report.setCheatsheetName((String) tuple[1]);
-                        report.setCreatedUser((String) tuple[2]);
-                        java.sql.Timestamp ts = (java.sql.Timestamp) tuple[3];
-                        report.setCreatedDate(ts != null ? ts.toString() : "");
-                        Number rc = (Number) tuple[4];
-                        report.setReactionCount(rc != null ? rc.longValue() : 0L);
-                        return report;
-                    }
+                .addScalar("reaction_count", LongType.INSTANCE);
+                
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            query.setParameter("startDate", java.sql.Timestamp.valueOf(startDate + " 00:00:00"));
+        }
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            query.setParameter("endDate", java.sql.Timestamp.valueOf(endDate + " 23:59:59"));
+        }
 
-                    @Override
-                    public List transformList(List collection) {
-                        return collection;
-                    }
-                })
+        return query.setResultTransformer(new ResultTransformer() {
+            @Override
+            public Object transformTuple(Object[] tuple, String[] aliases) {
+                CheatSheetReportEntity report = new CheatSheetReportEntity();
+                report.setNo(((Number) tuple[0]).intValue());
+                report.setCheatsheetName((String) tuple[1]);
+                report.setCreatedUser((String) tuple[2]);
+                java.sql.Timestamp ts = (java.sql.Timestamp) tuple[3];
+                report.setCreatedDate(ts != null ? ts.toString() : "");
+                Number rc = (Number) tuple[4];
+                report.setReactionCount(rc != null ? rc.longValue() : 0L);
+                return report;
+            }
+
+            @Override
+            public List transformList(List collection) {
+                return collection;
+            }
+        }).list();
+    }
+
+    @Override
+    public List<Object[]> getMonthlyCheatsheetCounts(int year) {
+        String hql = "select month(c.createdAt), count(c) from CheatsheetEntity c " +
+                     "where year(c.createdAt) = :year group by month(c.createdAt)";
+        return getSession().createQuery(hql, Object[].class)
+                .setParameter("year", year)
                 .list();
     }
 }

@@ -4,7 +4,7 @@
 <%-- ADMIN SIDEBAR --%>
 <c:if test="${sessionScope.currentUser.role == 1}">
     <div class="d-flex flex-column flex-shrink-0 p-3 bg-white admin-sidebar"
-         style="box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05); height: 100%; border-right: 1px solid #e2e8f0; position: sticky; top: 0;">
+         style="box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05); height: 100%; border-right: 1px solid #e2e8f0; position: sticky; top: 0; overflow-x: hidden; overflow-y: auto;">
          
         <a href="${pageContext.request.contextPath}/admin/dashboard" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
             <i class="bi bi-shield-lock-fill me-2 fs-4" style="color: #ff3366;"></i>

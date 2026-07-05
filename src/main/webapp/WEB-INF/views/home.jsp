@@ -371,7 +371,7 @@ a:hover { color: #cc0044; }
                                     <a class="tag-chip" href="${pageContext.request.contextPath}/${not empty sessionScope.currentUser ? 'cheatsheet/add' : 'login'}">
                                         <i class="bi bi-plus-lg"></i> Create
                                     </a>
-                                    <a class="tag-chip" href="${pageContext.request.contextPath}/announcements"><i class="bi bi-bell-fill"></i> Updates</a>
+                                    <a class="tag-chip" href="${pageContext.request.contextPath}/announcements"><i class="bi bi-bell-fill"></i> Announcements</a>
                                     <a class="tag-chip" href="${pageContext.request.contextPath}/profile"><i class="bi bi-person-fill"></i> Profile</a>
                                 </div>
                             </div>
@@ -417,7 +417,7 @@ a:hover { color: #cc0044; }
                         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                             <c:forEach items="${categorylist}" var="c">
                                 <div class="col">
-                                    <a href="${pageContext.request.contextPath}/cheatsheet/category/${c.id}" class="glass-card d-block p-4 text-center text-decoration-none h-100">
+                                    <a href="${pageContext.request.contextPath}/cheatsheet/category/${c.obfuscatedId}" class="glass-card d-block p-4 text-center text-decoration-none h-100">
                                         <div class="icon-box-glass"><i class="bi bi-grid-1x2-fill"></i></div>
                                         <h5 class="fw-bold text-dark mb-0">${c.name}</h5>
                                     </a>
@@ -450,7 +450,7 @@ a:hover { color: #cc0044; }
                                             </div>
                                             
                                             <h3 class="h5 fw-bold mb-2">
-                                                <a href="${pageContext.request.contextPath}/cheatsheet/detail/${share.cheatsheet.id}" class="text-dark hover-link text-decoration-none">
+                                                <a href="${pageContext.request.contextPath}/cheatsheet/detail/${share.cheatsheet.obfuscatedId}" class="text-dark hover-link text-decoration-none">
                                                     ${share.cheatsheet.title}
                                                 </a>
                                             </h3>
@@ -461,7 +461,7 @@ a:hover { color: #cc0044; }
                                                     <span class="tag-chip"><i class="bi bi-folder-fill text-secondary"></i> ${share.cheatsheet.category.name}</span>
                                                     <span class="tag-chip"><i class="bi bi-eye-fill text-secondary"></i> ${share.cheatsheet.viewCount != null ? share.cheatsheet.viewCount : 0}</span>
                                                 </div>
-                                                <a class="btn btn-outline-info btn-sm px-4 fw-bold" href="${pageContext.request.contextPath}/cheatsheet/detail/${share.cheatsheet.id}">View Post</a>
+                                                <a class="btn btn-outline-info btn-sm px-4 fw-bold" href="${pageContext.request.contextPath}/cheatsheet/detail/${share.cheatsheet.obfuscatedId}">View Post</a>
                                             </div>
                                         </div>
                                     </article>
@@ -483,7 +483,7 @@ a:hover { color: #cc0044; }
                                             <div>
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                                     <h5 class="fw-bold m-0">
-                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline fs-5">
+                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.obfuscatedId}" class="text-dark text-decoration-none hover-underline fs-5">
                                                             ${sheet.title}
                                                         </a>
                                                     </h5>
@@ -572,7 +572,7 @@ a:hover { color: #cc0044; }
                                             <div>
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                                     <h5 class="fw-bold m-0">
-                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline fs-5">
+                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.obfuscatedId}" class="text-dark text-decoration-none hover-underline fs-5">
                                                             ${sheet.title}
                                                         </a>
                                                     </h5>

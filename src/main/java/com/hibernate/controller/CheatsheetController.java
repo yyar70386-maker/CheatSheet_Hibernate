@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.TagEntity;
@@ -71,6 +72,7 @@ public class CheatsheetController {
     public ModelAndView save(
             @ModelAttribute("cheatsheet") CheatsheetEntity cheatsheet,
             @RequestParam(value = "tagIds", required = false) List<Integer> tagIds,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
             HttpServletRequest request,
             HttpSession session) {
 
@@ -86,6 +88,27 @@ public class CheatsheetController {
             cheatsheet.setTags(tags);
         }
 
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                String uploadDir = "C:/my_project_uploads/";
+                java.io.File dir = new java.io.File(uploadDir);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                String orgName = imageFile.getOriginalFilename();
+                String ext = "";
+                if (orgName != null && orgName.contains(".")) {
+                    ext = orgName.substring(orgName.lastIndexOf("."));
+                }
+                String newName = java.util.UUID.randomUUID().toString() + ext;
+                java.io.File dest = new java.io.File(dir, newName);
+                imageFile.transferTo(dest);
+                cheatsheet.setImagePath("/uploads/" + newName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         Integer id = cheatsheetService.save(cheatsheet);
         auditLogService.log(currentUser, "Create Cheatsheet", "Cheatsheet", id,
                 "Created cheatsheet: " + cheatsheet.getTitle(), request.getRemoteAddr());
@@ -99,7 +122,15 @@ public class CheatsheetController {
     }
 
     @GetMapping("/edit/{id}")
-    public ModelAndView edit(@PathVariable Integer id) {
+    public ModelAndView edit(@PathVariable("id") String encodedId) {
+        Integer id = com.hibernate.util.IdObfuscator.decode(encodedId);
+        if (id == null) {
+            try {
+                id = Integer.parseInt(encodedId);
+            } catch (NumberFormatException e) {
+                return new ModelAndView("redirect:/cheatsheet/list");
+            }
+        }
         CheatsheetEntity cheatsheet = cheatsheetService.findById(id);
         if (cheatsheet == null) {
             return new ModelAndView("redirect:/cheatsheet/list");
@@ -118,6 +149,7 @@ public class CheatsheetController {
     public ModelAndView update(
             @ModelAttribute("cheatsheet") CheatsheetEntity cheatsheet,
             @RequestParam(value = "tagIds", required = false) List<Integer> tagIds,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
             HttpServletRequest request,
             HttpSession session) {
 
@@ -126,6 +158,28 @@ public class CheatsheetController {
             cheatsheet.setAuthor(existingSheet.getAuthor());
             if (cheatsheet.getViewCount() == null) {
                 cheatsheet.setViewCount(existingSheet.getViewCount());
+            }
+            if (imageFile != null && !imageFile.isEmpty()) {
+                try {
+                    String uploadDir = "C:/my_project_uploads/";
+                    java.io.File dir = new java.io.File(uploadDir);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    String orgName = imageFile.getOriginalFilename();
+                    String ext = "";
+                    if (orgName != null && orgName.contains(".")) {
+                        ext = orgName.substring(orgName.lastIndexOf("."));
+                    }
+                    String newName = java.util.UUID.randomUUID().toString() + ext;
+                    java.io.File dest = new java.io.File(dir, newName);
+                    imageFile.transferTo(dest);
+                    cheatsheet.setImagePath("/uploads/" + newName);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                cheatsheet.setImagePath(existingSheet.getImagePath());
             }
         }
 
@@ -140,7 +194,15 @@ public class CheatsheetController {
     }
 
     @GetMapping("/delete/{id}")
-    public ModelAndView delete(@PathVariable Integer id, HttpServletRequest request, HttpSession session) {
+    public ModelAndView delete(@PathVariable("id") String encodedId, HttpServletRequest request, HttpSession session) {
+        Integer id = com.hibernate.util.IdObfuscator.decode(encodedId);
+        if (id == null) {
+            try {
+                id = Integer.parseInt(encodedId);
+            } catch (NumberFormatException e) {
+                return new ModelAndView("redirect:/cheatsheet/list");
+            }
+        }
         cheatsheetService.delete(id);
         auditLogService.log((User) session.getAttribute("currentUser"), "Delete Cheatsheet", "Cheatsheet", id,
                 "Cheatsheet deactivated.", request.getRemoteAddr());
@@ -167,10 +229,19 @@ public class CheatsheetController {
 
     @GetMapping("/category/{categoryId}")
     public ModelAndView browseByCategory(
-            @PathVariable("categoryId") Integer categoryId, 
+            @PathVariable("categoryId") String encodedCategoryId, 
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "filter", defaultValue = "ALL") String filter, 
             HttpSession session) {
+            
+        Integer categoryId = com.hibernate.util.IdObfuscator.decode(encodedCategoryId);
+        if (categoryId == null) {
+            try {
+                categoryId = Integer.parseInt(encodedCategoryId);
+            } catch (NumberFormatException e) {
+                return new ModelAndView("redirect:/home");
+            }
+        }
             
         int pageSize = 3;
         User currentUser = (User) session.getAttribute("currentUser");
@@ -191,7 +262,7 @@ public class CheatsheetController {
         mv.addObject("taglist", categoryTags);
         mv.addObject("currentPage", page); 
         mv.addObject("totalPages", totalPages);
-        mv.addObject("categoryId", categoryId); 
+        mv.addObject("categoryId", encodedCategoryId); 
         mv.addObject("categoryName", categoryName);
         mv.addObject("totalCount", totalCheatsheets); 
         mv.addObject("currentFilter", filter.toUpperCase()); 
@@ -201,7 +272,15 @@ public class CheatsheetController {
 
     // ==================== 🌟 Cheatsheet Detail View (Conflict ရှင်းပြီးသား ဗားရှင်း) ====================
     @GetMapping("/detail/{id}")
-    public ModelAndView viewDetail(@PathVariable("id") Integer id, HttpSession session) {
+    public ModelAndView viewDetail(@PathVariable("id") String encodedId, HttpSession session) {
+        Integer id = com.hibernate.util.IdObfuscator.decode(encodedId);
+        if (id == null) {
+            try {
+                id = Integer.parseInt(encodedId);
+            } catch (NumberFormatException e) {
+                return new ModelAndView("redirect:/home");
+            }
+        }
         CheatsheetEntity sheet = cheatsheetService.findById(id);
         if (sheet == null || !"active".equals(sheet.getStatus())) {
             return new ModelAndView("redirect:/error/404"); 
@@ -247,10 +326,19 @@ public class CheatsheetController {
 
     @GetMapping("/tag/{tagId}")
     public ModelAndView browseByTag(
-            @PathVariable("tagId") Integer tagId,
+            @PathVariable("tagId") String encodedTagId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "filter", defaultValue = "ALL") String filter,
             HttpSession session) {
+            
+        Integer tagId = com.hibernate.util.IdObfuscator.decode(encodedTagId);
+        if (tagId == null) {
+            try {
+                tagId = Integer.parseInt(encodedTagId);
+            } catch (NumberFormatException e) {
+                return new ModelAndView("redirect:/home");
+            }
+        }
             
         int pageSize = 3; 
         User currentUser = (User) session.getAttribute("currentUser");
@@ -271,7 +359,7 @@ public class CheatsheetController {
         mv.addObject("totalCount", totalCheatsheets);
         mv.addObject("currentPage", page);
         mv.addObject("totalPages", totalPages);
-        mv.addObject("tagId", tagId);
+        mv.addObject("tagId", encodedTagId);
         mv.addObject("currentFilter", filter.toUpperCase());
         
         return mv;
@@ -279,8 +367,17 @@ public class CheatsheetController {
     
     // ==================== 🌟 [.JASPER HARD-FIXED] View PDF Report System ====================
     @GetMapping("/view-pdf/{id}")
-    public void viewPdf(@PathVariable("id") Integer id, HttpServletResponse response, HttpSession session) {
+    public void viewPdf(@PathVariable("id") String encodedId, HttpServletResponse response, HttpSession session) {
         try {
+            Integer id = com.hibernate.util.IdObfuscator.decode(encodedId);
+            if (id == null) {
+                try {
+                    id = Integer.parseInt(encodedId);
+                } catch (NumberFormatException e) {
+                    response.sendRedirect(response.encodeRedirectURL("/cheatsheet/list"));
+                    return;
+                }
+            }
             CheatsheetEntity cheatsheet = cheatsheetService.findById(id);
             if (cheatsheet == null) {
                 response.sendRedirect(response.encodeRedirectURL("/cheatsheet/list"));

@@ -31,6 +31,8 @@ public class DashboardSummaryDto {
     private long bannedCheatsheets;
     private long bannedComments;
     private List<AuditLogEntity> recentActivities;
+    private List<Long> monthlyCheatsheetCounts;
+    private List<Long> monthlyActiveUserCounts;
     private List<User> latestUsers;
     private List<CheatsheetEntity> latestCheatsheets;
     private List<ReportEntity> latestReports;

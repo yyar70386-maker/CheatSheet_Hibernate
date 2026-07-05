@@ -31,13 +31,13 @@ body{
 }
 
 .page-title{
-    color:#1976d2;
+    color:#ff3366;
     font-size:28px;
     font-weight:bold;
 }
 
 .btn-add{
-    background:#1976d2;
+    background:#ff3366;
     color:white;
     padding:12px 20px;
     text-decoration:none;
@@ -46,7 +46,7 @@ body{
 }
 
 .btn-add:hover{
-    background:#0d47a1;
+    background:#e62e5c;
 }
 
 .table{
@@ -59,7 +59,7 @@ body{
 }
 
 .table th{
-    background:#1976d2;
+    background:#ff3366;
     color:white;
     padding:16px;
     text-align:left;
@@ -67,7 +67,7 @@ body{
 
 .table td{
     padding:16px;
-    border-bottom:1px solid #e3f2fd;
+    border-bottom:1px solid #ffeef2;
     vertical-align: middle; /* ဒေတာများ အလယ်ကွက်တိ ဖြစ်စေရန် */
 }
 
@@ -91,7 +91,7 @@ body{
 
 /* 🌟 Action Icon Buttons Styles */
 .btn-icon-edit {
-    color: #2196f3;
+    color: #ff3366;
     font-size: 20px;
     margin-right: 12px;
     transition: color 0.2s ease;
@@ -99,7 +99,7 @@ body{
 }
 
 .btn-icon-edit:hover {
-    color: #0b7dda;
+    color: #e62e5c;
 }
 
 .btn-icon-delete {
@@ -158,7 +158,7 @@ body{
                 <tr>
                     <td>${c.id}</td>
                     <td>
-                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${c.id}" style="color:#1976d2; text-decoration:none; font-weight:bold;">
+                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${c.obfuscatedId}" style="color:#ff3366; text-decoration:none; font-weight:bold;">
                             ${c.title}
                         </a>
                     </td>
@@ -185,14 +185,14 @@ body{
                     <td>
                         <!-- 🌟 စာသားအစား Pencil Icon ပြောင်းလဲခြင်း -->
                         <a class="btn-icon-edit" 
-                           href="${pageContext.request.contextPath}/cheatsheet/edit/${c.id}" 
+                           href="${pageContext.request.contextPath}/cheatsheet/edit/${c.obfuscatedId}" 
                            title="Edit Cheatsheet">
                             <i class="bi bi-pencil-square"></i>
                         </a>
 
                         <!-- 🌟 စာသားအစား Trash Icon ပြောင်းလဲခြင်း -->
                         <a class="btn-icon-delete"
-						   href="${pageContext.request.contextPath}/cheatsheet/delete/${c.id}"
+						   href="${pageContext.request.contextPath}/cheatsheet/delete/${c.obfuscatedId}"
 						   onclick="return confirm('Are you sure you want to delete this cheat sheet?');"
                            title="Delete Cheatsheet">
 						    <i class="bi bi-trash3-fill"></i>
