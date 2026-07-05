@@ -1,5 +1,6 @@
 package com.hibernate.controller;
 
+import com.hibernate.entity.SharedCheatsheetEntity;
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.User;
 import com.hibernate.dto.NotificationDto;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -128,29 +130,81 @@ public class AuthController {
         session.invalidate(); 
         return "redirect:/"; 
     }
+    
+ // 🌟 ၁။ စာမျက်နှာလှန်သည့် ခလုတ်နှိပ်ပါက နောက်ကွယ်မှ ဒေတာကို Session ထဲ သိမ်းပေးမည့် POST Mapping
+    @PostMapping("/home")
+    public String handleHomePagination(
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "sharedPage", required = false) Integer sharedPage,
+            @RequestParam(value = "q", required = false) String query,
+            HttpSession session) {
+        
+        if (page != null) session.setAttribute("currentPageSession", page);
+        if (sharedPage != null) session.setAttribute("sharedPageSession", sharedPage);
+        if (query != null) session.setAttribute("searchQuerySession", query);
+        
+        return "redirect:/home"; // 👈 URL အား အမြဲ Clean ဖြစ်နေစေရန် Redirect ပြန်လုပ်ခြင်း
+    }
    
     @Transactional
     @GetMapping("/home")
     public String showHomeDashboard(
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "q", defaultValue = "") String query,
+//            @RequestParam(value = "page", defaultValue = "1") int page,
+//            @RequestParam(value = "sharedPage", defaultValue = "1") int sharedPage,
+//            @RequestParam(value = "q", defaultValue = "") String query,
             HttpSession session,
             Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser != null) {
             model.addAttribute("currentUser", currentUser);
         }
+        
+        int page = (session.getAttribute("currentPageSession") != null) ? (int) session.getAttribute("currentPageSession") : 1;
+        int sharedPage = (session.getAttribute("sharedPageSession") != null) ? (int) session.getAttribute("sharedPageSession") : 1;
+        String query = (session.getAttribute("searchQuerySession") != null) ? (String) session.getAttribute("searchQuerySession") : "";
+        
         model.addAttribute("categorylist", categoryService.findAllActive());
         model.addAttribute("announcements", announcementService.findLatest(3));
+        
         model.addAttribute("cheatsheetlist", cheatsheetService.findLatestPublic(query, page, 6));
         model.addAttribute("searchQuery", query);
         model.addAttribute("currentPage", page);
-        
-        
-        model.addAttribute("sharedPosts", sharedCheatsheetRepository.findAllSharedWithDetails());
+      
         
         long total = cheatsheetService.countLatestPublic(query);
         model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / 6)));
+        
+        
+     // ===== 🌟 Shared Sheets Pagination (တစ်မျက်နှာလျှင် ၄ ခု အတိအကျ ကန့်သတ်ခြင်း) 🌟 =====
+        List<SharedCheatsheetEntity> allShared = sharedCheatsheetRepository.findAllSharedWithDetails();
+        int totalSharedCount = allShared.size();
+        int pageSize = 4; // တစ်စာမျက်နှာမှာ ပြသမည့် Post အရေအတွက်ကို ၄ ခုအဖြစ် သတ်မှတ်ခြင်း
+        
+        // ပို့စ်စုစုပေါင်းပေါ် မူတည်ပြီး စာမျက်နှာအရေအတွက်ကို Dynamic တွက်ချက်ခြင်း
+        int sharedTotalPages = (int) Math.ceil((double) totalSharedCount / pageSize);
+        if (sharedTotalPages == 0) {
+            sharedTotalPages = 1;
+        }
+        
+        // စာမျက်နှာ Bounds အတွက် Error မတက်အောင် Safety Check လုပ်ခြင်း
+        if (sharedPage < 1) sharedPage = 1;
+        if (sharedPage > sharedTotalPages) sharedPage = sharedTotalPages;
+        
+        // လက်ရှိ စာမျက်နှာအလိုက် Data ဖြတ်ထုတ်ရန် Start နှင့် End Index ကို တွက်ချက်ခြင်း
+        int fromIndex = (sharedPage - 1) * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, totalSharedCount);
+        
+        List<SharedCheatsheetEntity> paginatedShared = new ArrayList<>();
+        if (fromIndex < totalSharedCount) {
+            paginatedShared = allShared.subList(fromIndex, toIndex);
+        }
+        
+        
+        
+        
+        model.addAttribute("sharedPosts", paginatedShared); 
+        model.addAttribute("sharedCurrentPage", sharedPage);
+        model.addAttribute("sharedTotalPages", sharedTotalPages);
         
         model.addAttribute("totalSheets", cheatsheetService.getTotalSheetsCount());
         model.addAttribute("totalTags", tagService.getTotalTagsCount());

@@ -427,61 +427,7 @@
                             </div>
                         </div>
                     </c:if>
-						
-						
-						
-				<%-- 🌟 Shared Cheat Sheets Section 🌟 --%>
-<c:if test="${not empty sharedPosts}">
-    <div class="mb-5">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <div>
-                <h2 class="section-title h4 mb-1">Shared Cheat Sheets</h2>
-                <div class="text-muted small">Posts shared by the community.</div>
-            </div>
-        </div>
-        
-        <div class="d-grid gap-3">
-            <c:forEach items="${sharedPosts}" var="share">
-                <article class="sheet-card d-flex border-info">
-                    <div class="sheet-ribbon p-3 d-flex flex-lg-column align-items-center justify-content-center gap-1 bg-info bg-opacity-10 border-info">
-                        <div class="sheet-pages"><i class="bi bi-share-fill text-info"></i></div>
-                    </div>
-                    <div class="p-3 p-lg-4 flex-grow-1">
-                        <div class="mb-3 text-muted small bg-light p-2 rounded d-inline-block">
-                            <i class="bi bi-arrow-return-right text-info"></i>
-                            <strong class="text-dark"><c:out value="${share.user.fullName != null ? share.user.fullName : share.user.username}" /></strong> shared 
-                            <strong><c:out value="${share.cheatsheet.author.fullName != null ? share.cheatsheet.author.fullName : share.cheatsheet.author.username}" /></strong>'s post
-                        </div>
-                        
-                        <h3 class="h5 fw-bold mb-2">
-                            <a href="${pageContext.request.contextPath}/cheatsheet/detail/${share.cheatsheet.id}" class="text-dark hover-link">
-                                ${share.cheatsheet.title}
-                            </a>
-                        </h3>
-                        <p class="text-secondary small mb-3">${share.cheatsheet.description}</p>
-
-                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top">
-                            <div class="d-flex flex-wrap gap-1">
-                                <span class="tag-chip"><i class="bi bi-folder-fill text-secondary"></i> ${share.cheatsheet.category.name}</span>
-                                <span class="tag-chip"><i class="bi bi-eye-fill text-secondary"></i> ${share.cheatsheet.viewCount != null ? share.cheatsheet.viewCount : 0}</span>
-                            </div>
-                            <a class="btn btn-outline-info btn-sm px-4 fw-bold" href="${pageContext.request.contextPath}/cheatsheet/detail/${share.cheatsheet.id}">View Post</a>
-                        </div>
-                    </div>
-                </article>
-            </c:forEach>
-        </div>
-    </div>
-</c:if>
-						
-						
-						
-						
-						
-						
-						
-						
-						
+					
 						
                     <%-- Latest Public Cheat Sheets Sub Grid Block --%>
                     <div class="d-flex align-items-center justify-content-between mb-4">
@@ -491,7 +437,7 @@
                         </div>
                         <span class="tag-chip bg-white fw-semibold">Page ${currentPage} of ${totalPages}</span>
                     </div>
-
+                    
                     <c:choose>
                         <c:when test="${empty cheatsheetlist}">
                             <div class="empty-panel text-center p-5">
@@ -544,6 +490,9 @@
                                     </article>
                                 </c:forEach>
                             </div>
+                            
+                            
+                            	
 
                             <%-- Pagination logic blocks --%>
                             <c:if test="${totalPages > 1}">
@@ -567,13 +516,114 @@
                     </c:choose>
                 </div>
             </div>
+                            
+				<%-- 🌟 Shared Cheat Sheets Section (Pagination နဲ့ Empty Check ပါဝင်သည်) 🌟 --%>
+<div class="mb-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="section-title h4 mb-1">Shared Cheat Sheets</h2>
+            <div class="text-muted small">Posts shared by the community.</div>
+        </div>
+        <!-- Shared စာမျက်နှာအညွှန်း (Page Indicator) -->
+        <span class="tag-chip bg-white fw-semibold">Page ${sharedCurrentPage} of ${sharedTotalPages}</span>
+    </div>
+    
+    <c:choose>
+        <c:when test="${empty sharedPosts}">
+            <!-- Shared Post မရှိပါက ပြသမည့်နေရာ (Empty State) -->
+            <div class="empty-panel text-center p-5">
+                <i class="bi bi-share display-5 d-block mb-3 text-secondary"></i>
+                <div class="fw-bold">No shared cheat sheets found</div>
+                <div class="text-muted small">Community shares will show up here.</div>
+            </div>
+        </c:when>
+        
+        <c:otherwise>
+            <!-- Shared Cards များပြသရန် Grid Layout -->
+            <div class="d-grid gap-3">
+                <c:forEach items="${sharedPosts}" var="share">
+                    <article class="sheet-card d-flex border-info">
+                        <div class="sheet-ribbon p-3 d-flex flex-lg-column align-items-center justify-content-center gap-1 bg-info bg-opacity-10 border-info">
+    <!-- Shared Sheets ရဲ့ ရောက်ရှိနေတဲ့ စာမျက်နှာနံပါတ်ကို Dynamic ပြသပေးမည့်နေရာ -->
+    <div class="sheet-pages fw-bold text-info h3 mb-0">${sharedCurrentPage}</div>
+    <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Page</div>
+</div>
+                        <div class="p-3 p-lg-4 flex-grow-1">
+                            <div class="mb-3 text-muted small bg-light p-2 rounded d-inline-block">
+                                <i class="bi bi-arrow-return-right text-info"></i>
+                                <strong class="text-dark">
+                                    <c:out value="${share.user.fullName != null ? share.user.fullName : share.user.username}" />
+                                </strong> shared 
+                                <strong>
+                                    <c:out value="${share.cheatsheet.author.fullName != null ? share.cheatsheet.author.fullName : share.cheatsheet.author.username}" />
+                                </strong>'s post
+                            </div>
+                            
+                            <h3 class="h5 fw-bold mb-2">
+                                <a href="${pageContext.request.contextPath}/cheatsheet/detail/${share.cheatsheet.id}" class="text-dark hover-link">
+                                    ${share.cheatsheet.title}
+                                </a>
+                            </h3>
+                            <p class="text-secondary small mb-3">${share.cheatsheet.description}</p>
 
-            <%-- 🧩 Footer Component Include inside Content Area --%>
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top">
+                                <div class="d-flex flex-wrap gap-1">
+                                    <span class="tag-chip"><i class="bi bi-folder-fill text-secondary"></i> ${share.cheatsheet.category.name}</span>
+                                    <span class="tag-chip"><i class="bi bi-eye-fill text-secondary"></i> ${share.cheatsheet.viewCount != null ? share.cheatsheet.viewCount : 0}</span>
+                                </div>
+                                <a class="btn btn-outline-info btn-sm px-4 fw-bold" href="${pageContext.request.contextPath}/cheatsheet/detail/${share.cheatsheet.id}">View Post</a>
+                            </div>
+                        </div>
+                    </article>
+                </c:forEach>
+            </div>
+            
+<%-- Shared Pagination logic block --%>
+<c:if test="${sharedTotalPages > 1}">
+    <nav class="mt-4" aria-label="Shared cheat sheet pagination">
+        <ul class="pagination justify-content-center flex-wrap">
+            <li class="page-item ${sharedCurrentPage <= 1 ? 'disabled' : ''}">
+                <a class="page-link" href="javascript:void(0);" onclick="submitPage(null, ${sharedCurrentPage - 1})">Previous</a>
+            </li>
+            
+            <c:forEach begin="1" end="${sharedTotalPages}" var="p">
+                <li class="page-item ${p == sharedCurrentPage ? 'active' : ''}">
+                    <a class="page-link" href="javascript:void(0);" onclick="submitPage(null, ${p})">${p}</a>
+                </li>
+            </c:forEach>
+            
+            <li class="page-item ${sharedCurrentPage >= sharedTotalPages ? 'disabled' : ''}">
+                <a class="page-link" href="javascript:void(0);" onclick="submitPage(null, ${sharedCurrentPage + 1})">Next</a>
+            </li>
+        </ul>
+    </nav>
+</c:if>
+        </c:otherwise>
+    </c:choose>
+</div>
+					    
+            <!--  🧩 Footer Component Include inside Content Area  -->
             <jsp:include page="footer.jsp" />
 
         </div> <%-- /main-content-area --%>
     </div> <%-- /app-container --%>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <form id="cleanPaginationForm" action="${pageContext.request.contextPath}/home" method="POST" style="display:none;">
+    <input type="hidden" name="page" id="hiddenPage" value="${currentPage}">
+    <input type="hidden" name="sharedPage" id="hiddenSharedPage" value="${sharedCurrentPage}">
+    <input type="hidden" name="q" value="${searchQuery}">
+</form>
+
+<script>
+function submitPage(page, sharedPage) {
+    if (page !== null) document.getElementById('hiddenPage').value = page;
+    if (sharedPage !== null) document.getElementById('hiddenSharedPage').value = sharedPage;
+    document.getElementById('cleanPaginationForm').submit();
+}
+</script>
+    
+    
 </body>
 </html>

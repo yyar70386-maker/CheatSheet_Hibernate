@@ -54,6 +54,9 @@ public class CheatsheetEntity {
     @Column(name = "status", length = 45)
     private String status = "active";
 
+    @Column(name = "banned", nullable = false)
+    private Boolean banned = false;
+    
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Timestamp createdAt;

@@ -55,7 +55,7 @@ public class CheatsheetController {
             List<TagEntity> tags = tagService.findByIds(tagIds);
             cheatsheet.setTags(tags);
         }
-
+        
         cheatsheetService.save(cheatsheet);
         return new ModelAndView("redirect:/cheatsheet/list");
     }
