@@ -404,4 +404,57 @@ public class AuthController {
         }
 
         return "redirect:/profile";
-    }}
+    }
+   
+    // 🌟 Password အသစ်ကို သိမ်းရန် (POST)
+ // 🌟 Password အသစ်ကို သိမ်းရန် (POST)
+ // 🌟 Profile Page ထဲက Security Tab Form အတွက် Password ပြောင်းရန် (POST)
+    @PostMapping("/profile/change-password")
+    public String processChangePassword(@RequestParam("oldPassword") String oldPassword,
+                                        @RequestParam("newPassword") String newPassword,
+                                        @RequestParam("confirmPassword") String confirmPassword,
+                                        HttpSession session,
+                                        RedirectAttributes redirectAttributes) {
+        
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        // 🌟 Password Format စစ်ဆေးခြင်း (အနည်းဆုံး ၆ လုံး၊ စာသားနှင့် ဂဏန်းသာ)
+        String passwordPattern = "^[a-zA-Z0-9]{6,}$";
+        if (!newPassword.matches(passwordPattern)) {
+            redirectAttributes.addFlashAttribute("error", "Password must be at least 6 characters long and contain only letters and numbers (No special characters allowed)!");
+            return "redirect:/profile?tab=security"; // Security tab သို့ ပြန်ညွှန်းမည်
+        }
+
+        // ၁။ New Password နဲ့ Confirm Password တူ/မတူ စစ်ဆေးခြင်း
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("error", "New password and Confirm password do not match!");
+            return "redirect:/profile?tab=security";
+        }
+
+        // ၂။ လက်ရှိ Password မှန်/မမှန် စစ်ဆေးခြင်း
+        if (!userService.checkPassword(currentUser, oldPassword)) {
+            redirectAttributes.addFlashAttribute("error", "Incorrect current password!");
+            return "redirect:/profile?tab=security";
+        }
+
+        // ၃။ Password အသစ်ပြောင်းပြီး Database တွင် Update လုပ်ခြင်း
+        try {
+            boolean isChanged = userService.changePassword(currentUser.getId(), oldPassword, newPassword);
+            
+            if(isChanged) {
+                redirectAttributes.addFlashAttribute("message", "Password has been successfully changed!");
+                return "redirect:/profile?tab=security"; // အောင်မြင်ပါက Message ဖြင့် Security Tab သို့ ပြန်သွားမည်
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Failed to change password. Please try again.");
+                return "redirect:/profile?tab=security";
+            }
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "An error occurred while changing password.");
+            return "redirect:/profile?tab=security";
+        }
+    }    
+}
