@@ -44,17 +44,19 @@ public class CheatsheetEntity {
 
     @Column(name = "view_count")
     private Integer viewCount = 0;
-
-    // 🌟 [FIXED] ပျောက်ဆုံးနေသော shareCount Field အား ပြန်လည်ထည့်သွင်းပေးခဲ့သည် (ဒါမှ setShareCount အလုပ်လုပ်မည်)
+    
     @Column(name = "share_count")
     private Integer shareCount = 0;
-
+    
     @Column(name = "visibility", columnDefinition = "ENUM('PUBLIC','PRIVATE','FRIEND-ONLY')")
     private String visibility = "PUBLIC";
 
     @Column(name = "status", length = 45)
     private String status = "active";
 
+    @Column(name = "banned", nullable = false)
+    private Boolean banned = false;
+    
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Timestamp createdAt;
@@ -70,26 +72,12 @@ public class CheatsheetEntity {
         inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<TagEntity> tags;
-
-    @Column(name = "banned", nullable = false)
-    private boolean banned = false;
-
-    @Column(name = "banned_reason", length = 500)
-    private String bannedReason;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "banned_by")
-    private User bannedBy;
-
-    @Column(name = "banned_at")
-    private Timestamp bannedAt;
-
-    @Column(name = "deleted_at")
-    private Timestamp deletedAt;
-
-    // 🌟 [FIXED] မင်းသူငယ်ချင်းရေးထားသော ပတ်သက်ဆက်နွယ်မှုအပိုင်းများ ပြန်လည်ဖြည့်စွက်ပေးထားသည်
-    @OneToMany(mappedBy = "cheatsheet", fetch = FetchType.LAZY)
-    @BatchSize(size = 20)
+    
+    
+    
+    
+    @OneToMany(mappedBy = "cheatsheet", fetch = FetchType.LAZY) // EAGER မှ LAZY သို့
+    @BatchSize(size = 20) // ဤ Annotation ကို ထည့်ပေးပါ
     private List<SharedCheatsheetEntity> sharedList;
 
     @Transient
