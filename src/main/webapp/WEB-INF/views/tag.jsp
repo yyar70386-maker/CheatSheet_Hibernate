@@ -115,7 +115,8 @@
 
                 <!-- Form Action Buttons -->
                 <div class="d-flex justify-content-end gap-3">
-                    <a href="${pageContext.request.contextPath}/tag/list" class="btn btn-cancel d-flex align-items-center gap-1">
+                    <!-- 🌟 [CANCEL FIX] Cancel နှိပ်လျှင် ဗြောင် View သို့မသွားဘဲ Admin Panel မျက်နှာပြင်ထဲသို့ တိုက်ရိုက်ပြန်လှည့်ခိုင်းခြင်း -->
+                    <a href="${pageContext.request.contextPath}/admin/tags" class="btn btn-cancel d-flex align-items-center gap-1">
                         Cancel
                     </a>
                     <button type="submit" class="btn btn-submit d-flex align-items-center gap-1">
