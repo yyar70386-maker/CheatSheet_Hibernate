@@ -397,33 +397,74 @@ body {
 							<p class="text-muted small mb-4 pb-2 border-bottom">Ensure
 								your account is using a long, random password to stay secure.</p>
 
+							<c:if test="${not empty error}">
+								<div
+									class="alert alert-danger alert-dismissible fade show rounded-3 small fw-bold mb-3"
+									role="alert">
+									<i class="bi bi-exclamation-triangle-fill me-2"></i>${error}
+									<button type="button" class="btn-close" data-bs-dismiss="alert"
+										aria-label="Close"></button>
+								</div>
+							</c:if>
+							<c:if test="${not empty message}">
+								<div
+									class="alert alert-success alert-dismissible fade show rounded-3 small fw-bold mb-3"
+									role="alert">
+									<i class="bi bi-check-circle-fill me-2"></i>${message}
+									<button type="button" class="btn-close" data-bs-dismiss="alert"
+										aria-label="Close"></button>
+								</div>
+							</c:if>
+
 							<form
 								action="${pageContext.request.contextPath}/profile/change-password"
 								method="POST" style="max-width: 500px;">
+
 								<div class="mb-3">
 									<label class="form-label text-muted small fw-bold">Current
-										Password</label> <input type="password" name="oldPassword"
-										class="form-control" placeholder="Enter current password"
+										Password</label> <input type="password" id="oldPassword"
+										name="oldPassword" class="form-control"
+										placeholder="Enter current password" required>
+								</div>
+
+								<div class="mb-3">
+									<label class="form-label text-muted small fw-bold">New
+										Password</label> <input type="password" id="newPassword"
+										name="newPassword" class="form-control"
+										placeholder="At least 6 characters (Letters & Numbers only)"
+										pattern="^[a-zA-Z0-9]{6,}$"
+										title="Must be at least 6 characters long and contain only letters and numbers"
 										required>
+
+									<div id="passwordFormatError"
+										class="text-danger small mt-1 fw-bold" style="display: none;">
+										Must be at least 6 characters (Letters & Numbers only)!</div>
+
+									<div id="sameAsOldError" class="text-danger small mt-1 fw-bold"
+										style="display: none;">New password cannot be the same
+										as current password!</div>
 								</div>
 
 								<div class="mb-4">
-									<label class="form-label text-muted small fw-bold">New
-										Password</label> <input type="password" name="newPassword"
-										class="form-control" placeholder="At least 6 characters"
-										required>
+									<label class="form-label text-muted small fw-bold">Confirm
+										New Password</label> <input type="password" id="confirmPassword"
+										name="confirmPassword" class="form-control"
+										placeholder="Retype new password" required>
+									<div id="passwordMatchError"
+										class="text-danger small mt-1 fw-bold" style="display: none;">
+										Passwords do not match!</div>
 								</div>
 
 								<div>
-									<button type="submit"
-										class="btn btn-dark px-4 rounded-pill fw-bold shadow-sm">
+									<button type="submit" id="submitBtn"
+										class="btn btn-dark px-4 rounded-pill fw-bold shadow-sm"
+										disabled>
 										<i class="bi bi-key-fill me-2"></i>Update Password
 									</button>
 								</div>
 							</form>
 						</div>
 					</div>
-
 				</div>
 			</div>
 		</div>
@@ -494,6 +535,77 @@ body {
 				bsAlert.close();
 			});
 		}, 3000);
+
+		document
+				.addEventListener(
+						"DOMContentLoaded",
+						function() {
+							const oldPassword = document
+									.getElementById('oldPassword'); // 🌟 အသစ်ထည့်ထားသည်
+							const newPassword = document
+									.getElementById('newPassword');
+							const confirmPassword = document
+									.getElementById('confirmPassword');
+
+							const matchErrorMsg = document
+									.getElementById('passwordMatchError');
+							const formatErrorMsg = document
+									.getElementById('passwordFormatError');
+							const sameAsOldErrorMsg = document
+									.getElementById('sameAsOldError'); // 🌟 အသစ်ထည့်ထားသည်
+							const submitBtn = document
+									.getElementById('submitBtn');
+
+							// Regex: စာသားနှင့် ဂဏန်းသာ၊ အနည်းဆုံး ၆ လုံး
+							const passwordRegex = /^[a-zA-Z0-9]{6,}$/;
+
+							function validateProfilePassword() {
+								let isValidFormat = passwordRegex
+										.test(newPassword.value);
+								let isMatch = confirmPassword.value === ""
+										|| newPassword.value === confirmPassword.value;
+								let isSameAsOld = (oldPassword.value !== "" && newPassword.value === oldPassword.value); // 🌟 အသစ်ထည့်ထားသည်
+
+								// ၁။ Format စစ်ဆေးခြင်း
+								if (newPassword.value !== "" && !isValidFormat) {
+									formatErrorMsg.style.display = 'block';
+								} else {
+									formatErrorMsg.style.display = 'none';
+								}
+
+								// ၂။ အဟောင်းနှင့် အသစ် တူ/မတူ စစ်ဆေးခြင်း
+								if (newPassword.value !== "" && isSameAsOld) {
+									sameAsOldErrorMsg.style.display = 'block';
+								} else {
+									sameAsOldErrorMsg.style.display = 'none';
+								}
+
+								// ၃။ Confirm Password ကိုက်ညီမှု ရှိ/မရှိ စစ်ဆေးခြင်း
+								if (confirmPassword.value !== "" && !isMatch) {
+									matchErrorMsg.style.display = 'block';
+								} else {
+									matchErrorMsg.style.display = 'none';
+								}
+
+								// ၄။ သတ်မှတ်ချက် အကုန်ကိုက်ညီမှ (နှင့် အဟောင်းနဲ့မတူမှ) ခလုတ်ကို ဖွင့်ပေးမည်
+								if (isValidFormat && isMatch && !isSameAsOld
+										&& newPassword.value !== ""
+										&& confirmPassword.value !== ""
+										&& oldPassword.value !== "") {
+									submitBtn.disabled = false;
+								} else {
+									submitBtn.disabled = true;
+								}
+							}
+
+							// Field သုံးခုလုံးကို Event Listener တပ်ထားပါမည်
+							oldPassword.addEventListener('keyup',
+									validateProfilePassword);
+							newPassword.addEventListener('keyup',
+									validateProfilePassword);
+							confirmPassword.addEventListener('keyup',
+									validateProfilePassword);
+						});
 	</script>
 </body>
 </html>

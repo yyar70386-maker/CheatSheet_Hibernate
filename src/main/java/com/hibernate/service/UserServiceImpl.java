@@ -113,6 +113,16 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    // 🌟 [ADDED] Controller မှ တိုက်ရိုက် Password မှန်/မမှန် စစ်ဆေးရန် Method
+    @Override
+    public boolean checkPassword(User user, String rawPassword) {
+        if (user == null || user.getPassword() == null) {
+            return false;
+        }
+        // JBCrypt ကို အသုံးပြု၍ Hash လုပ်ထားသော Password နှင့် တိုက်စစ်ခြင်း
+        return BCrypt.checkpw(rawPassword, user.getPassword());
+    }
+    
     @Override
     public boolean sendResetPasswordEmail(String email, String contextPath) {
         User user = userRepository.findByEmail(email);
@@ -153,14 +163,12 @@ public class UserServiceImpl implements UserService {
         userRepository.update(user);
     }
 
-    // 🌟 [ADDED] UI တွင် List ထုတ်ပြရန် Repository မှတစ်ဆင့် ဒေတာဆွဲထုတ်ခြင်း
     @Override
     @Transactional(readOnly = true)
     public List<User> getAllUsers() {
         return userRepository.getAllUsers();
     }
 
-    // 🌟 [ADDED] Admin မှ User အား ဖျက်ရန် ဆောင်ရွက်ခြင်း
     @Override
     public void deleteUser(int id) {
         userRepository.deleteUser(id);

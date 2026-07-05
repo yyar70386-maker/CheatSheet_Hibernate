@@ -1,21 +1,18 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Register</title>
 
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
-
 body{
 	min-height:100vh;
 	display:flex;
@@ -57,6 +54,12 @@ h3{
 	border-left:none;
 }
 
+.form-control:focus {
+	background:#fff;
+	box-shadow:none;
+	border-color:#0d6efd;
+}
+
 .btn-primary{
 	height:48px;
 	border-radius:12px;
@@ -65,20 +68,28 @@ h3{
 	font-weight:600;
 }
 
-.btn-primary:hover{
+.btn-primary:hover:not(:disabled){
 	transform:translateY(-2px);
 	box-shadow:0 10px 20px rgba(13,110,253,.3);
 }
 
-.error{
-	color:red;
-	font-size:12px;
-	display:none;
-	margin-top:5px;
+.btn-primary:disabled {
+    background: #a5b1c2;
+    cursor: not-allowed;
 }
 
+/* 🌟 Improved Error Message Styling */
+.error{
+	color: #dc3545;
+	font-size: 13px;
+	font-weight: 600;
+	display: none;
+	margin-top: 5px;
+}
+.error i {
+	margin-right: 4px;
+}
 </style>
-
 </head>
 
 <body>
@@ -89,95 +100,66 @@ h3{
 	<p class="sub">Join Cheat Sheet System</p>
 
 	<c:if test="${not empty error}">
-		<div class="alert alert-danger text-center">
-			${error}
+		<div class="alert alert-danger text-center small fw-bold">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i>${error}
 		</div>
 	</c:if>
 
-	<form action="${pageContext.request.contextPath}/register"
-		method="POST"
-		onsubmit="return validateForm()">
+	<form action="${pageContext.request.contextPath}/register" method="POST" id="regForm">
 
-		<!-- Username -->
 		<div class="mb-3">
-			<label>Username</label>
+			<label class="form-label small fw-bold text-muted">Username</label>
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-person"></i></span>
-				<input type="text" name="username" class="form-control" required>
+				<input type="text" id="username" name="username" class="form-control" placeholder="Enter username" required>
 			</div>
+			<div id="usernameError" class="error"><i class="bi bi-exclamation-circle"></i>Username is required</div>
 		</div>
 
-		<!-- Email -->
 		<div class="mb-3">
-			<label>Email</label>
+			<label class="form-label small fw-bold text-muted">Email</label>
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-envelope"></i></span>
-				<input type="email" id="email" name="email" class="form-control" required>
+				<input type="email" id="email" name="email" class="form-control" placeholder="example@gmail.com" required>
 			</div>
-			<div id="emailError" class="error">Invalid email</div>
+			<div id="emailError" class="error"><i class="bi bi-exclamation-circle"></i>Invalid email format!</div>
 		</div>
 
-		<!-- Full Name -->
 		<div class="mb-3">
-			<label>Full Name</label>
+			<label class="form-label small fw-bold text-muted">Full Name</label>
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-card-text"></i></span>
-				<input type="text" id="fullName" name="fullName" class="form-control" required>
+				<input type="text" id="fullName" name="fullName" class="form-control" placeholder="Enter full name" required>
 			</div>
-			<div id="nameError" class="error">Only letters allowed</div>
+			<div id="nameError" class="error"><i class="bi bi-exclamation-circle"></i>Only letters and spaces allowed!</div>
 		</div>
 
-		<!-- Password -->
 		<div class="mb-3">
-			<label>Password</label>
-
+			<label class="form-label small fw-bold text-muted">Password</label>
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-lock"></i></span>
-
-				<input type="password"
-					   id="password"
-					   name="password"
-					   class="form-control"
-					   placeholder="Hover to auto-generate"
-					   required>
-
-				<button type="button"
-						class="btn btn-outline-secondary"
-						onclick="togglePassword()">
-
+				<input type="password" id="password" name="password" class="form-control" placeholder="Hover to auto-generate" required>
+				<button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
 					<i class="bi bi-eye" id="eyeIcon"></i>
-
 				</button>
 			</div>
-
-			<div id="passwordError" class="error">Min 8 characters</div>
+			<div id="passwordError" class="error"><i class="bi bi-exclamation-circle"></i>Must be at least 6 characters (Letters & Numbers only)!</div>
 		</div>
 
-		<!-- Confirm -->
 		<div class="mb-3">
-			<label>Confirm Password</label>
-
+			<label class="form-label small fw-bold text-muted">Confirm Password</label>
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-
-				<input type="password"
-					   id="confirmPassword"
-					   name="confirmPassword"
-					   class="form-control"
-					   required>
+				<input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Retype password" required>
 			</div>
-
-			<div id="matchError" class="error">Password not match</div>
+			<div id="matchError" class="error"><i class="bi bi-exclamation-circle"></i>Passwords do not match!</div>
 		</div>
 
-		<!-- Buttons -->
 		<div class="d-grid gap-2 mt-4">
-			<button type="submit" class="btn btn-primary">
+			<button type="submit" id="submitBtn" class="btn btn-primary" disabled>
 				Sign Up
 			</button>
-
-			<a href="${pageContext.request.contextPath}/"
-			   class="btn btn-outline-secondary">
+			<a href="${pageContext.request.contextPath}/" class="btn btn-outline-secondary d-flex align-items-center justify-content-center fw-bold">
 				Cancel
 			</a>
 		</div>
@@ -187,118 +169,151 @@ h3{
 </div>
 
 <script>
+const usernameInput = document.getElementById("username");
+const emailInput = document.getElementById("email");
+const nameInput = document.getElementById("fullName");
+const passInput = document.getElementById("password");
+const confirmInput = document.getElementById("confirmPassword");
+const submitBtn = document.getElementById("submitBtn");
 
-const pass=document.getElementById("password");
-const confirm=document.getElementById("confirmPassword");
+// Errors
+const usernameError = document.getElementById("usernameError");
+const emailError = document.getElementById("emailError");
+const nameError = document.getElementById("nameError");
+const passwordError = document.getElementById("passwordError");
+const matchError = document.getElementById("matchError");
 
-let done=false;
+// Regex Validation Pattern များ
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const nameRegex = /^[a-zA-Z\s]+$/;
+const passwordRegex = /^[a-zA-Z0-9]{6,}$/; // 🌟 စာသားနှင့်ဂဏန်းသာ၊ အနည်းဆုံး ၆ လုံး
 
-// auto generate once
-pass.addEventListener("mouseenter",generateOnce);
-pass.addEventListener("focus",generateOnce);
+let done = false;
+
+// 🌟 Auto Generate Logic (Special character မပါ၊ အလုံး ၆ လုံးစည်းမျဉ်းဖြင့် ပြင်ဆင်ထားသည်)
+passInput.addEventListener("mouseenter", generateOnce);
+passInput.addEventListener("focus", generateOnce);
 
 function generateOnce(){
 	if(done) return;
-	done=true;
+	done = true;
 
-	let p=generate();
+	let p = generateRandomPassword();
 
-	pass.value=p;
-	confirm.value=p;
+	passInput.value = p;
+	confirmInput.value = p;
 
-	pass.type="text";
-	confirm.type="text";
+	passInput.type = "text";
+	confirmInput.type = "text";
+    
+    validateFormRealTime();
 }
 
-function generate(){
+function generateRandomPassword(){
+	const u = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	const l = "abcdefghijklmnopqrstuvwxyz";
+	const n = "0123456789";
 
-	const u="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	const l="abcdefghijklmnopqrstuvwxyz";
-	const n="0123456789";
-	const s="!@#$%^&*()";
+	let all = u + l + n;
+	let p = "";
 
-	let all=u+l+n+s;
-	let p="";
+	// စည်းမျဉ်းပြည့်စုံရန် အနည်းဆုံး တစ်လုံးစီအရင်ထည့်မည်
+	p += u[Math.floor(Math.random() * u.length)];
+	p += l[Math.floor(Math.random() * l.length)];
+	p += n[Math.floor(Math.random() * n.length)];
 
-	p+=u[Math.floor(Math.random()*u.length)];
-	p+=l[Math.floor(Math.random()*l.length)];
-	p+=n[Math.floor(Math.random()*n.length)];
-	p+=s[Math.floor(Math.random()*s.length)];
-
-	for(let i=0;i<6;i++){
-		p+=all[Math.floor(Math.random()*all.length)];
+	// စုစုပေါင်း ၆ လုံးပြည့်အောင် ဖြည့်မည်
+	for(let i = 0; i < 3; i++){
+		p += all[Math.floor(Math.random() * all.length)];
 	}
 
-	return p.split('').sort(()=>0.5-Math.random()).join('');
+	return p.split('').sort(() => 0.5 - Math.random()).join('');
 }
 
-// user type -> stop auto
-pass.addEventListener("input",()=>{
-	pass.type="password";
-	confirm.type="password";
-	done=true;
+// User စာရိုက်လျှင် password ပြန်ဖျောက်ရန်
+passInput.addEventListener("input", () => {
+	passInput.type = "password";
+	confirmInput.type = "password";
+	done = true;
 });
 
-confirm.addEventListener("input",()=>{
-	confirm.type="password";
+confirmInput.addEventListener("input", () => {
+	confirmInput.type = "password";
 });
 
-// toggle show/hide
+// Toggle Show/Hide Password
 function togglePassword(){
-
-	const eye=document.getElementById("eyeIcon");
-
-	if(pass.type==="password"){
-		pass.type="text";
-		confirm.type="text";
-		eye.classList.replace("bi-eye","bi-eye-slash");
-	}else{
-		pass.type="password";
-		confirm.type="password";
-		eye.classList.replace("bi-eye-slash","bi-eye");
+	const eye = document.getElementById("eyeIcon");
+	if(passInput.type === "password"){
+		passInput.type = "text";
+		confirmInput.type = "text";
+		eye.classList.replace("bi-eye", "bi-eye-slash");
+	} else {
+		passInput.type = "password";
+		confirmInput.type = "password";
+		eye.classList.replace("bi-eye-slash", "bi-eye");
 	}
 }
 
-// validation
-function validateForm(){
+// 🛡️ Real-time Keyboard Form Validation စနစ်
+function validateFormRealTime(){
+	let isFormValid = true;
 
-	let ok=true;
-
-	const email=document.getElementById("email").value;
-	const full=document.getElementById("fullName").value;
-
-	const emailError=document.getElementById("emailError");
-	const nameError=document.getElementById("nameError");
-	const passwordError=document.getElementById("passwordError");
-	const matchError=document.getElementById("matchError");
-
-	emailError.style.display="none";
-	nameError.style.display="none";
-	passwordError.style.display="none";
-	matchError.style.display="none";
-
-	if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-		emailError.style.display="block";
-		ok=false;
+	// ၁။ Username Validation
+	if(usernameInput.value.trim() === "") {
+		usernameError.style.display = "block";
+		isFormValid = false;
+	} else {
+		usernameError.style.display = "none";
 	}
 
-	if(!/^[a-zA-Z\s]+$/.test(full)){
-		nameError.style.display="block";
-		ok=false;
+	// ၂။ Email Validation
+	if(emailInput.value !== "" && !emailRegex.test(emailInput.value)){
+		emailError.style.display = "block";
+		isFormValid = false;
+	} else {
+		emailError.style.display = "none";
+		if(emailInput.value === "") isFormValid = false;
 	}
 
-	if(pass.value.length<8){
-		passwordError.style.display="block";
-		ok=false;
+	// ၃။ Full Name Validation
+	if(nameInput.value !== "" && !nameRegex.test(nameInput.value)){
+		nameError.style.display = "block";
+		isFormValid = false;
+	} else {
+		nameError.style.display = "none";
+		if(nameInput.value === "") isFormValid = false;
 	}
 
-	if(pass.value!==confirm.value){
-		matchError.style.display="block";
-		ok=false;
+	// ၄။ Password Format Validation
+	if(passInput.value !== "" && !passwordRegex.test(passInput.value)){
+		passwordError.style.display = "block";
+		isFormValid = false;
+	} else {
+		passwordError.style.display = "none";
+		if(passInput.value === "") isFormValid = false;
 	}
 
-	return ok;
+	// ၅။ Confirm Password Match Validation
+	let isMatch = (passInput.value === confirmInput.value);
+	if(confirmInput.value !== "" && !isMatch){
+		matchError.style.display = "block";
+		isFormValid = false;
+	} else {
+		matchError.style.display = "none";
+		if(confirmInput.value === "") isFormValid = false;
+	}
+
+	// အားလုံးမှန်ကန်မှ Sign Up ခလုတ်ကို နှိပ်ခွင့်ပြုမည်
+	submitBtn.disabled = !isFormValid;
 }
+
+// Event Listeners များ တပ်ဆင်ခြင်း
+usernameInput.addEventListener('input', validateFormRealTime);
+emailInput.addEventListener('input', validateFormRealTime);
+nameInput.addEventListener('input', validateFormRealTime);
+passInput.addEventListener('input', validateFormRealTime);
+confirmInput.addEventListener('input', validateFormRealTime);
 
 </script>
 

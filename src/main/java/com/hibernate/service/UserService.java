@@ -38,4 +38,6 @@ public interface UserService {
     void unlockUser(int id, User admin, String ipAddress);
 
     void changeUserRole(int id, int role, User admin, String ipAddress);
+ // လက်ရှိ Password မှန်/မမှန် စစ်ဆေးရန်
+    boolean checkPassword(User user, String rawPassword);
 }

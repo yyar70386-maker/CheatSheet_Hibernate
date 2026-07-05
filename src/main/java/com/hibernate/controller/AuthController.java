@@ -406,4 +406,62 @@ public class AuthController {
         }
 
         return "redirect:/profile";
+    }
+   
+    @PostMapping("/profile/change-password")
+    public String processChangePassword(@RequestParam("oldPassword") String oldPassword,
+                                        @RequestParam("newPassword") String newPassword,
+                                        @RequestParam("confirmPassword") String confirmPassword,
+                                        HttpSession session,
+                                        RedirectAttributes redirectAttributes) {
+        
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        // ၁။ Password အဟောင်းနှင့် အသစ် တူနေခြင်း ရှိ/မရှိ စစ်ဆေးခြင်း
+        if (oldPassword.equals(newPassword)) {
+            redirectAttributes.addFlashAttribute("error", "New password cannot be the same as your current password!");
+            return "redirect:/profile?tab=security";
+        }
+
+        // ၂။ Password Format စစ်ဆေးခြင်း (အနည်းဆုံး ၆ လုံး၊ စာသားနှင့် ဂဏန်းသာ)
+        String passwordPattern = "^[a-zA-Z0-9]{6,}$";
+        if (!newPassword.matches(passwordPattern)) {
+            redirectAttributes.addFlashAttribute("error", "Password must be at least 6 characters long and contain only letters and numbers (No special characters allowed)!");
+            return "redirect:/profile?tab=security";
+        }
+
+        // ၃။ New Password နဲ့ Confirm Password တူ/မတူ စစ်ဆေးခြင်း
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("error", "New password and Confirm password do not match!");
+            return "redirect:/profile?tab=security";
+        }
+
+        // ၄။ လက်ရှိ Password မှန်/မမှန် စစ်ဆေးခြင်း
+        if (!userService.checkPassword(currentUser, oldPassword)) {
+            redirectAttributes.addFlashAttribute("error", "Incorrect current password!");
+            return "redirect:/profile?tab=security";
+        }
+
+        // ၅။ Password အသစ်ပြောင်းပြီး Database တွင် Update လုပ်ခြင်း
+        try {
+            boolean isChanged = userService.changePassword(currentUser.getId(), oldPassword, newPassword);
+            
+            if(isChanged) {
+                // 🌟 [CHANGEDHERE] Session ကို ဖျက်ချပြီး Login Page သို့ ပို့မည်
+                session.invalidate(); 
+                
+                redirectAttributes.addFlashAttribute("message", "Password changed successfully! Please log in with your new password.");
+                return "redirect:/login"; // Login စာမျက်နှာသို့ ရောက်သွားမည်
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Failed to change password. Please try again.");
+                return "redirect:/profile?tab=security";
+            }
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "An error occurred while changing password.");
+            return "redirect:/profile?tab=security";
+        }
     }}
