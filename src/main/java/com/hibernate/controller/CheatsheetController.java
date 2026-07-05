@@ -20,7 +20,10 @@ import com.hibernate.dto.NotificationDto;
 import com.hibernate.service.AuditLogService;
 import com.hibernate.service.CategoryService;
 import com.hibernate.service.CheatsheetService;
+import com.hibernate.service.FavoriteService;
+import com.hibernate.service.InteractionServiceImpl;
 import com.hibernate.service.NotificationService;
+import com.hibernate.service.RatingService;
 import com.hibernate.service.TagService;
 import com.hibernate.websocket.NotificationSocketService;
 
@@ -37,6 +40,9 @@ public class CheatsheetController {
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
     private final NotificationSocketService notificationSocketService;
+    private final FavoriteService favoriteService;
+    private final InteractionServiceImpl interactionService;
+    private final RatingService ratingService;
 
     // ==================== 🌟 My Cheatsheets Personal List ====================
     @GetMapping("/list")
@@ -193,7 +199,7 @@ public class CheatsheetController {
         return mv;
     }
 
-    // ==================== 🌟 Cheatsheet Detail View (With Smart View Count Logic) ====================
+    // ==================== 🌟 Cheatsheet Detail View (Conflict ရှင်းပြီးသား ဗားရှင်း) ====================
     @GetMapping("/detail/{id}")
     public ModelAndView viewDetail(@PathVariable("id") Integer id, HttpSession session) {
         CheatsheetEntity sheet = cheatsheetService.findById(id);
@@ -216,7 +222,26 @@ public class CheatsheetController {
 
         ModelAndView mv = new ModelAndView("cheatsheet-detail");
         mv.addObject("sheet", sheet);
+        
+        // Interaction & Rating Data များကို View ထဲသို့ ထည့်ပေးခြင်း
+        mv.addObject("avgRating", ratingService.getAverageRatingBySheetId(id));
+        mv.addObject("sheetLikes", interactionService.countSheetReactions(id, true));
+        mv.addObject("sheetDislikes", interactionService.countSheetReactions(id, false));
+        mv.addObject("commentsList", interactionService.getCommentsBySheetId(id, currentUserId));
+        
+        if (currentUser != null) {
+            var favorite = favoriteService.getByUserIdAndSheetId(currentUser.getId(), id);
+            var userReaction = interactionService.getSheetReaction(currentUser.getId(), id);
+            var userRatingEntity = ratingService.getByUserAndSheetId(currentUser.getId(), id);
+            
+            mv.addObject("isFavorited", favorite != null);
+            mv.addObject("userSheetLike", userReaction != null ? userReaction.getIsLike() : null);
+            mv.addObject("userRating", userRatingEntity != null ? userRatingEntity.getStars() : 0);
+        }
+        
+        // UI ဘက်တွင် Edit/Delete ခလုတ်ပြရန်/ဖျောက်ရန်အတွက် ပေါင်းစည်းပေးထားပါတယ်
         mv.addObject("isOwner", isOwner); 
+        
         return mv;
     }
 
@@ -252,34 +277,29 @@ public class CheatsheetController {
         return mv;
     }
     
- // ==================== 🌟 [.JASPER HARD-FIXED] View PDF Report System ====================
+    // ==================== 🌟 [.JASPER HARD-FIXED] View PDF Report System ====================
     @GetMapping("/view-pdf/{id}")
     public void viewPdf(@PathVariable("id") Integer id, HttpServletResponse response, HttpSession session) {
         try {
-            // ၁။ DB မှ Cheatsheet ဒေတာဆွဲထုတ်ခြင်း
             CheatsheetEntity cheatsheet = cheatsheetService.findById(id);
             if (cheatsheet == null) {
                 response.sendRedirect(response.encodeRedirectURL("/cheatsheet/list"));
                 return;
             }
 
-            // Download Count တိုးခြင်း
             int currentDownloads = (cheatsheet.getDownloadCount() != null) ? cheatsheet.getDownloadCount() : 0;
             cheatsheet.setDownloadCount(currentDownloads + 1);
             cheatsheetService.update(cheatsheet);
             
-            // ၂။ .jasper ဖိုင်ကို တိုက်ရိုက်ဖတ်ယူခြင်း
             InputStream reportStream = this.getClass().getResourceAsStream("/reports/cheatsheet_template.jasper");
             if (reportStream == null) {
                 throw new java.io.FileNotFoundException("Jasper compiled (.jasper) file not found in resources folder!");
             }
             
-            // ၃။ DataSource ပြင်ဆင်ခြင်း
             List<CheatsheetEntity> dataList = java.util.Collections.singletonList(cheatsheet);
             net.sf.jasperreports.engine.data.JRBeanCollectionDataSource dataSource = 
                     new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(dataList);
 
-            // ၄။ User Param Mapping ပြုလုပ်ခြင်း
             Map<String, Object> parameters = new HashMap<>();
             User currentUser = (User) session.getAttribute("currentUser");
             String username = "Guest User";
@@ -288,21 +308,17 @@ public class CheatsheetController {
             }
             parameters.put("DownloadedBy", username); 
             
-            // ၅။ .jasper stream ကို တိုက်ရိုက် Fill လုပ်ခြင်း (ignore.missing.font properties က နောက်ကွယ်မှ ကာကွယ်ပေးထားပါသည်)
             net.sf.jasperreports.engine.JasperPrint jasperPrint = 
                     net.sf.jasperreports.engine.JasperFillManager.fillReport(reportStream, parameters, dataSource);
             
-            // ၆။ PDF ဒေတာအား byte array အဖြစ် ပြောင်းလဲခြင်း
             byte[] pdfBytes = net.sf.jasperreports.engine.JasperExportManager.exportReportToPdf(jasperPrint);
             
-            // ၇။ HTTP Response Header သတ်မှတ်ခြင်း
             response.setContentType("application/pdf");
             String filename = (cheatsheet.getTitle() != null) ? cheatsheet.getTitle() : "cheatsheet";
             
             response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + ".pdf\"");
             response.setContentLength(pdfBytes.length);
 
-            // ၈။ Binary Data အား Output Stream ဆီသို့ တွန်းထုတ်ပြီး ပိတ်သိမ်းခြင်း
             java.io.OutputStream out = response.getOutputStream();
             out.write(pdfBytes);
             out.flush();

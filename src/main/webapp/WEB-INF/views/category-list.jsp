@@ -115,15 +115,15 @@ body{
 
         <table class="table">
             <tr>
-                <th>ID</th>
+                <th>S.No</th>
                 <th>Name</th>
                 <th>Created At</th>
                 <th>Actions</th>
             </tr>
 
-            <c:forEach items="${categorylist}" var="c">
+            <c:forEach items="${categorylist}" var="c" varStatus="statusLoop">
                 <tr>
-                    <td>${c.id}</td>
+                    <td>${statusLoop.index + 1}</td>
                     <td>${c.name}</td>
                     <td>${c.createdAt}</td>
                     <td>

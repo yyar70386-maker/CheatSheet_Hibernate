@@ -39,7 +39,7 @@
         <table class="table align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    <th>ID</th>
+                    <th>S.No</th>
                     <th>Reporter</th>
                     <th>Target</th>
                     <th>Reason</th>
@@ -54,9 +54,9 @@
                         <tr><td colspan="7" class="text-center text-muted py-5">No reports found.</td></tr>
                     </c:when>
                     <c:otherwise>
-                        <c:forEach items="${reports}" var="r">
+                        <c:forEach items="${reports}" var="r" varStatus="statusLoop">
                             <tr>
-                                <td>${r.id}</td>
+                                <td>${((currentPage - 1) * 15) + statusLoop.index + 1}</td>
                                 <td><c:out value="${r.user != null ? r.user.username : 'Unknown'}" /></td>
                                 <td><span class="badge text-bg-light border">${r.targetType}</span> #${r.targetId != null ? r.targetId : r.sheetId}</td>
                                 <td><c:out value="${r.reason}" /></td>

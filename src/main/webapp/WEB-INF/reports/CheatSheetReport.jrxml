@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CheatSheet Report Template for JasperReports -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="CheatSheetReport"
+              pageWidth="595"
+              pageHeight="842"
+              columnWidth="515"
+              leftMargin="40"
+              rightMargin="40"
+              topMargin="40"
+              bottomMargin="40"
+              uuid="a1b2c3d4-e5f6-7890-abcd-ef1234567890">
+
+    <property name="ireport.zoom" value="1.0"/>
+    <property name="ireport.x" value="0"/>
+    <property name="ireport.y" value="0"/>
+
+    <!-- Report Fields (must match CheatSheetReportEntity getters) -->
+    <field name="no" class="java.lang.Integer"/>
+    <field name="cheatsheetName" class="java.lang.String"/>
+    <field name="createdUser" class="java.lang.String"/>
+    <field name="createdDate" class="java.lang.String"/>
+    <field name="reactionCount" class="java.lang.Long"/>
+
+    <!-- Report Parameters -->
+    <parameter name="ReportTitle" class="java.lang.String"/>
+    <parameter name="GeneratedAt" class="java.lang.String"/>
+
+    <title>
+        <band height="60">
+            <staticText>
+                <reportElement x="0" y="5" width="515" height="30" uuid="title-text"/>
+                <textElement textAlignment="Center">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[$P{ReportTitle}]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="38" width="515" height="18" uuid="generated-at"/>
+                <textElement textAlignment="Center">
+                    <font size="10"/>
+                </textElement>
+                <text><![CDATA[Generated: ]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="70" y="38" width="445" height="18" uuid="generated-at-value"/>
+                <textElement textAlignment="Center">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{GeneratedAt}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="28">
+            <rect>
+                <reportElement x="0" y="0" width="515" height="28" backcolor="#4f46e5" uuid="header-bg"/>
+            </rect>
+            <staticText>
+                <reportElement x="5" y="4" width="35" height="20" forecolor="#FFFFFF" uuid="col-no"/>
+                <textElement textAlignment="Center">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[No]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="45" y="4" width="175" height="20" forecolor="#FFFFFF" uuid="col-name"/>
+                <textElement textAlignment="Left">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[CheatSheet Name]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="225" y="4" width="120" height="20" forecolor="#FFFFFF" uuid="col-user"/>
+                <textElement textAlignment="Left">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Created User]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="350" y="4" width="105" height="20" forecolor="#FFFFFF" uuid="col-date"/>
+                <textElement textAlignment="Center">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Created Date]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="460" y="4" width="50" height="20" forecolor="#FFFFFF" uuid="col-reaction"/>
+                <textElement textAlignment="Center">
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Reactions]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="24">
+            <rect>
+                <reportElement x="0" y="0" width="515" height="24" uuid="row-bg">
+                    <printWhenExpression><![CDATA[$F{no} % 2 == 0]]></printWhenExpression>
+                </reportElement>
+                <propertyExpression name="backcolor"><![CDATA[$F{no} % 2 == 0 ? "#F3F4F6" : "#FFFFFF"]]></propertyExpression>
+            </rect>
+            <textField>
+                <reportElement x="5" y="2" width="35" height="20" uuid="f-no"/>
+                <textElement textAlignment="Center">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{no}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="45" y="2" width="175" height="20" uuid="f-name"/>
+                <textElement textAlignment="Left">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{cheatsheetName}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="225" y="2" width="120" height="20" uuid="f-user"/>
+                <textElement textAlignment="Left">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{createdUser}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="350" y="2" width="105" height="20" uuid="f-date"/>
+                <textElement textAlignment="Center">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{createdDate}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="460" y="2" width="50" height="20" uuid="f-reaction"/>
+                <textElement textAlignment="Center">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{reactionCount}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="25">
+            <line>
+                <reportElement x="0" y="0" width="515" height="1" uuid="footer-line"/>
+            </line>
+            <textField>
+                <reportElement x="0" y="5" width="250" height="15" uuid="footer-text"/>
+                <textElement>
+                    <font size="8" isItalic="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["CheatSheet Report - CheatSheetsHub Admin"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="415" y="5" width="100" height="15" uuid="page-num"/>
+                <textElement textAlignment="Right">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+            </textField>
+            <textField evaluationTime="Report">
+                <reportElement x="0" y="5" width="515" height="15" uuid="total-pages"/>
+                <textElement textAlignment="Right">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+</jasperReport>

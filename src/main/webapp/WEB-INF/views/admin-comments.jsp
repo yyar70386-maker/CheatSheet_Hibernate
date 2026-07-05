@@ -86,7 +86,7 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light text-secondary small fw-bold text-uppercase">
                                 <tr>
-                                    <th class="ps-4">ID</th>
+                                    <th class="ps-4">S.No</th>
                                     <th>Comment Content</th>
                                     <th>Source CheatSheet</th>
                                     <th>Author</th>
@@ -97,9 +97,9 @@
                             <tbody>
                                 <c:choose>
                                     <c:when test="${not empty comments}">
-                                        <c:forEach var="c" items="${comments}">
+                                        <c:forEach var="c" items="${comments}" varStatus="statusLoop">
                                             <tr>
-                                                <td class="ps-4 fw-bold text-secondary">#${c.id}</td>
+                                                <td class="ps-4 fw-bold text-secondary">${((currentPage - 1) * 10) + statusLoop.index + 1}</td>
                                                 <td style="max-width: 300px;">
                                                     <div class="text-dark fw-medium text-truncate-2" style="white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                                         <c:out value="${c.content}" />

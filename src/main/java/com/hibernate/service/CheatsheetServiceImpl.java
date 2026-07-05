@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import com.hibernate.dto.NotificationDto;
 import com.hibernate.entity.CheatsheetEntity;
+import com.hibernate.entity.CheatSheetReportEntity;
 import com.hibernate.entity.TagEntity;
 import com.hibernate.entity.User;
 import com.hibernate.repository.CheatsheetRepository;
@@ -20,20 +21,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class CheatsheetServiceImpl implements CheatsheetService {
 
     private final CheatsheetRepository cheatsheetRepository;
+    
+    // 🌟 [FIXED] သူငယ်ချင်းဖြစ်သူ၏ ကုဒ်သစ်များအတွက် လိုအပ်သော Service များကို Constructor Injection ဝင်အောင် private final တပ်ပေးခြင်း
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
 
-    // ==================== 🌟 [UPDATED WITH STORED PROCEDURE] ====================
-    // တီချယ်ပြောသလို စားဖိုမှူး (Service Layer) အလုပ်မရှုပ်တော့ဘဲ SQL ဘက်က တွက်ပြီးသားကို တန်းယူသုံးသည့် စနစ်သစ်
+    // ==================== 🌟 [STORED PROCEDURE CALL IMPLEMENTATION] ====================
     @Override
     @Transactional(readOnly = true)
     public List<TagEntity> findTagsByCategoryId(Integer categoryId, Integer currentUserId) {
-        // ၁။ Repository မှတစ်ဆင့် Database ၏ Native Stored Procedure ကို CALL ခေါ်ယူခြင်း
+        // Repository မှတစ်ဆင့် Database ၏ Native Stored Procedure ကို CALL ခေါ်ယူခြင်း
         List<Object[]> spResults = cheatsheetRepository.callStoredProcedureForTagCounts(categoryId, currentUserId);
         
         List<TagEntity> processedTags = new ArrayList<>();
         
-        // ၂။ Database က တွက်ချက်ပြီးသား ဟင်းချက်ရုံအသားတုံး (ရလဒ်အချော) များကို Object ထဲသို့ တိုက်ရိုက်မြေပုံညွှန်း (Mapping) လုပ်ခြင်း
         if (spResults != null) {
             for (Object[] row : spResults) {
                 TagEntity tag = new TagEntity();
@@ -44,7 +45,6 @@ public class CheatsheetServiceImpl implements CheatsheetService {
                 // Stored Procedure ၏ COUNT() ရလဒ်အား BigInteger သို့မဟုတ် Long ပုံစံဖြင့် လက်ခံခြင်း
                 java.math.BigInteger count = (java.math.BigInteger) row[2]; // cheatsheet_count
                 
-                // Java ထဲတွင် Logic များ လိုက်တွက်စရာမလိုဘဲ ချက်ချင်း Name (Count) စာသား တွဲပေးလိုက်ရုံသာ
                 tag.setName(rawName + " (" + count + ")");
                 processedTags.add(tag);
             }
@@ -106,7 +106,6 @@ public class CheatsheetServiceImpl implements CheatsheetService {
         return cheatsheetRepository.countByCategoryId(categoryId, currentUserId, filter);
     }
 
-    // Legacy method Mapping -> တီချယ်ခိုင်းသည့်အမိန့်အရ Procedure ခေါ်ဆိုမှုဆီသို့ အလိုအလျောက် လွှဲပြောင်းပေးထားသည်
     @Override
     @Transactional(readOnly = true)
     public List<Object[]> countCheatsheetsPerTagByRepository(Integer categoryId, Integer currentUserId) {
@@ -117,6 +116,18 @@ public class CheatsheetServiceImpl implements CheatsheetService {
     @Transactional(readOnly = true)
     public List<CheatsheetEntity> findLatestPublic(String keyword, int page, int size) {
         return cheatsheetRepository.findLatestPublic(keyword, page, size);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CheatsheetEntity> findPopularPublic(int size) {
+        return cheatsheetRepository.findPopularPublic(size);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CheatsheetEntity> findPublicCreatedBetween(java.sql.Timestamp start, java.sql.Timestamp end) {
+        return cheatsheetRepository.findPublicCreatedBetween(start, end);
     }
 
     @Override
@@ -156,6 +167,7 @@ public class CheatsheetServiceImpl implements CheatsheetService {
         return cheatsheetRepository.countSearchAll(keyword, categoryId, status, banned);
     }
 
+    // ==================== 🌟 ADMIN CONTROL PANEL LOGIC (MERGED) ====================
     @Override
     @Transactional
     public NotificationDto banCheatsheet(Integer id, String reason, User admin, String ipAddress) {
@@ -169,7 +181,6 @@ public class CheatsheetServiceImpl implements CheatsheetService {
             cheatsheetRepository.update(cheatsheet);
             auditLogService.log(admin, "CheatSheet Banned", "CheatSheet", id, "Banned CheatSheet: " + cheatsheet.getTitle() + " (Reason: " + reason + ")", ipAddress);
 
-            // Notify cheatsheet author
             if (cheatsheet.getAuthor() != null) {
                 return notificationService.createNotification(
                         cheatsheet.getAuthor().getId(),
@@ -182,8 +193,7 @@ public class CheatsheetServiceImpl implements CheatsheetService {
         }
         return null;
     }
-
-    @Override
+ @Override
     @Transactional
     public NotificationDto restoreCheatsheet(Integer id, User admin, String ipAddress) {
         CheatsheetEntity cheatsheet = cheatsheetRepository.findById(id);
@@ -195,8 +205,7 @@ public class CheatsheetServiceImpl implements CheatsheetService {
             cheatsheet.setStatus("active");
             cheatsheetRepository.update(cheatsheet);
             auditLogService.log(admin, "CheatSheet Restored", "CheatSheet", id, "Restored CheatSheet: " + cheatsheet.getTitle(), ipAddress);
-
-            // Notify cheatsheet author
+            
             if (cheatsheet.getAuthor() != null) {
                 return notificationService.createNotification(
                         cheatsheet.getAuthor().getId(),
@@ -220,7 +229,6 @@ public class CheatsheetServiceImpl implements CheatsheetService {
             cheatsheetRepository.update(cheatsheet);
             auditLogService.log(admin, "CheatSheet Approved", "CheatSheet", id, "Approved CheatSheet: " + cheatsheet.getTitle(), ipAddress);
 
-            // Notify cheatsheet author
             if (cheatsheet.getAuthor() != null) {
                 return notificationService.createNotification(
                         cheatsheet.getAuthor().getId(),
@@ -243,7 +251,6 @@ public class CheatsheetServiceImpl implements CheatsheetService {
             cheatsheetRepository.update(cheatsheet);
             auditLogService.log(admin, "CheatSheet Rejected", "CheatSheet", id, "Rejected CheatSheet: " + cheatsheet.getTitle(), ipAddress);
 
-            // Notify cheatsheet author
             if (cheatsheet.getAuthor() != null) {
                 return notificationService.createNotification(
                         cheatsheet.getAuthor().getId(),
@@ -267,5 +274,11 @@ public class CheatsheetServiceImpl implements CheatsheetService {
     @Transactional(readOnly = true)
     public long countPublished() {
         return cheatsheetRepository.countPublished();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CheatSheetReportEntity> getCheatsheetReportData() {
+        return cheatsheetRepository.findCheatsheetReportData();
     }
 }

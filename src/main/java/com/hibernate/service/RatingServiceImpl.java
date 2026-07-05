@@ -14,6 +14,9 @@ public class RatingServiceImpl implements RatingService {
     @Transactional
     @Override
     public String submitRating(Integer userId, Integer cheatSheetId, Integer stars) {
+        if (userId == null || cheatSheetId == null || stars == null || stars < 1 || stars > 5) {
+            throw new IllegalArgumentException("Invalid rating request.");
+        }
         RatingEntity existing = ratingRepo.getByUserAndSheetId(userId, cheatSheetId);
         
         if (existing != null) {

@@ -121,7 +121,7 @@ a:hover {
 .feature-card, .sheet-card, .notice-card, .empty-panel {
     border: 1px solid var(--line-color);
     background: var(--card-bg);
-    border-radius: 12px;
+    border-radius: 8px;
 }
 
 .feature-card {
@@ -146,20 +146,34 @@ a:hover {
 }
 
 .sheet-card {
-    overflow: hidden;
+    min-height: 230px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.sheet-ribbon {
-    background: #f1f3f5;
-    border-right: 1px solid var(--line-color);
-    min-width: 85px;
-    text-align: center;
+.sheet-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
 }
 
-.sheet-pages {
-    color: var(--brand-primary);
-    font-size: 1.75rem;
-    font-weight: 800;
+.sheet-card-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.metric-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #475569;
+    font-size: 0.82rem;
 }
 
 .author-chip, .tag-chip {
@@ -320,24 +334,59 @@ a:hover {
                     </section>
 
                     <%-- Cheat Sheets Latest Feed --%>
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h2 class="section-title h4 mb-1">Latest Cheat Sheets</h2>
-                    </div>
-                    <div class="d-grid gap-3 mb-5">
-                        <c:forEach items="${cheatsheetlist}" var="sheet">
-                            <article class="sheet-card d-flex">
-                                <div class="sheet-ribbon p-3 d-flex align-items-center justify-content-center">
-                                    <div class="sheet-pages">1</div>
+                    <section id="latest-sheets" class="mb-5">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <h2 class="section-title h4 mb-1">Latest Cheat Sheets</h2>
+                        </div>
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                            <c:forEach items="${cheatsheetlist}" var="sheet">
+                                <div class="col">
+                                    <article class="sheet-card p-4 h-100">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <span class="sheet-card-icon"><i class="bi bi-file-earmark-code"></i></span>
+                                            <span class="badge text-bg-light border">${sheet.category != null ? sheet.category.name : 'General'}</span>
+                                        </div>
+                                        <h3 class="h5 fw-bold mb-2">
+                                            <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark">${sheet.title}</a>
+                                        </h3>
+                                        <p class="text-secondary small mb-3 flex-grow-1">${sheet.description}</p>
+                                        <div class="d-flex flex-wrap gap-3 mt-auto">
+                                            <span class="metric-pill"><i class="bi bi-eye"></i>${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+                                            <span class="metric-pill"><i class="bi bi-download"></i>${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                            <span class="metric-pill"><i class="bi bi-person"></i>${sheet.author != null ? sheet.author.username : 'Unknown'}</span>
+                                        </div>
+                                    </article>
                                 </div>
-                                <div class="p-3 flex-grow-1">
-                                    <h3 class="h5 fw-bold mb-2">
-                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark">${sheet.title}</a>
-                                    </h3>
-                                    <p class="text-secondary small mb-3">${sheet.description}</p>
+                            </c:forEach>
+                        </div>
+                    </section>
+
+                    <section class="mb-5" id="popular-sheets">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <h2 class="section-title h4 mb-1">Popular Cheat Sheets</h2>
+                        </div>
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                            <c:forEach items="${popularCheatsheets}" var="sheet">
+                                <div class="col">
+                                    <article class="sheet-card p-4 h-100">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <span class="sheet-card-icon"><i class="bi bi-stars"></i></span>
+                                            <span class="badge text-bg-warning"><i class="bi bi-graph-up-arrow me-1"></i>Popular</span>
+                                        </div>
+                                        <h3 class="h5 fw-bold mb-2">
+                                            <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark">${sheet.title}</a>
+                                        </h3>
+                                        <p class="text-secondary small mb-3 flex-grow-1">${sheet.description}</p>
+                                        <div class="d-flex flex-wrap gap-3 mt-auto">
+                                            <span class="metric-pill"><i class="bi bi-hand-thumbs-up"></i>Reacts</span>
+                                            <span class="metric-pill"><i class="bi bi-eye"></i>${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+                                            <span class="metric-pill"><i class="bi bi-star-fill text-warning"></i>Rated</span>
+                                        </div>
+                                    </article>
                                 </div>
-                            </article>
-                        </c:forEach>
-                    </div>
+                            </c:forEach>
+                        </div>
+                    </section>
 
                     <jsp:include page="footer.jsp" />
                 </c:otherwise>
