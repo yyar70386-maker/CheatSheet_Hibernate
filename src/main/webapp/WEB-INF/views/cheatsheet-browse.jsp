@@ -17,11 +17,13 @@
             margin: 40px 0 20px 0;
         }
         .cheatsheet-card {
-            border: 1px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             border-radius: 20px;
             padding: 30px;
-            background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             height: auto;
             display: flex;
@@ -29,7 +31,7 @@
         }
         .cheatsheet-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
         }
         .grid-item {
             align-self: start; 
@@ -46,7 +48,7 @@
             -webkit-line-clamp: unset;
         }
         .see-more-btn {
-            color: #1976d2;
+            color: #ff3366;
             cursor: pointer;
             font-weight: bold;
             font-size: 14px;
@@ -56,6 +58,7 @@
         }
         .see-more-btn:hover {
             text-decoration: underline;
+            color: #e62e5c;
         }
         .card-meta-item {
             color: #666;
@@ -66,7 +69,9 @@
             gap: 10px;
         }
         .tag-badge-link {
-            background-color: #e2e8f0;
+            background-color: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
             color: #333;
             padding: 6px 14px;
             border-radius: 20px;
@@ -74,10 +79,12 @@
             font-weight: bold;
             text-decoration: none;
             display: inline-block;
+            transition: all 0.2s ease;
         }
         .tag-badge-link:hover {
-            background-color: #1976d2;
+            background-color: #1a1a1a;
             color: white;
+            transform: translateY(-2px);
         }
         .stats-section {
             font-size: 14px;
@@ -87,9 +94,12 @@
             margin-top: 15px;
         }
         .tags-footer-section {
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
             padding: 30px;
             margin-top: 50px;
         }
@@ -100,14 +110,14 @@
         }
         .vertical-tag-item {
             font-size: 16px;
-            color: #0d47a1;
+            color: #ff3366;
             text-decoration: none;
             font-weight: bold;
             display: inline-block;
             width: fit-content;
         }
         .vertical-tag-item:hover {
-            color: #1976d2;
+            color: #e62e5c;
             text-decoration: underline;
         }
         
@@ -121,20 +131,22 @@
         
         /* 🌟 Dropdown Button Style */
         .filter-dropdown-btn {
-            border: 1px solid #1976d2;
-            color: #1976d2;
+            border: 1px solid #ff3366;
+            color: #ff3366;
             font-weight: 600;
             border-radius: 8px;
             padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(5px);
         }
         .filter-dropdown-btn:hover, .filter-dropdown-btn:focus {
-            background-color: #1976d2;
+            background-color: #ff3366;
             color: white;
-            border-color: #1976d2;
+            border-color: #ff3366;
         }
     </style>
 </head>
-<body class="bg-light">
+<body style="background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%); min-height: 100vh; color: #1a1a1a;">
 
     <jsp:include page="header.jsp" />
 
@@ -159,19 +171,19 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="filterDropdown">
                         <li>
-                            <a class="dropdown-item ${currentFilter == 'ALL' || empty currentFilter ? 'active bg-primary' : ''}" 
+                            <a class="dropdown-item ${currentFilter == 'ALL' || empty currentFilter ? 'active bg-brand-primary' : ''}" 
                                href="${pageContext.request.contextPath}/cheatsheet/category/${categoryId}?filter=ALL">
                                 <i class="bi bi-collection-fill me-2"></i> All
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item ${currentFilter == 'PUBLIC' ? 'active bg-primary' : ''}" 
+                            <a class="dropdown-item ${currentFilter == 'PUBLIC' ? 'active bg-brand-primary' : ''}" 
                                href="${pageContext.request.contextPath}/cheatsheet/category/${categoryId}?filter=PUBLIC">
                                 <i class="bi bi-globe me-2"></i> Public Only
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item ${currentFilter == 'FRIEND' ? 'active bg-primary' : ''}" 
+                            <a class="dropdown-item ${currentFilter == 'FRIEND' ? 'active bg-brand-primary' : ''}" 
                                href="${pageContext.request.contextPath}/cheatsheet/category/${categoryId}?filter=FRIEND">
                                 <i class="bi bi-people-fill me-2"></i> Friends Only
                             </a>

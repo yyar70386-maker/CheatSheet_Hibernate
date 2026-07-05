@@ -72,25 +72,44 @@
         background-color: #f8f9fa;
     }
     .brand-primary {
-        color: #4f46e5 !important;
+        color: #ff3366 !important;
     }
     .bg-brand-primary {
-        background-color: #4f46e5 !important;
+        background-color: #ff3366 !important;
         color: #fff !important;
     }
     .btn-brand-primary {
-        background-color: #4f46e5 !important;
-        border-color: #4f46e5 !important;
+        background-color: #ff3366 !important;
+        border-color: #ff3366 !important;
         color: #fff !important;
     }
     .btn-brand-primary:hover {
-        background-color: #4338ca !important;
-        border-color: #4338ca !important;
+        background-color: #e62e5c !important;
+        border-color: #e62e5c !important;
         color: #fff !important;
+    }
+    .btn-outline-primary {
+        color: #ff3366;
+        border-color: #ff3366;
+    }
+    .btn-outline-primary:hover {
+        background-color: #ff3366;
+        color: #fff;
+    }
+    .btn-primary {
+        background-color: #ff3366;
+        border-color: #ff3366;
+    }
+    .btn-primary:hover {
+        background-color: #e62e5c;
+        border-color: #e62e5c;
+    }
+    .text-primary {
+        color: #ff3366 !important;
     }
 </style>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+<nav class="navbar navbar-expand-lg navbar-light sticky-top" style="background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);">
     <div class="container">
         <a class="navbar-brand fw-bold fs-4 d-flex align-items-center" href="${pageContext.request.contextPath}/">
             <i class="bi bi-code-square me-2 text-primary"></i> 
@@ -304,7 +323,7 @@
                 text: "Do you really want to log out of your account?",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#dc3545',
+                confirmButtonColor: '#ff3366',
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: 'Yes, logout!',
                 cancelButtonText: 'Cancel',

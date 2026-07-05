@@ -1,114 +1,104 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Create Category</title>
-
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
-}
-
-body{
-    background:#f4f8ff;
-}
-
-.form-container{
-    width:700px;
-    margin:60px auto;
-    background:white;
-    padding:50px;
-    border-radius:20px;
-    border:2px solid #bbdefb;
-    box-shadow:0 4px 20px rgba(21,101,192,0.15);
-}
-
-.form-icon{
-    text-align:center;
-    font-size:55px;
-    color:#1976d2;
-    margin-bottom:20px;
-}
-
-.form-title{
-    text-align:center;
-    color:#1565c0;
-    margin-bottom:40px;
-    font-size:42px;
-    font-weight:bold;
-}
-
-.form-group{
-    margin-bottom:30px;
-}
-
-.form-group label{
-    display:block;
-    margin-bottom:12px;
-    font-weight:bold;
-    color:#0d47a1;
-    font-size:20px;
-}
-
-.form-control{
-    width:100%;
-    padding:17px;
-    border:2px solid #90caf9;
-    border-radius:12px;
-    font-size:18px;
-    outline:none;
-}
-
-.form-control:focus{
-    border-color:#1976d2;
-}
-
-.btn-primary{
-    width:100%;
-    padding:18px;
-    border:none;
-    border-radius:12px;
-    background:#1976d2;
-    color:white;
-    font-size:20px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-.btn-primary:hover{
-    background:#0d47a1;
-}
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Category - Admin Panel</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <style>
+        html, body {
+            height: 100vh;
+            overflow: hidden; 
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+        }
+        .navbar {
+            height: 56px;
+            z-index: 1030;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+        }
+        .app-container {
+            display: flex;
+            height: calc(100vh - 56px); 
+            width: 100%;
+        }
+        .main-content-area {
+            flex-grow: 1;
+            height: 100%;
+            overflow-y: auto; 
+            min-width: 0;
+            padding: 24px;
+            background-color: #ffffff;
+        }
+        
+        /* Custom Admin Pink/White Theme Overrides */
+        .btn-primary { background-color: #ff3366 !important; border-color: #ff3366 !important; }
+        .btn-primary:hover { background-color: #e62e5c !important; border-color: #e62e5c !important; }
+        .text-primary { color: #ff3366 !important; }
+        .form-control:focus { border-color: #ff3366; box-shadow: 0 0 0 0.25rem rgba(255, 51, 102, 0.25); }
+    </style>
 </head>
-<body>
+<body style="background-color: #ffffff;">
 
-<div class="form-container">
+    <jsp:include page="header.jsp" />
 
+    <div class="app-container">
+        <jsp:include page="sidebar.jsp">
+            <jsp:param name="activePage" value="categories" />
+        </jsp:include>
+        
+        <div class="main-content-area">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark m-0">Add Category</h2>
+                    <p class="text-muted m-0 small">Create a new category for cheatsheets.</p>
+                </div>
+                <a href="${pageContext.request.contextPath}/category/list" class="btn btn-outline-secondary px-3 fw-medium">
+                    <i class="bi bi-arrow-left me-2"></i>Back to List
+                </a>
+            </div>
 
-    <h1 class="form-title">Create Category</h1>
+            <div class="card border-0 shadow-sm rounded-3" style="max-width: 600px;">
+                <div class="card-body p-4">
+                    <form action="${pageContext.request.contextPath}/category/save" method="post">
+                        
+                        <div class="mb-4">
+                            <label for="categoryName" class="form-label fw-bold text-dark">Category Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-secondary"><i class="bi bi-folder2-open"></i></span>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="categoryName" 
+                                       name="name" 
+                                       placeholder="e.g., Web Development" 
+                                       required>
+                            </div>
+                        </div>
 
-    <form:form method="post"
-               action="${pageContext.request.contextPath}/category/save"
-               modelAttribute="category">
+                        <input type="hidden" name="status" value="active">
 
-        <div class="form-group">
-            <label>Category Name</label>
-            <form:input path="name"
-                        cssClass="form-control"
-                        placeholder="Enter category name..."/>
+                        <hr class="mt-4 mb-4" style="color: #e2e8f0;">
+
+                        <div class="d-flex justify-content-end gap-3">
+                            <button type="submit" class="btn btn-primary d-flex align-items-center px-4 gap-2">
+                                <i class="bi bi-check-circle-fill"></i> Save Category
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
         </div>
+    </div>
 
-        <input type="submit" value="Create Category" class="btn-primary"/>
-
-    </form:form>
-
-</div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

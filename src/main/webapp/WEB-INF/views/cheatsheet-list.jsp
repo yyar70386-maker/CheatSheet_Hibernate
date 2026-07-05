@@ -16,8 +16,8 @@
 }
 
 body{
-    background:#eef3fb;
-    padding:20px 10px;
+    background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%);
+    min-height: 100vh;
 }
 
 .page-header{
@@ -28,35 +28,40 @@ body{
 }
 
 .page-title{
-    color:#1976d2;
+    color: #ff3366;
     font-size:28px;
     font-weight:bold;
 }
 
 .btn-add{
-    background:#1976d2;
+    background: #ff3366;
     color:white;
     padding:12px 20px;
     text-decoration:none;
     border-radius:8px;
     font-weight:bold;
+    transition: background 0.3s;
 }
 
 .btn-add:hover{
-    background:#0d47a1;
+    background: #e62e5c;
+    color: white;
 }
 
 .table{
     width:100%;
     border-collapse:collapse;
-    background:white;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-radius:12px;
     overflow:hidden;
-    box-shadow:0 4px 20px rgba(21,101,192,0.15);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 .table th{
-    background:#1976d2;
+    background: rgba(255, 51, 102, 0.8);
     color:white;
     padding:16px;
     text-align:left;
@@ -64,7 +69,8 @@ body{
 
 .table td{
     padding:16px;
-    border-bottom:1px solid #e3f2fd;
+    border-bottom:1px solid rgba(255, 255, 255, 0.8);
+    color: #333;
 }
 
 .table tr:last-child td{
@@ -72,7 +78,7 @@ body{
 }
 
 .btn-edit{
-    background:#64b5f6;
+    background: #4facfe;
     color:white;
     padding:8px 14px;
     border-radius:6px;
@@ -82,7 +88,8 @@ body{
 }
 
 .btn-edit:hover{
-    background:#42a5f5;
+    background: #00c6fb;
+    color: white;
 }
 
 .btn-delete{
@@ -96,10 +103,11 @@ body{
 
 .btn-delete:hover{
     background:#d32f2f;
+    color: white;
 }
 
 .no-data{
-    color:red;
+    color: #ff3366;
     text-align:center;
     margin-top:50px;
     font-size:24px;
@@ -110,7 +118,9 @@ body{
 
 </head>
 <body>
+<jsp:include page="header.jsp" />
 
+<div class="container mt-5 mb-5" style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
 <div class="page-header">
 
     <h1 class="page-title">Cheatsheet List</h1>
@@ -175,8 +185,8 @@ body{
                         </a>
 
                         <a class="btn-delete"
-						   href="${pageContext.request.contextPath}/category/delete/${c.id}"
-						   onclick="return confirm('Are you sure you want to delete this category?');">
+						   href="${pageContext.request.contextPath}/cheatsheet/delete/${c.id}"
+						   onclick="return confirm('Are you sure you want to delete this cheatsheet?');">
 						    Delete
 						</a>
 
@@ -192,5 +202,7 @@ body{
 
 </c:choose>
 
+</div>
+<jsp:include page="footer.jsp" />
 </body>
 </html>

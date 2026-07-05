@@ -41,10 +41,10 @@
                     <p class="text-muted m-0 small">Generate and export CheatSheet data reports.</p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
-                    <a class="btn btn-danger text-white" href="${pageContext.request.contextPath}/admin/reports/cheatsheet/pdf">
+                    <a class="btn btn-danger text-white" href="${pageContext.request.contextPath}/admin/reports/cheatsheet/pdf" download="cheatsheet-report.pdf">
                         <i class="bi bi-filetype-pdf me-1"></i> View PDF
                     </a>
-                    <a class="btn btn-success text-white" href="${pageContext.request.contextPath}/admin/reports/cheatsheet/excel">
+                    <a class="btn btn-success text-white" href="${pageContext.request.contextPath}/admin/reports/cheatsheet/excel" download="cheatsheet-report.xlsx">
                         <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Excel
                     </a>
                 </div>
@@ -74,7 +74,7 @@
                             <div>
                                 <div class="text-secondary small fw-medium">Export PDF</div>
                                 <div class="fs-6 fw-semibold text-dark">
-                                    <a href="${pageContext.request.contextPath}/admin/reports/cheatsheet/pdf" class="text-decoration-none text-success">
+                                    <a href="${pageContext.request.contextPath}/admin/reports/cheatsheet/pdf" class="text-decoration-none text-success" download="cheatsheet-report.pdf">
                                         <i class="bi bi-box-arrow-up-right me-1"></i>Download
                                     </a>
                                 </div>
@@ -91,7 +91,7 @@
                             <div>
                                 <div class="text-secondary small fw-medium">Export Excel</div>
                                 <div class="fs-6 fw-semibold text-dark">
-                                    <a href="${pageContext.request.contextPath}/admin/reports/cheatsheet/excel" class="text-decoration-none text-warning">
+                                    <a href="${pageContext.request.contextPath}/admin/reports/cheatsheet/excel" class="text-decoration-none text-warning" download="cheatsheet-report.xlsx">
                                         <i class="bi bi-box-arrow-up-right me-1"></i>Download
                                     </a>
                                 </div>

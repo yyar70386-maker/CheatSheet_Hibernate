@@ -9,47 +9,49 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-<!-- 📊 Chart.js Library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-:root {
-    --page-bg: #f8f9fa;
-    --card-bg: #ffffff;
-    --text-dark: #212529;
-    --text-muted: #6c757d;
-    --line-color: #dee2e6;
-    --brand-primary: #1976d2;
-    --brand-dark: #0d47a1;
-    --accent-green: #2e7d32;
-    --accent-teal: #00796b;
-    --accent-amber: #f57c00;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-html, body {
-    height: 100vh;
-    overflow: hidden;
+/* ================= Base & Background ================= */
+* {
     margin: 0;
     padding: 0;
-    background-color: var(--page-bg);
-    color: var(--text-dark);
-    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
 }
 
-a {
-    color: var(--brand-primary);
-    text-decoration: none;
+body {
+    /* Soft radial background from the new design */
+    background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%);
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+    color: #1a1a1a;
 }
 
-a:hover {
-    color: var(--brand-dark);
+/* ================= Particle Canvas ================= */
+#particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
 }
 
+a { text-decoration: none; color: #ff3366; }
+a:hover { color: #cc0044; }
+
+/* ================= Layout ================= */
 .app-container {
     display: flex;
     height: calc(100vh - 56px);
     width: 100%;
+    position: relative;
+    z-index: 10;
 }
 
 .main-content-area {
@@ -57,332 +59,314 @@ a:hover {
     height: 100%;
     overflow-y: auto;
     min-width: 0;
-    padding: 24px;
-    background-color: var(--page-bg);
+    padding: 30px;
+    background: transparent; /* Allow background to show through */
 }
 
-/* Hero Banner Section */
-.hero-section {
-    background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-primary) 100%);
-    padding: 3.5rem 2rem;
-    color: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+/* ================= Glassmorphism Core ================= */
+.glass-card {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.search-panel {
-    background: var(--card-bg);
-    border-radius: 50px;
-    padding: 0.4rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-.search-input {
-    border: 0;
-    background: transparent;
-    padding-left: 1rem;
-}
-
-.search-input:focus {
-    box-shadow: none;
-}
-
-.btn-library {
-    background-color: var(--brand-primary);
-    color: white;
-    font-weight: 600;
-    border-radius: 50px;
-    transition: all 0.2s ease;
-}
-
-.btn-library:hover {
-    background-color: var(--brand-dark);
-    color: white;
-}
-
-.section-title {
-    font-weight: 700;
-    position: relative;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.section-title::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 3px;
-    width: 40px;
-    background-color: var(--brand-primary);
-    border-radius: 2px;
-}
-
-.feature-card, .sheet-card, .notice-card, .empty-panel {
-    border: 1px solid var(--line-color);
-    background: var(--card-bg);
-    border-radius: 8px;
-}
-
-.feature-card {
-    transition: transform 0.3s ease;
-    text-decoration: none;
-    display: block;
-}
-
-.feature-card:hover {
+.glass-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
 }
 
-.icon-box {
-    width: 64px;
-    height: 64px;
+/* ================= 3D Scene (Hero Right) ================= */
+.scene {
+    width: 100%;
+    height: 400px;
+    perspective: 1200px;
     display: flex;
-    align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    background-color: #e9ecef;
-    margin: 0 auto 15px auto;
-}
-
-.sheet-card {
-    min-height: 230px;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.sheet-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
-}
-
-.sheet-card-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 8px;
-    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    background: #eef2ff;
-    color: #4f46e5;
-}
-
-.metric-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    color: #475569;
-    font-size: 0.82rem;
-}
-
-.author-chip, .tag-chip {
-    border: 1px solid var(--line-color);
-    background: #f8f9fa;
-    border-radius: 50px;
-    color: var(--text-muted);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.82rem;
-    padding: 4px 12px;
-}
-
-/* Admin Circle Chart Box */
-.chart-box-container {
     position: relative;
-    margin: auto;
-    height: 200px;
-    width: 200px;
 }
+
+.floor-shadow {
+    position: absolute;
+    bottom: 0px;
+    width: 250px;
+    height: 50px;
+    background: radial-gradient(ellipse at center, rgba(230, 100, 150, 0.4) 0%, rgba(0,0,0,0) 70%);
+    border-radius: 50%;
+    transform: rotateX(70deg);
+    filter: blur(15px);
+    animation: shadowPulse 6s ease-in-out infinite;
+}
+
+.glass-stack {
+    position: relative;
+    width: 180px;
+    height: 240px;
+    transform-style: preserve-3d;
+    transform: rotateX(60deg) rotateZ(-45deg);
+    animation: float3D 6s ease-in-out infinite;
+}
+
+.layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5), 0 20px 40px rgba(0, 0, 0, 0.1);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.layer-1 { background: linear-gradient(135deg, rgba(255, 51, 102, 0.4), rgba(255, 102, 153, 0.1)); transform: translateZ(0px); box-shadow: 0 0 50px rgba(255, 51, 102, 0.3); }
+.layer-2 { background: linear-gradient(135deg, rgba(255, 204, 0, 0.4), rgba(255, 153, 51, 0.1)); transform: translateZ(45px); }
+.layer-3 { background: linear-gradient(135deg, rgba(102, 102, 255, 0.4), rgba(153, 51, 255, 0.1)); transform: translateZ(90px); }
+.layer-4 { background: linear-gradient(135deg, rgba(0, 255, 255, 0.5), rgba(0, 153, 255, 0.2)); transform: translateZ(135px); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 40px rgba(0, 255, 255, 0.4); }
+
+.glass-stack:hover .layer-1 { transform: translateZ(-20px); }
+.glass-stack:hover .layer-2 { transform: translateZ(40px); }
+.glass-stack:hover .layer-3 { transform: translateZ(100px); }
+.glass-stack:hover .layer-4 { transform: translateZ(160px); }
+
+.code-icon-3d {
+    width: 70px; height: 70px; fill: none; stroke: white; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+    transform: rotateZ(45deg) rotateX(-10deg);
+}
+
+/* ================= Specific UI Elements ================= */
+.hero-title { font-size: 3.5rem; font-weight: 800; line-height: 1.1; color: #1a1a1a; margin-bottom: 20px; letter-spacing: -1px; }
+
+.search-panel { background: rgba(255, 255, 255, 0.7); border-radius: 50px; padding: 0.5rem; border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 10px 30px rgba(0,0,0,0.05); backdrop-filter: blur(10px); }
+.search-input { border: 0; background: transparent; padding-left: 1.5rem; color: #333; font-weight: 500; }
+.search-input:focus { box-shadow: none; }
+.btn-library { background: #1a1a1a; color: white; font-weight: 600; border-radius: 50px; padding: 10px 30px; transition: all 0.3s; }
+.btn-library:hover { background: #ff3366; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3); }
+
+.tag-chip {
+    background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255,255,255,0.8); backdrop-filter: blur(5px);
+    border-radius: 50px; color: #333; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; padding: 8px 20px; font-weight: 600; transition: all 0.2s ease;
+}
+.tag-chip:hover { background: #1a1a1a; color: #fff; transform: translateY(-2px); }
+.tag-chip i { color: #ff3366; }
+
+.section-title { font-weight: 700; position: relative; padding-bottom: 0.5rem; margin-bottom: 1.5rem; color: #1a1a1a; }
+.icon-box-glass { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: rgba(255,255,255,0.8); margin: 0 auto 15px auto; font-size: 1.5rem; color: #ff3366; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+/* Infinite Marquee */
+.marquee-container { width: 100%; overflow: hidden; padding: 2rem 0; margin-bottom: 2rem; border-top: 1px solid rgba(255,255,255,0.4); border-bottom: 1px solid rgba(255,255,255,0.4); }
+.marquee-content { display: inline-flex; white-space: nowrap; animation: slideMarquee 25s linear infinite; }
+.marquee-item { font-size: 1.2rem; font-weight: 700; color: rgba(26, 26, 26, 0.4); margin: 0 50px; display: flex; align-items: center; gap: 12px; transition: color 0.3s ease; }
+.marquee-item:hover { color: #ff3366; }
+
+/* Admin Charts */
+.chart-box-container { position: relative; margin: auto; height: 180px; width: 180px; }
+
+/* Animations */
+@keyframes float3D {
+    0% { transform: rotateX(60deg) rotateZ(-45deg) translateZ(0px); }
+    50% { transform: rotateX(60deg) rotateZ(-45deg) translateZ(25px); }
+    100% { transform: rotateX(60deg) rotateZ(-45deg) translateZ(0px); }
+}
+@keyframes shadowPulse {
+    0% { transform: rotateX(70deg) scale(1); opacity: 0.6; }
+    50% { transform: rotateX(70deg) scale(1.2); opacity: 0.3; }
+    100% { transform: rotateX(70deg) scale(1); opacity: 0.6; }
+}
+@keyframes slideMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes slideUpFade { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+
+.anim-1 { opacity: 0; animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.1s; }
+.anim-2 { opacity: 0; animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s; }
+.anim-3 { opacity: 0; animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.5s; }
 </style>
 </head>
 <body>
 
-    <%-- 🧩 Header Component --%>
+    <canvas id="particles"></canvas>
+
     <jsp:include page="header.jsp" />
 
     <div class="app-container">
-
-        <%-- 🛠️ Sidebar Component --%>
+        
         <jsp:include page="sidebar.jsp">
             <jsp:param name="activePage" value="dashboard" />
         </jsp:include>
 
         <div class="main-content-area">
 
-            <%-- 🔐 Role-Based Switching Logic (From main branch) --%>
             <c:choose>
-                <%-- 🌟 ADMIN VIEW --%>
+                <%-- 🌟 ADMIN VIEW (Glassmorphism) --%>
                 <c:when test="${not empty sessionScope.currentUser && sessionScope.currentUser.role == 1}">
-                    <div class="mb-5 text-center mt-3">
-                        <h2 class="fw-bold mb-2">
-                            <i class="bi bi-speedometer2 text-primary me-2"></i>Admin Overview Panel
-                        </h2>
-                        <div class="text-muted small">Real-time database system summary metrics info</div>
+                    <div class="mb-5 text-center mt-3 anim-1">
+                        <h2 class="fw-bold mb-2 text-dark"><i class="bi bi-speedometer2 text-danger me-2"></i>Admin Dashboard</h2>
+                        <div class="text-muted small fw-medium">Real-time platform metrics in 3D Glass Space</div>
                     </div>
 
                     <div class="row g-4 justify-content-center">
-                        <!-- Total Users Circle -->
-                        <div class="col-md-4">
-                            <div class="card bg-white border-0 shadow-sm rounded-3 p-4 text-center h-100">
-                                <h6 class="text-muted fw-bold mb-3">
-                                    <i class="bi bi-people-fill me-2 text-primary"></i>Total Users
-                                </h6>
-                                <div class="chart-box-container">
-                                    <canvas id="usersCircleChart"></canvas>
-                                </div>
-                                <div class="fs-4 fw-bold mt-3 text-dark">
-                                    <c:out value="${not empty totalUsers ? totalUsers : (not empty summary.totalUsers ? summary.totalUsers : 0)}" />
-                                </div>
+                        <div class="col-md-4 anim-2">
+                            <div class="glass-card p-4 text-center h-100">
+                                <h6 class="text-muted fw-bold mb-3"><i class="bi bi-people-fill me-2" style="color: #ff3366;"></i>Total Users</h6>
+                                <div class="chart-box-container"><canvas id="usersCircleChart"></canvas></div>
+                                <div class="fs-3 fw-bold mt-3 text-dark"><c:out value="${not empty totalUsers ? totalUsers : (not empty summary.totalUsers ? summary.totalUsers : 0)}" /></div>
                             </div>
                         </div>
-
-                        <!-- Total Categories Circle -->
-                        <div class="col-md-4">
-                            <div class="card bg-white border-0 shadow-sm rounded-3 p-4 text-center h-100">
-                                <h6 class="text-muted fw-bold mb-3">
-                                    <i class="bi bi-tags-fill me-2 text-warning"></i>Total Categories
-                                </h6>
-                                <div class="chart-box-container">
-                                    <canvas id="categoriesCircleChart"></canvas>
-                                </div>
-                                <div class="fs-4 fw-bold mt-3 text-dark">
-                                    <c:out value="${not empty categorylist ? categorylist.size() : 0}" />
-                                </div>
+                        <div class="col-md-4 anim-3">
+                            <div class="glass-card p-4 text-center h-100">
+                                <h6 class="text-muted fw-bold mb-3"><i class="bi bi-tags-fill me-2" style="color: #ffcc00;"></i>Total Categories</h6>
+                                <div class="chart-box-container"><canvas id="categoriesCircleChart"></canvas></div>
+                                <div class="fs-3 fw-bold mt-3 text-dark"><c:out value="${not empty categorylist ? categorylist.size() : 0}" /></div>
                             </div>
                         </div>
-
-                        <!-- Total CheatSheets Circle -->
-                        <div class="col-md-4">
-                            <div class="card bg-white border-0 shadow-sm rounded-3 p-4 text-center h-100">
-                                <h6 class="text-muted fw-bold mb-3">
-                                    <i class="bi bi-file-earmark-code-fill me-2 text-success"></i>Cheat Sheets
-                                </h6>
-                                <div class="chart-box-container">
-                                    <canvas id="sheetsCircleChart"></canvas>
-                                </div>
-                                <div class="fs-4 fw-bold mt-3 text-dark">
-                                    <c:out value="${not empty totalSheets ? totalSheets : (not empty summary.totalCheatsheets ? summary.totalCheatsheets : 0)}" />
-                                </div>
+                        <div class="col-md-4 anim-3">
+                            <div class="glass-card p-4 text-center h-100">
+                                <h6 class="text-muted fw-bold mb-3"><i class="bi bi-file-earmark-code-fill me-2" style="color: #00ccff;"></i>Cheat Sheets</h6>
+                                <div class="chart-box-container"><canvas id="sheetsCircleChart"></canvas></div>
+                                <div class="fs-3 fw-bold mt-3 text-dark"><c:out value="${not empty totalSheets ? totalSheets : (not empty summary.totalCheatsheets ? summary.totalCheatsheets : 0)}" /></div>
                             </div>
                         </div>
                     </div>
                 </c:when>
 
-                <%-- 🌟 REGULAR USER / GUEST VIEW --%>
+                <%-- 🌟 REGULAR USER / GUEST VIEW (3D Glass Theme) --%>
                 <c:otherwise>
-                    <%-- 🚀 Merged Hero Banner Section (With Action Buttons from HEAD branch) --%>
-                    <header class="hero-section mb-5">
-                        <div class="container-fluid px-2">
-                            <div class="row g-4 align-items-center">
-                                <div class="col-xl-7 text-center text-xl-start">
-                                    <div class="text-uppercase small fw-bold tracking-wider mb-2 opacity-75">Quick references for every topic</div>
-                                    <h1 class="hero-title mb-3">Developer Cheat Sheets</h1>
-                                    <p class="fs-5 opacity-90 mb-0">
-                                        Browse community cheat sheets, search fast, and jump into the newest references first.
-                                    </p>
-                                </div>
-                                <div class="col-xl-5">
-                                    <form action="${pageContext.request.contextPath}/home" method="get" class="search-panel shadow-sm">
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
-                                            <input type="search" class="form-control search-input" name="q" value="${searchQuery}" placeholder="Search cheat sheets...">
-                                            <button class="btn btn-library px-4" type="submit">Search</button>
-                                        </div>
+                    <%-- Hero Section --%>
+                    <div class="container-fluid mb-5 pt-4">
+                        <div class="row align-items-center min-vh-50">
+                            <div class="col-lg-6 col-xl-7 text-center text-lg-start mb-5 mb-lg-0">
+                                <div class="badge bg-white text-dark rounded-pill px-3 py-2 mb-3 shadow-sm border anim-1 fw-bold">🚀 The ultimate developer library</div>
+                                <h1 class="hero-title anim-1">Master Code with<br><span style="color: #ff3366;">3D CheatSheets</span></h1>
+                                <p class="fs-6 text-muted mb-4 anim-2" style="max-width: 500px;">
+                                    Unify your programming knowledge with our beautiful, high-performance community references. Search fast, code faster.
+                                </p>
+                                
+                                <div class="anim-3">
+                                    <form action="${pageContext.request.contextPath}/home" method="get" class="search-panel d-flex">
+                                        <span class="input-group-text bg-transparent border-0"><i class="bi bi-search" style="color: #ff3366;"></i></span>
+                                        <input type="search" class="form-control search-input" name="q" value="${searchQuery}" placeholder="What do you want to learn today?">
+                                        <button class="btn btn-library" type="submit">Search</button>
                                     </form>
-                                    <div class="d-flex flex-wrap justify-content-center justify-content-xl-start gap-2 mt-3">
-                                        <c:choose>
-                                            <c:when test="${not empty sessionScope.currentUser}">
-                                                <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/cheatsheet/add">
-                                                    <i class="bi bi-plus-circle-fill text-primary"></i> Create
-                                                </a>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/login">
-                                                    <i class="bi bi-plus-circle-fill text-primary"></i> Create
-                                                </a>
-                                            </c:otherwise>
-                                        </c:choose>
-                                        <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/announcements"><i class="bi bi-megaphone-fill text-warning"></i> Announcements</a>
-                                        <a class="tag-chip bg-white text-dark shadow-sm" href="${pageContext.request.contextPath}/profile"><i class="bi bi-person-circle text-info"></i> Profile</a>
+                                </div>
+                                
+                                <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3 mt-4 anim-3">
+                                    <a class="tag-chip" href="${pageContext.request.contextPath}/${not empty sessionScope.currentUser ? 'cheatsheet/add' : 'login'}">
+                                        <i class="bi bi-plus-lg"></i> Create
+                                    </a>
+                                    <a class="tag-chip" href="${pageContext.request.contextPath}/announcements"><i class="bi bi-bell-fill"></i> Updates</a>
+                                    <a class="tag-chip" href="${pageContext.request.contextPath}/profile"><i class="bi bi-person-fill"></i> Profile</a>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-6 col-xl-5 anim-2 d-none d-md-block">
+                                <div class="scene">
+                                    <div class="floor-shadow"></div>
+                                    <div class="glass-stack">
+                                        <div class="layer layer-1"></div>
+                                        <div class="layer layer-2"></div>
+                                        <div class="layer layer-3"></div>
+                                        <div class="layer layer-4">
+                                            <svg class="code-icon-3d" viewBox="0 0 24 24">
+                                                <polyline points="16 18 22 12 16 6"></polyline>
+                                                <polyline points="8 6 2 12 8 18"></polyline>
+                                            </svg>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </header>
+                    </div>
 
-                    <%-- Browse Categories Layout --%>
-                    <section class="mb-5" id="categories">
-                        <div class="d-flex align-items-end justify-content-between mb-4">
-                            <div>
-                                <h2 class="section-title h4 mb-1">Browse Categories</h2>
-                            </div>
+                    <%-- Infinite Marquee --%>
+                    <div class="marquee-container anim-3">
+                        <div class="marquee-content">
+                            <div class="marquee-item"><i class="bi bi-file-code text-danger"></i> JDBC Template</div>
+                            <div class="marquee-item"><i class="bi bi-cup-hot text-warning"></i> Java Core</div>
+                            <div class="marquee-item"><i class="bi bi-database text-info"></i> MySQL</div>
+                            <div class="marquee-item"><i class="bi bi-box-seam text-success"></i> Spring Boot</div>
+                            <div class="marquee-item"><i class="bi bi-github text-dark"></i> Version Control</div>
+                            <div class="marquee-item"><i class="bi bi-file-code text-danger"></i> JDBC Template</div>
+                            <div class="marquee-item"><i class="bi bi-cup-hot text-warning"></i> Java Core</div>
+                            <div class="marquee-item"><i class="bi bi-database text-info"></i> MySQL</div>
+                            <div class="marquee-item"><i class="bi bi-box-seam text-success"></i> Spring Boot</div>
+                            <div class="marquee-item"><i class="bi bi-github text-dark"></i> Version Control</div>
                         </div>
+                    </div>
+
+                    <%-- Categories (Glass Cards) --%>
+                    <section class="mb-5 anim-3" id="categories">
+                        <h2 class="section-title h4 mb-4">Browse Categories</h2>
                         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                             <c:forEach items="${categorylist}" var="c">
                                 <div class="col">
-                                    <a href="${pageContext.request.contextPath}/cheatsheet/category/${c.id}" class="card feature-card h-100 p-4 text-center bg-white">
-                                        <div class="icon-box">
-                                            <i class="bi bi-layers-half text-primary"></i>
-                                        </div>
-                                        <h5 class="card-title fw-bold text-dark mb-2">${c.name}</h5>
+                                    <a href="${pageContext.request.contextPath}/cheatsheet/category/${c.id}" class="glass-card d-block p-4 text-center text-decoration-none h-100">
+                                        <div class="icon-box-glass"><i class="bi bi-grid-1x2-fill"></i></div>
+                                        <h5 class="fw-bold text-dark mb-0">${c.name}</h5>
                                     </a>
                                 </div>
                             </c:forEach>
                         </div>
                     </section>
 
-                    <%-- Cheat Sheets Latest Feed --%>
-                    <section id="latest-sheets" class="mb-5">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h2 class="section-title h4 mb-1">Latest Cheat Sheets</h2>
-                        </div>
+                    <%-- Latest Sheets (Glass Cards) --%>
+                    <section id="latest-sheets" class="mb-5 anim-3">
+                        <h2 class="section-title h4 mb-4">Latest References</h2>
                         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
                             <c:forEach items="${cheatsheetlist}" var="sheet">
                                 <div class="col">
-                                    <article class="sheet-card p-4 h-100">
+                                    <div class="glass-card p-4 h-100 d-flex flex-column">
                                         <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <span class="sheet-card-icon"><i class="bi bi-file-earmark-code"></i></span>
-                                            <span class="badge text-bg-light border">${sheet.category != null ? sheet.category.name : 'General'}</span>
+                                            <div class="bg-white rounded p-2 shadow-sm text-primary"><i class="bi bi-code-square fs-5"></i></div>
+                                            <span class="badge bg-dark bg-opacity-10 text-dark rounded-pill px-3 py-1 border border-light">
+                                                ${sheet.category != null ? sheet.category.name : 'General'}
+                                            </span>
                                         </div>
                                         <h3 class="h5 fw-bold mb-2">
-                                            <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark">${sheet.title}</a>
+                                            <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none">${sheet.title}</a>
                                         </h3>
-                                        <p class="text-secondary small mb-3 flex-grow-1">${sheet.description}</p>
-                                        <div class="d-flex flex-wrap gap-3 mt-auto">
-                                            <span class="metric-pill"><i class="bi bi-eye"></i>${sheet.viewCount != null ? sheet.viewCount : 0}</span>
-                                            <span class="metric-pill"><i class="bi bi-download"></i>${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
-                                            <span class="metric-pill"><i class="bi bi-person"></i>${sheet.author != null ? sheet.author.username : 'Unknown'}</span>
+                                        <p class="text-muted small mb-4 flex-grow-1">${sheet.description}</p>
+                                        <div class="d-flex flex-wrap justify-content-between align-items-center mt-auto border-top pt-3 border-light border-opacity-50">
+                                            <div class="small fw-semibold text-dark"><i class="bi bi-person-circle text-muted me-1"></i> ${sheet.author != null ? sheet.author.username : 'System'}</div>
+                                            <div class="d-flex gap-3 text-muted small">
+                                                <span><i class="bi bi-eye"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+                                                <span><i class="bi bi-download"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                            </div>
                                         </div>
-                                    </article>
+                                    </div>
                                 </div>
                             </c:forEach>
                         </div>
                     </section>
 
-                    <section class="mb-5" id="popular-sheets">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h2 class="section-title h4 mb-1">Popular Cheat Sheets</h2>
-                        </div>
+                    <%-- Popular Sheets (Glass Cards) --%>
+                    <section id="popular-sheets" class="mb-5 anim-3">
+                        <h2 class="section-title h4 mb-4">Popular References</h2>
                         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
                             <c:forEach items="${popularCheatsheets}" var="sheet">
                                 <div class="col">
-                                    <article class="sheet-card p-4 h-100">
+                                    <div class="glass-card p-4 h-100 d-flex flex-column">
                                         <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <span class="sheet-card-icon"><i class="bi bi-stars"></i></span>
-                                            <span class="badge text-bg-warning"><i class="bi bi-graph-up-arrow me-1"></i>Popular</span>
+                                            <div class="bg-white rounded p-2 shadow-sm text-primary"><i class="bi bi-star-fill fs-5" style="color: #ffcc00;"></i></div>
+                                            <span class="badge bg-dark bg-opacity-10 text-dark rounded-pill px-3 py-1 border border-light">
+                                                ${sheet.category != null ? sheet.category.name : 'General'}
+                                            </span>
                                         </div>
                                         <h3 class="h5 fw-bold mb-2">
-                                            <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark">${sheet.title}</a>
+                                            <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none">${sheet.title}</a>
                                         </h3>
-                                        <p class="text-secondary small mb-3 flex-grow-1">${sheet.description}</p>
-                                        <div class="d-flex flex-wrap gap-3 mt-auto">
-                                            <span class="metric-pill"><i class="bi bi-hand-thumbs-up"></i>Reacts</span>
-                                            <span class="metric-pill"><i class="bi bi-eye"></i>${sheet.viewCount != null ? sheet.viewCount : 0}</span>
-                                            <span class="metric-pill"><i class="bi bi-star-fill text-warning"></i>Rated</span>
+                                        <p class="text-muted small mb-4 flex-grow-1">${sheet.description}</p>
+                                        <div class="d-flex flex-wrap justify-content-between align-items-center mt-auto border-top pt-3 border-light border-opacity-50">
+                                            <div class="small fw-semibold text-dark"><i class="bi bi-person-circle text-muted me-1"></i> ${sheet.author != null ? sheet.author.username : 'System'}</div>
+                                            <div class="d-flex gap-3 text-muted small">
+                                                <span><i class="bi bi-eye"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+                                                <span><i class="bi bi-download"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                            </div>
                                         </div>
-                                    </article>
+                                    </div>
                                 </div>
                             </c:forEach>
                         </div>
@@ -397,35 +381,87 @@ a:hover {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- 📊 JavaScript for Admin Circle Charts -->
+    <script>
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const particlesArray = [];
+        const numberOfParticles = 60; // Adjusted for better performance with glassmorphism
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.5 + 0.5; 
+                this.speedX = Math.random() * 1 - 0.5; 
+                this.speedY = Math.random() * -1.5 - 0.5; 
+                // Color matches the pink/blue theme
+                this.color = `rgba(${Math.floor(Math.random() * 100 + 155)}, ${Math.floor(Math.random() * 50 + 50)}, ${Math.floor(Math.random() * 150 + 100)}, ${Math.random() * 0.4 + 0.1})`;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.y < 0) {
+                    this.y = canvas.height;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = this.color;
+            }
+        }
+
+        for (let i = 0; i < numberOfParticles; i++) { particlesArray.push(new Particle()); }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+
     <c:if test="${not empty sessionScope.currentUser && sessionScope.currentUser.role == 1}">
         <script>
             const valUsers = ${not empty totalUsers ? totalUsers : (not empty summary.totalUsers ? summary.totalUsers : 0)};
             const valCategories = ${not empty categorylist ? categorylist.size() : 0};
             const valSheets = ${not empty totalSheets ? totalSheets : (not empty summary.totalCheatsheets ? summary.totalCheatsheets : 0)};
 
-            const globalChartConfig = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                cutout: '75%'
+            const globalChartConfig = { 
+                responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '75%',
+                elements: { arc: { borderWidth: 0 } }
             };
 
             new Chart(document.getElementById('usersCircleChart'), {
                 type: 'doughnut',
-                data: { datasets: [{ data: [valUsers, valUsers == 0 ? 1 : 0], backgroundColor: ['#1976d2', '#e9ecef'], borderWidth: 0 }] },
+                data: { datasets: [{ data: [valUsers, valUsers == 0 ? 1 : 0], backgroundColor: ['#ff3366', 'rgba(255,255,255,0.4)'] }] },
                 options: globalChartConfig
             });
 
             new Chart(document.getElementById('categoriesCircleChart'), {
                 type: 'doughnut',
-                data: { datasets: [{ data: [valCategories, valCategories == 0 ? 1 : 0], backgroundColor: ['#ffc107', '#e9ecef'], borderWidth: 0 }] },
+                data: { datasets: [{ data: [valCategories, valCategories == 0 ? 1 : 0], backgroundColor: ['#ffcc00', 'rgba(255,255,255,0.4)'] }] },
                 options: globalChartConfig
             });
 
             new Chart(document.getElementById('sheetsCircleChart'), {
                 type: 'doughnut',
-                data: { datasets: [{ data: [valSheets, valSheets == 0 ? 1 : 0], backgroundColor: ['#2e7d32', '#e9ecef'], borderWidth: 0 }] },
+                data: { datasets: [{ data: [valSheets, valSheets == 0 ? 1 : 0], backgroundColor: ['#00ccff', 'rgba(255,255,255,0.4)'] }] },
                 options: globalChartConfig
             });
         </script>

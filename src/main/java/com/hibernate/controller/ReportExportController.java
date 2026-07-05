@@ -93,7 +93,7 @@ public class ReportExportController {
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
             response.setContentType("application/pdf");
-            response.setHeader("Content-Disposition", "inline; filename=\"cheatsheet-report.pdf\"");
+            response.setHeader("Content-Disposition", "attachment; filename=\"cheatsheet-report.pdf\"");
             JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
 
         } catch (Exception e) {

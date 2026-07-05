@@ -13,31 +13,36 @@
 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
 body {
-	background-color: #f0f2f5;
+	background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%);
+	min-height: 100vh;
 	font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 	padding-top: 70px;
 }
 
 /* 🌟 Navbar Styling (Fixed & High Z-Index) */
 .custom-navbar {
-	background: #ffffff;
-	border-bottom: 1px solid #e4e6eb;
+	background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.6);
 	z-index: 1030;
 	/* Profile ပုံတွေ၊ Modal တွေရဲ့ အောက်ကို ရောက်မသွားအောင် */
 }
 
 /* 🌟 Profile Card & Cover Photo */
 .profile-card {
-	border: none;
+	border: 1px solid rgba(255, 255, 255, 0.6);
 	border-radius: 16px;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
 	overflow: hidden;
-	background: #ffffff;
+	background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 .cover-photo {
 	height: 160px;
-	background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+	background: linear-gradient(135deg, rgba(255, 51, 102, 0.8), rgba(255, 102, 153, 0.8));
 	position: relative;
 }
 
@@ -122,11 +127,11 @@ body {
 }
 
 .custom-tabs .nav-link:hover {
-	color: #0d6efd;
+	color: #ff3366;
 }
 
 .custom-tabs .nav-link.active {
-	color: #0d6efd;
+	color: #ff3366;
 	border: none;
 	background: transparent;
 }
@@ -138,7 +143,7 @@ body {
 	left: 0;
 	width: 100%;
 	height: 3px;
-	background-color: #0d6efd;
+	background-color: #ff3366;
 	border-radius: 3px 3px 0 0;
 }
 
@@ -155,19 +160,20 @@ body {
 
 /* 🌟 CheatSheet Cards */
 .cheatsheet-card {
-	border: 1px solid #e2e8f0;
+	border: 1px solid rgba(255, 255, 255, 0.6);
 	border-radius: 12px;
 	padding: 20px;
-	background: #ffffff;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+	background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(5px);
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 	transition: all 0.3s ease;
 	height: 100%;
 }
 
 .cheatsheet-card:hover {
 	transform: translateY(-4px);
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-	border-color: #0d6efd;
+	box-shadow: 0 15px 25px rgba(0, 0, 0, 0.08);
+	border-color: #ff3366;
 }
 </style>
 </head>
@@ -176,8 +182,8 @@ body {
 
 	<nav class="navbar custom-navbar px-4 shadow-sm fixed-top">
 		<a href="${pageContext.request.contextPath}/home"
-			class="navbar-brand mb-0 h1 fw-bold text-primary"> <i
-			class="bi bi-code-square me-2"></i>DevHub
+			class="navbar-brand mb-0 h1 fw-bold" style="color: #ff3366;"> <i
+			class="bi bi-code-square me-2"></i>Cheatsheet
 		</a> <a href="${pageContext.request.contextPath}/home"
 			class="btn btn-outline-secondary px-4 rounded-pill fw-bold shadow-sm d-flex align-items-center">
 			<i class="bi bi-arrow-left me-2"></i> Back to Dashboard
@@ -309,7 +315,7 @@ body {
 
 						<form action="${pageContext.request.contextPath}/profile/update"
 							method="POST"
-							class="bg-light p-4 rounded-4 mb-4 border border-white shadow-sm">
+							class="p-4 rounded-4 mb-4 border border-white shadow-sm" style="background: rgba(255, 255, 255, 0.5);">
 							<h5 class="fw-bold mb-3">
 								<i class="bi bi-pencil-square me-2 text-muted"></i>Edit Details
 							</h5>
@@ -390,7 +396,7 @@ body {
 						class="tab-pane fade ${param.tab == 'security' ? 'show active' : ''}"
 						id="security-pane" role="tabpanel">
 						<div
-							class="bg-light p-4 rounded-4 border border-white shadow-sm mt-2">
+							class="p-4 rounded-4 border border-white shadow-sm mt-2" style="background: rgba(255, 255, 255, 0.5);">
 							<h5 class="text-danger fw-bold mb-2">
 								<i class="bi bi-shield-lock-fill me-2"></i>Change Password
 							</h5>

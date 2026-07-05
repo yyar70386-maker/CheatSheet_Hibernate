@@ -31,19 +31,20 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background: linear-gradient(135deg, #4facfe, #00c6fb);
+	background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%);
 	padding: 20px;
 }
 
 .login-card {
 	width: 100%;
 	max-width: 430px;
-	background: rgba(255, 255, 255, .95);
-	border: none;
+	background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
 	border-radius: 20px;
 	padding: 35px;
-	box-shadow: 0 25px 50px rgba(0, 0, 0, .15);
-	backdrop-filter: blur(15px);
+	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
 	animation: fadeUp .6s ease;
 }
 
@@ -52,14 +53,14 @@ body {
 	height: 80px;
 	margin: auto;
 	border-radius: 50%;
-	background: linear-gradient(135deg, #0d6efd, #4facfe);
+	background: linear-gradient(135deg, rgba(255, 51, 102, 0.9), rgba(255, 102, 153, 0.9));
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	font-size: 35px;
 	color: white;
 	margin-bottom: 20px;
-	box-shadow: 0 10px 20px rgba(13, 110, 253, .3);
+	box-shadow: 0 10px 20px rgba(255, 51, 102, .3);
 }
 
 h2 {
@@ -92,11 +93,11 @@ h2 {
 
 .form-control:focus {
 	box-shadow: none;
-	border-color: #0d6efd;
+	border-color: #ff3366;
 }
 
 .input-group:focus-within .input-group-text {
-	border-color: #0d6efd;
+	border-color: #ff3366;
 }
 
 .password-btn {
@@ -107,14 +108,14 @@ h2 {
 	height: 50px;
 	border: none;
 	border-radius: 12px;
-	background: linear-gradient(135deg, #0d6efd, #4facfe);
+	background: linear-gradient(135deg, rgba(255, 51, 102, 0.9), rgba(255, 102, 153, 0.9));
 	font-weight: 600;
 	transition: .3s;
 }
 
 .btn-login:hover {
 	transform: translateY(-2px);
-	box-shadow: 0 10px 20px rgba(13, 110, 253, .3);
+	box-shadow: 0 10px 20px rgba(255, 51, 102, .3);
 }
 
 .btn-cancel {
@@ -148,7 +149,7 @@ to {
 	margin: auto;
 	margin-bottom: 20px;
 	border-radius: 50%;
-	background: linear-gradient(135deg, #0d6efd, #4facfe);
+	background: linear-gradient(135deg, rgba(255, 51, 102, 0.9), rgba(255, 102, 153, 0.9));
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -156,7 +157,7 @@ to {
 	font-size: 16px;
 	font-weight: bold;
 	text-align: center;
-	box-shadow: 0 10px 20px rgba(13, 110, 253, .3);
+	box-shadow: 0 10px 20px rgba(255, 51, 102, .3);
 }
 }
 </style>

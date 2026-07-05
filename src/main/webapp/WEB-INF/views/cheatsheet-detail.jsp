@@ -13,31 +13,31 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
-        body { background-color: #ffffff; }
+        body { background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%); min-height: 100vh; color: #1a1a1a; }
         .detail-container { max-width: 900px; margin: 60px auto; padding: 0 20px; }
-        .sheet-title { font-size: 48px; font-weight: 800; color: #222222; display: inline-block; }
-        .author-text { font-size: 22px; color: #777777; font-weight: bold; margin-left: 10px; }
-        .description-text { font-size: 18px; color: #444444; margin-top: 25px; margin-bottom: 35px; line-height: 1.6; }
+        .sheet-title { font-size: 48px; font-weight: 800; color: #1a1a1a; display: inline-block; }
+        .author-text { font-size: 22px; color: #555; font-weight: bold; margin-left: 10px; }
+        .description-text { font-size: 18px; color: #333; margin-top: 25px; margin-bottom: 35px; line-height: 1.6; }
         
-        .code-container-box { background-color: #f8f5f2; border-radius: 14px; padding: 25px 30px; margin-bottom: 35px; }
-        .plain-code-text { font-family: 'Courier New', Courier, monospace; font-size: 18px; line-height: 1.5; color: #333333; margin: 0; white-space: pre-wrap; word-break: break-all; }
+        .code-container-box { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 20px; padding: 25px 30px; margin-bottom: 35px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); }
+        .plain-code-text { font-family: 'Courier New', Courier, monospace; font-size: 18px; line-height: 1.5; color: #1a1a1a; margin: 0; white-space: pre-wrap; word-break: break-all; }
         
-        .tag-badge { background-color: #e2e8f0; color: #333; padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: bold; text-decoration: none; display: inline-block; }
-        .tag-badge:hover { background-color: #1976d2; color: white; }
+        .tag-badge { background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.8); color: #333; padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: bold; text-decoration: none; display: inline-block; transition: all 0.2s ease; }
+        .tag-badge:hover { background-color: #1a1a1a; color: white; transform: translateY(-2px); }
 
-        .interaction-bar { background: #fdfdfd; padding: 15px 20px; border-radius: 10px; border: 1px solid #eee; margin-top: 30px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-        .action-btn { background: none; border: 1px solid #ddd; padding: 8px 15px; border-radius: 20px; font-weight: 600; color: #555; transition: 0.2s; }
-        .action-btn:hover { background: #f0f0f0; }
+        .interaction-bar { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 20px; padding: 15px 20px; margin-top: 30px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); }
+        .action-btn { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.8); padding: 8px 15px; border-radius: 20px; font-weight: 600; color: #555; transition: 0.2s; }
+        .action-btn:hover { background: #fff; transform: translateY(-2px); }
         
-        .btn-heart:hover, .btn-heart.active { background: #fff0f1; color: #e63946; border-color: #e63946; }
-        .btn-like:hover, .btn-like.active { background: #e0fbfc; color: #028090; border-color: #028090; }
+        .btn-heart:hover, .btn-heart.active { background: #fff0f1; color: #ff3366; border-color: #ff3366; }
+        .btn-like:hover, .btn-like.active { background: #e0fbfc; color: #ff3366; border-color: #ff3366; }
         .btn-dislike:hover, .btn-dislike.active { background: #fae0e4; color: #d62828; border-color: #d62828; }
 
         .comment-section { margin-top: 50px; }
-        .comment-box { background: #fafafa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #eee; }
-        .reply-box { margin-left: 50px; border-left: 3px solid #0dcaf0; background: #fcfcfc; }
-        .comment-author { font-weight: bold; color: #333; font-size: 15px; }
-        .comment-text { margin-top: 8px; color: #555; font-size: 15px; line-height: 1.5; }
+        .comment-box { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); padding: 20px; border-radius: 20px; margin-bottom: 15px; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .reply-box { margin-left: 50px; border-left: 3px solid #ff3366; background: rgba(255, 255, 255, 0.3); }
+        .comment-author { font-weight: bold; color: #1a1a1a; font-size: 15px; }
+        .comment-text { margin-top: 8px; color: #333; font-size: 15px; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -60,8 +60,8 @@
                 <c:choose>
                     <c:when test="${sheet.author != null}">
                         <a href="${pageContext.request.contextPath}/profile/${sheet.author.id}" 
-                           class="text-dark fw-bold text-decoration-none" 
-                           style="border-bottom: 2px solid #0d6efd; padding-bottom: 2px;">
+                            class="text-dark fw-bold text-decoration-none" 
+                           style="border-bottom: 2px solid #ff3366; padding-bottom: 2px;">
                             <c:out value="${sheet.author.username}" />
                         </a>
                     </c:when>
@@ -111,14 +111,17 @@
                     <div class="d-flex align-items-center">
                         <span class="me-3 fw-bold text-dark"><i class="fa-solid fa-star text-warning"></i> ${avgRating > 0 ? avgRating : '0.0'}</span>
                         <span class="text-muted me-2" style="font-size: 14px;">Your Rate:</span>
-                        <select id="ratingSelect" class="form-select form-select-sm me-2" style="width: 100px; cursor:pointer;">
-                            <option value="5" ${userRating == 5 ? 'selected' : ''}>5 Stars</option>
-                            <option value="4" ${userRating == 4 ? 'selected' : ''}>4 Stars</option>
-                            <option value="3" ${userRating == 3 ? 'selected' : ''}>3 Stars</option>
-                            <option value="2" ${userRating == 2 ? 'selected' : ''}>2 Stars</option>
-                            <option value="1" ${userRating == 1 ? 'selected' : ''}>1 Star</option>
-                        </select>
-                        <button type="button" id="rateSubmitBtn" onclick="submitRatingJS()" class="btn btn-sm btn-outline-warning text-dark fw-bold">Rate / Undo</button>
+                        
+                        <div class="star-rating me-3" style="font-size: 20px; cursor: pointer;">
+                            <i class="fa-star star-icon ${userRating >= 1 ? 'fa-solid text-warning' : 'fa-regular text-muted'}" data-value="1"></i>
+                            <i class="fa-star star-icon ${userRating >= 2 ? 'fa-solid text-warning' : 'fa-regular text-muted'}" data-value="2"></i>
+                            <i class="fa-star star-icon ${userRating >= 3 ? 'fa-solid text-warning' : 'fa-regular text-muted'}" data-value="3"></i>
+                            <i class="fa-star star-icon ${userRating >= 4 ? 'fa-solid text-warning' : 'fa-regular text-muted'}" data-value="4"></i>
+                            <i class="fa-star star-icon ${userRating >= 5 ? 'fa-solid text-warning' : 'fa-regular text-muted'}" data-value="5"></i>
+                        </div>
+                        <input type="hidden" id="ratingSelect" value="${userRating > 0 ? userRating : 0}">
+                        
+                        <button type="button" id="rateSubmitBtn" onclick="submitRatingJS()" class="btn btn-sm btn-outline-warning text-dark fw-bold">Undo</button>
                     </div>
                     <button type="button" class="action-btn text-danger" data-bs-toggle="modal" data-bs-target="#reportSheetModal">
                         <i class="bi bi-flag"></i> Report
@@ -138,7 +141,7 @@
 
             <c:choose>
                 <c:when test="${not empty sessionScope.currentUser}">
-                    <div class="mb-5 p-4 bg-light rounded border">
+                    <div class="mb-5 p-4 rounded border" style="background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); border-color: rgba(255, 255, 255, 0.6) !important;">
                         <textarea id="mainCommentContent" class="form-control mb-3" rows="3" placeholder="Share your thoughts..."></textarea>
                         <button type="button" onclick="postMainCommentJS()" class="btn btn-primary px-4 fw-bold"><i class="bi bi-send"></i> Post Comment</button>
                     </div>
@@ -198,10 +201,10 @@
 
                             <%-- Reply Input Form --%>
                             <c:if test="${not empty sessionScope.currentUser}">
-                                <div id="replyForm_${comment.id}" class="mt-3 p-3 bg-light rounded border" style="display:none;">
+                                <div id="replyForm_${comment.id}" class="mt-3 p-3 rounded border" style="display:none; background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); border-color: rgba(255, 255, 255, 0.6) !important;">
                                     <div class="input-group">
                                         <input type="text" id="replyInput_${comment.id}" class="form-control" placeholder="Replying...">
-                                        <button class="btn btn-info text-white fw-bold" type="button" onclick="postReplyJS(${comment.id})">Send</button>
+                                        <button class="btn btn-primary fw-bold" type="button" onclick="postReplyJS(${comment.id})">Send</button>
                                         <button class="btn btn-secondary" type="button" onclick="document.getElementById('replyForm_${comment.id}').style.display='none'">Cancel</button>
                                     </div>
                                 </div>
@@ -274,10 +277,13 @@
             }).catch(err => alert("Action failed: " + err.message));
         }
 
-        function submitRatingJS() {
+        function submitRatingJS(ratingValue) {
             if (!checkLogin()) return;
-            let stars = document.getElementById('ratingSelect').value;
-            fetch(contextPath + '/rating/submit', {method: 'POST', body: new URLSearchParams({userId: currentUserId, cheatSheetId: currentSheetId, stars: stars})})
+            if(!ratingValue) {
+                ratingValue = document.getElementById("ratingSelect").value;
+            }
+            if(ratingValue == 0) ratingValue = null; // for undo
+            fetch(contextPath + '/rating/submit', {method: 'POST', body: new URLSearchParams({userId: currentUserId, cheatSheetId: currentSheetId, stars: ratingValue})})
             .then(() => {
                 let btn = document.getElementById('rateSubmitBtn');
                 let originalText = btn.innerText;
@@ -308,10 +314,10 @@
                         </div>
                     </div>
                     <div id="repliesContainer_`+newId+`"></div>
-                    <div id="replyForm_`+newId+`" class="mt-3 p-3 bg-light rounded border" style="display:none;">
+                    <div id="replyForm_`+newId+`" class="mt-3 p-3 rounded border" style="display:none; background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); border-color: rgba(255, 255, 255, 0.6) !important;">
                         <div class="input-group">
                             <input type="text" id="replyInput_`+newId+`" class="form-control" placeholder="Replying...">
-                            <button class="btn btn-info text-white fw-bold" type="button" onclick="postReplyJS(`+newId+`)">Send</button>
+                            <button class="btn btn-primary fw-bold" type="button" onclick="postReplyJS(`+newId+`)">Send</button>
                             <button class="btn btn-secondary" type="button" onclick="document.getElementById('replyForm_`+newId+`').style.display='none'">Cancel</button>
                         </div>
                     </div>
@@ -350,6 +356,49 @@
                 document.getElementById('replyForm_' + parentId).style.display = 'none'; 
             }).catch(err => alert("Action failed: " + err.message));
         }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const stars = document.querySelectorAll(".star-rating .star-icon");
+            const ratingInput = document.getElementById("ratingSelect");
+            if (stars.length > 0 && ratingInput) {
+                let currentRating = parseInt(ratingInput.value);
+
+                stars.forEach(star => {
+                    star.addEventListener("mouseover", function() {
+                        let value = this.getAttribute("data-value");
+                        highlightStars(value);
+                    });
+                    star.addEventListener("mouseout", function() {
+                        highlightStars(currentRating);
+                    });
+                    star.addEventListener("click", function() {
+                        currentRating = this.getAttribute("data-value");
+                        ratingInput.value = currentRating;
+                        highlightStars(currentRating);
+                        submitRatingJS(currentRating);
+                    });
+                });
+
+                function highlightStars(value) {
+                    stars.forEach(s => {
+                        if (s.getAttribute("data-value") <= value) {
+                            s.classList.remove("fa-regular", "text-muted");
+                            s.classList.add("fa-solid", "text-warning");
+                        } else {
+                            s.classList.remove("fa-solid", "text-warning");
+                            s.classList.add("fa-regular", "text-muted");
+                        }
+                    });
+                }
+                
+                document.getElementById("rateSubmitBtn").addEventListener("click", function() {
+                    currentRating = 0;
+                    ratingInput.value = 0;
+                    highlightStars(0);
+                });
+            }
+        });
     </script>
 </body>
 </html>

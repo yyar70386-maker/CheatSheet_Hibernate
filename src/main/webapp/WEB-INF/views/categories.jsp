@@ -45,9 +45,17 @@
         .table img {
             object-fit: cover;
         }
+        
+        /* Custom Admin Pink/White Theme Overrides */
+        .btn-primary { background-color: #ff3366 !important; border-color: #ff3366 !important; }
+        .btn-primary:hover { background-color: #e62e5c !important; border-color: #e62e5c !important; }
+        .btn-outline-primary { color: #ff3366 !important; border-color: #ff3366 !important; }
+        .btn-outline-primary:hover { background-color: #ff3366 !important; color: white !important; }
+        .text-primary { color: #ff3366 !important; }
+        .main-content-area { background-color: #ffffff; }
     </style>
 </head>
-<body class="bg-light">
+<body style="background-color: #ffffff;">
 
     <jsp:include page="header.jsp" />
 

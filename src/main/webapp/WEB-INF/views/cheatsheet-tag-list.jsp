@@ -12,25 +12,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <style>
-        body { display: flex; flex-direction: column; min-height: 100vh; }
+        body { display: flex; flex-direction: column; min-height: 100vh; background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%); color: #1a1a1a; }
         .page-header-section { text-align: left; margin: 20px 0 20px 0; }
-        .cheatsheet-card { border: 1px solid #e2e8f0; border-radius: 20px; padding: 30px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: transform 0.3s ease, box-shadow 0.3s ease; height: auto; display: flex; flex-direction: column; }
-        .cheatsheet-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .cheatsheet-card { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; height: auto; display: flex; flex-direction: column; }
+        .cheatsheet-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); }
         .grid-item { align-self: start; }
         .description-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .description-text.expanded { display: block; -webkit-line-clamp: unset; }
-        .see-more-btn { color: #1976d2; cursor: pointer; font-weight: bold; font-size: 14px; display: inline-block; margin-top: 5px; }
+        .see-more-btn { color: #ff3366; cursor: pointer; font-weight: bold; font-size: 14px; display: inline-block; margin-top: 5px; }
+        .see-more-btn:hover { color: #e62e5c; text-decoration: underline; }
         .card-meta-item { color: #666; font-size: 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
-        .tag-badge-link { background-color: #e2e8f0; color: #333; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block; }
-        .tag-badge-link:hover { background-color: #1976d2; color: white; }
+        .tag-badge-link { background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.8); color: #333; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block; transition: all 0.2s ease; }
+        .tag-badge-link:hover { background-color: #1a1a1a; color: white; transform: translateY(-2px); }
         .stats-section { font-size: 14px; color: #555; display: flex; gap: 20px; margin-top: 15px; }
         
         .visibility-icon-box { font-size: 18px; cursor: help; }
-        .filter-dropdown-btn { border: 1px solid #1976d2; color: #1976d2; font-weight: 600; border-radius: 8px; padding: 8px 16px; }
-        .filter-dropdown-btn:hover, .filter-dropdown-btn:focus { background-color: #1976d2; color: white; border-color: #1976d2; }
+        .filter-dropdown-btn { border: 1px solid #ff3366; color: #ff3366; font-weight: 600; border-radius: 8px; padding: 8px 16px; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px); }
+        .filter-dropdown-btn:hover, .filter-dropdown-btn:focus { background-color: #ff3366; color: white; border-color: #ff3366; }
     </style>
 </head>
-<body class="bg-light">
+<body style="background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%); min-height: 100vh; color: #1a1a1a;">
 
     <jsp:include page="header.jsp" />
 
@@ -58,19 +59,19 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="tagFilterDropdown">
                         <li>
-                            <a class="dropdown-item ${currentFilter == 'ALL' || empty currentFilter ? 'active bg-primary' : ''}" 
+                            <a class="dropdown-item ${currentFilter == 'ALL' || empty currentFilter ? 'active bg-brand-primary' : ''}" 
                                href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?filter=ALL">
                                 <i class="bi bi-collection-fill me-2"></i> All
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item ${currentFilter == 'PUBLIC' ? 'active bg-primary' : ''}" 
+                            <a class="dropdown-item ${currentFilter == 'PUBLIC' ? 'active bg-brand-primary' : ''}" 
                                href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?filter=PUBLIC">
                                 <i class="bi bi-globe me-2"></i> Public Only
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item ${currentFilter == 'FRIEND' ? 'active bg-primary' : ''}" 
+                            <a class="dropdown-item ${currentFilter == 'FRIEND' ? 'active bg-brand-primary' : ''}" 
                                href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?filter=FRIEND">
                                 <i class="bi bi-people-fill me-2"></i> Friends Only
                             </a>

@@ -16,29 +16,32 @@
 }
 
 body{
-    background:#f4f8ff;
+    background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%);
+    min-height: 100vh;
 }
 
 .container{
     width:900px;
     margin:40px auto;
-    background:white;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     padding:40px;
-    border-radius:18px;
-    border:2px solid #bbdefb;
-    box-shadow:0 4px 20px rgba(21,101,192,0.15);
+    border-radius:20px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
 }
 
 .form-icon{
     text-align:center;
     font-size:55px;
-    color:#1976d2;
+    color: #ff3366;
     margin-bottom:15px;
 }
 
 h1{
     text-align:center;
-    color:#1565c0;
+    color: #ff3366;
     margin-bottom:35px;
     font-size:40px;
 }
@@ -51,22 +54,23 @@ label{
     display:block;
     margin-bottom:10px;
     font-weight:bold;
-    color:#0d47a1;
+    color: #333;
     font-size:18px;
 }
 
 .form-control{
     width:100%;
     padding:15px;
-    border:2px solid #90caf9;
+    border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius:12px;
     font-size:17px;
     outline:none;
-    background:white;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(5px);
 }
 
 .form-control:focus{
-    border-color:#1976d2;
+    border-color: #ff3366;
 }
 
 textarea{
@@ -80,7 +84,7 @@ textarea{
 
 .btn{
     width:100%;
-    background:#1976d2;
+    background: #ff3366;
     color:white;
     border:none;
     padding:17px;
@@ -88,29 +92,30 @@ textarea{
     font-size:20px;
     font-weight:bold;
     cursor:pointer;
+    transition: background 0.3s;
 }
 
 .btn:hover{
-    background:#0d47a1;
+    background: #e62e5c;
 }
 
 #tagContainer{
     margin-top:15px;
     min-height:45px;
     padding:15px;
-    border:2px dashed #90caf9;
+    border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius:12px;
-    background:#f8fbff;
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .tag-box{
     display:inline-block;
     margin:6px;
     padding:9px 14px;
-    background:#e3f2fd;
-    border:1px solid #90caf9;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius:20px;
-    color:#0d47a1;
+    color: #333;
     font-weight:bold;
     cursor:pointer;
 }
@@ -123,7 +128,7 @@ textarea{
     display:block;
     text-align:center;
     margin-top:25px;
-    color:#1976d2;
+    color: #ff3366;
     text-decoration:none;
     font-weight:bold;
 }
@@ -135,6 +140,7 @@ textarea{
 
 </head>
 <body>
+<jsp:include page="header.jsp" />
 
 <div class="container">
 
@@ -247,5 +253,6 @@ document.getElementById("categorySelect").addEventListener("change", function(){
 });
 </script>
 
+<jsp:include page="footer.jsp" />
 </body>
 </html>
