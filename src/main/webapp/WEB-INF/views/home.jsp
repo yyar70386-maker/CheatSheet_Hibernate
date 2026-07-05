@@ -427,7 +427,62 @@
                             </div>
                         </div>
                     </c:if>
+						
+						
+						
+				<%-- 🌟 Shared Cheat Sheets Section 🌟 --%>
+<c:if test="${not empty sharedPosts}">
+    <div class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h2 class="section-title h4 mb-1">Shared Cheat Sheets</h2>
+                <div class="text-muted small">Posts shared by the community.</div>
+            </div>
+        </div>
+        
+        <div class="d-grid gap-3">
+            <c:forEach items="${sharedPosts}" var="share">
+                <article class="sheet-card d-flex border-info">
+                    <div class="sheet-ribbon p-3 d-flex flex-lg-column align-items-center justify-content-center gap-1 bg-info bg-opacity-10 border-info">
+                        <div class="sheet-pages"><i class="bi bi-share-fill text-info"></i></div>
+                    </div>
+                    <div class="p-3 p-lg-4 flex-grow-1">
+                        <div class="mb-3 text-muted small bg-light p-2 rounded d-inline-block">
+                            <i class="bi bi-arrow-return-right text-info"></i>
+                            <strong class="text-dark"><c:out value="${share.user.fullName != null ? share.user.fullName : share.user.username}" /></strong> shared 
+                            <strong><c:out value="${share.cheatsheet.author.fullName != null ? share.cheatsheet.author.fullName : share.cheatsheet.author.username}" /></strong>'s post
+                        </div>
+                        
+                        <h3 class="h5 fw-bold mb-2">
+                            <a href="${pageContext.request.contextPath}/cheatsheet/detail/${share.cheatsheet.id}" class="text-dark hover-link">
+                                ${share.cheatsheet.title}
+                            </a>
+                        </h3>
+                        <p class="text-secondary small mb-3">${share.cheatsheet.description}</p>
 
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top">
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="tag-chip"><i class="bi bi-folder-fill text-secondary"></i> ${share.cheatsheet.category.name}</span>
+                                <span class="tag-chip"><i class="bi bi-eye-fill text-secondary"></i> ${share.cheatsheet.viewCount != null ? share.cheatsheet.viewCount : 0}</span>
+                            </div>
+                            <a class="btn btn-outline-info btn-sm px-4 fw-bold" href="${pageContext.request.contextPath}/cheatsheet/detail/${share.cheatsheet.id}">View Post</a>
+                        </div>
+                    </div>
+                </article>
+            </c:forEach>
+        </div>
+    </div>
+</c:if>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
                     <%-- Latest Public Cheat Sheets Sub Grid Block --%>
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <div>

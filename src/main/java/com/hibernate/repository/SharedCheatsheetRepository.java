@@ -1,6 +1,9 @@
 package com.hibernate.repository;
 
 import java.util.List;
+
+import javax.transaction.Transactional;
+
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -37,6 +40,7 @@ public class SharedCheatsheetRepository {
         return count != null && count > 0;
     }
 
+    @Transactional
  // 🌟 ၄။ လက်ရှိ Login ဝင်ထားသူ (မိမိ) Share ထားသော ဒေတာများကိုသာ သီးသန့်ဆွဲထုတ်ခြင်း
     @SuppressWarnings("unchecked")
     public List<SharedCheatsheetEntity> findMySharedWithDetails(Integer userId) {

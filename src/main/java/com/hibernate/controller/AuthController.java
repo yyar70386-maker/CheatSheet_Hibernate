@@ -13,6 +13,8 @@ import com.hibernate.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,8 +47,10 @@ public class AuthController {
     @Autowired
     private UserFollowService userFollowService;
     
-   
+    @Autowired
+    private com.hibernate.repository.SharedCheatsheetRepository sharedCheatsheetRepository;
     
+    @Transactional
     @GetMapping("/")
     public String showHomePage(
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -61,6 +65,8 @@ public class AuthController {
         model.addAttribute("cheatsheetlist", cheatsheetService.findLatestPublic(query, page, pageSize));
         model.addAttribute("searchQuery", query);
         model.addAttribute("currentPage", page);
+        
+        model.addAttribute("sharedPosts", sharedCheatsheetRepository.findAllSharedWithDetails());
         
         long total = cheatsheetService.countLatestPublic(query);
         model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / pageSize)));
@@ -123,6 +129,7 @@ public class AuthController {
         return "redirect:/"; 
     }
    
+    @Transactional
     @GetMapping("/home")
     public String showHomeDashboard(
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -138,6 +145,9 @@ public class AuthController {
         model.addAttribute("cheatsheetlist", cheatsheetService.findLatestPublic(query, page, 6));
         model.addAttribute("searchQuery", query);
         model.addAttribute("currentPage", page);
+        
+        
+        model.addAttribute("sharedPosts", sharedCheatsheetRepository.findAllSharedWithDetails());
         
         long total = cheatsheetService.countLatestPublic(query);
         model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / 6)));
