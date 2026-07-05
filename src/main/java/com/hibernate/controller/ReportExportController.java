@@ -1,6 +1,6 @@
 package com.hibernate.controller;
 
-import java.io.File;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +28,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
 
 @Controller
 @RequiredArgsConstructor
@@ -79,11 +80,15 @@ public class ReportExportController {
                 reportData.get(i).setNo(i + 1);
             }
 
-            // Load .jrxml from WEB-INF/reports/
+            // WEB-INF/reports/ လမ်းကြောင်းအတိုင်း စိတ်ချရစွာ ပြန်လည်ဖတ်ရှုခြင်း
             String jrxmlPath = session.getServletContext().getRealPath("/WEB-INF/reports/CheatSheetReport.jrxml");
-            File jrxmlFile = new File(jrxmlPath);
+            java.io.File jrxmlFile = new java.io.File(jrxmlPath);
+            if (!jrxmlFile.exists()) {
+                throw new RuntimeException("JRXML file not found at: " + jrxmlPath);
+            }
+            InputStream inputStream = new java.io.FileInputStream(jrxmlFile);
 
-            JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
+            JasperReport jasperReport = JasperCompileManager.compileReport(inputStream);
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("ReportTitle", "CheatSheet Report");
@@ -92,9 +97,15 @@ public class ReportExportController {
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportData);
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
+            // Headers ကို အပေါ်မှာ ကြိုတင်သတ်မှတ်ပါတယ်
             response.setContentType("application/pdf");
             response.setHeader("Content-Disposition", "attachment; filename=\"cheatsheet-report.pdf\"");
-            JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
+            
+            java.io.OutputStream outputStream = response.getOutputStream();
+            JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
+
+            outputStream.flush();
+            outputStream.close();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,11 +129,15 @@ public class ReportExportController {
                 reportData.get(i).setNo(i + 1);
             }
 
-            // Load .jrxml from WEB-INF/reports/
+            // WEB-INF/reports/ လမ်းကြောင်းအတိုင်း ဖတ်ရှုခြင်း
             String jrxmlPath = session.getServletContext().getRealPath("/WEB-INF/reports/CheatSheetReport.jrxml");
-            File jrxmlFile = new File(jrxmlPath);
+            java.io.File jrxmlFile = new java.io.File(jrxmlPath);
+            if (!jrxmlFile.exists()) {
+                throw new RuntimeException("JRXML file not found at: " + jrxmlPath);
+            }
+            InputStream inputStream = new java.io.FileInputStream(jrxmlFile);
 
-            JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
+            JasperReport jasperReport = JasperCompileManager.compileReport(inputStream);
 
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("ReportTitle", "CheatSheet Report");
@@ -131,14 +146,29 @@ public class ReportExportController {
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportData);
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
-            // Export to XLSX
-            JRXlsxExporter exporter = new JRXlsxExporter();
-            exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-            exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(response.getOutputStream()));
-
+            // Headers ကို အပေါ်မှာ ကြိုတင်သတ်မှတ်ပါတယ်
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             response.setHeader("Content-Disposition", "attachment; filename=\"cheatsheet-report.xlsx\"");
+
+            java.io.OutputStream outputStream = response.getOutputStream();
+            
+            // Excel ပုံစံ ကောင်းမွန်စေရန် configuration များ ထည့်သွင်းခြင်း
+            JRXlsxExporter exporter = new JRXlsxExporter();
+            exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+            exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
+            
+            SimpleXlsxReportConfiguration configuration = new SimpleXlsxReportConfiguration();
+            configuration.setOnePagePerSheet(false);
+            configuration.setRemoveEmptySpaceBetweenRows(true);
+            configuration.setRemoveEmptySpaceBetweenColumns(true);
+            configuration.setWhitePageBackground(false);
+            configuration.setDetectCellType(true);
+            
+            exporter.setConfiguration(configuration);
             exporter.exportReport();
+
+            outputStream.flush();
+            outputStream.close();
 
         } catch (Exception e) {
             e.printStackTrace();
