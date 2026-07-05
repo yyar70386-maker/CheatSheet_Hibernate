@@ -32,4 +32,22 @@
 	</context-param>
 	
 	
+	
+	<context-param>
+    <param-name>contextClass</param-name>
+    <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+</context-param>
+
+
+<context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>com.hibernate.config.AppConfig</param-value> 
+</context-param>
+	
+	
+	
+	
+	
+	
+	
 </web-app>

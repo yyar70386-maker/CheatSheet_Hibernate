@@ -28,13 +28,24 @@
     .notification-button {
         position: relative;
     }
-    .notification-badge {
-        position: absolute;
-        top: 0;
-        right: 0;
-        transform: translate(35%, -35%);
-        display: none;
-    }
+  .notification-badge{
+    position:absolute;
+    top:-6px;
+    right:-6px;
+    min-width:20px;
+    height:20px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#dc3545;
+    color:white;
+
+    border-radius:50%;
+    font-size:12px;
+    font-weight:bold;
+}
     .notification-menu {
         width: 320px;
         max-height: 380px;
@@ -84,10 +95,11 @@
                     <%-- ==================== 🔒 CASE 2: USER IS LOGGED IN ==================== --%>
                     <c:otherwise>
                         <li class="nav-item dropdown me-lg-2">
-                            <a class="nav-link notification-button" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-bell fs-5"></i>
-                                <span id="notificationBadge" class="badge rounded-pill bg-danger notification-badge">0</span>
-                            </a>
+                          <a class="nav-link notification-button position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="bi bi-bell fs-5"></i>
+   <span id="notificationBadge" class="notification-badge" style="display: flex;"></span>
+</a>
+
                             <ul class="dropdown-menu dropdown-menu-end notification-menu" aria-labelledby="notificationDropdown">
                                 <li class="dropdown-header d-flex justify-content-between align-items-center">
                                     <span>Notifications</span>
@@ -135,78 +147,84 @@
     </div>
 </nav>
 
-<%-- ==================== 🌐 WEBSOCKET REAL-TIME NOTIFICATION SCRIPT ==================== --%>
 <c:if test="${not empty sessionScope.currentUser}">
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-    <script>
-        (function () {
-            var contextPath = '${pageContext.request.contextPath}';
-            var currentUserId = '${sessionScope.currentUser.id}';
-            var badge = document.getElementById('notificationBadge');
-            var list = document.getElementById('notificationList');
-            var empty = document.getElementById('notificationEmpty');
-            var unreadCount = 0;
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script>
+(function () {
+    var contextPath = '${pageContext.request.contextPath}';
+    var currentUserId = Number('${sessionScope.currentUser.id}');
+    
+    if (!currentUserId || currentUserId === 0) return;
 
-            function setBadge(count) {
-                unreadCount = count || 0;
-                badge.textContent = unreadCount;
-                badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+    var badge = document.getElementById('notificationBadge');
+    var list = document.getElementById('notificationList');
+    var empty = document.getElementById('notificationEmpty');
+
+    fetch(contextPath + '/notifications/recent', {
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        window.myUnreadCount = Number(data.unreadCount) || 0;
+        updateBadgeDisplay();
+        
+        list.innerHTML = "";
+        if (data.notifications && data.notifications.length > 0) {
+            empty.style.display = "none";
+            data.notifications.forEach(appendNotification);
+        } else {
+            empty.style.display = "block";
+        }
+    });
+
+    // 2. WebSocket Connection
+    var socket = new SockJS(contextPath + '/ws-notifications');
+    var stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function () {
+        console.log("✅ WebSocket Connected!");
+
+        stompClient.subscribe('/topic/notifications/' + currentUserId, function(message){
+            var notification = JSON.parse(message.body);
+
+            window.myUnreadCount++; 
+            updateBadgeDisplay(); 
+            appendNotification(notification);
+
+            if(notification.type === "SHARE"){
+                alert(notification.message);
             }
+        });
+    });
 
-            function escapeHtml(value) {
-                var div = document.createElement('div');
-                div.textContent = value || '';
-                return div.innerHTML;
-            }
+    function updateBadgeDisplay() {
+        var badge = document.getElementById('notificationBadge');
+        if (!badge) return;
+        
+        // Console မှာ ဂဏန်း တကယ်ပါ/မပါ စစ်ဆေးရန်
+        console.log("My Unread Count is:", window.myUnreadCount);
 
-            function addNotification(notification, prepend) {
-                empty.style.display = 'none';
+        if (window.myUnreadCount > 0) {
+            // textContent အစား innerText ကို သုံးပါမည်
+            badge.innerText = String(window.myUnreadCount); 
+            badge.style.display = 'flex';
+        } else {
+            badge.innerText = '';
+            badge.style.display = 'none';
+        }
+    }
 
-                var item = document.createElement('a');
-                item.className = 'dropdown-item notification-item small';
-                item.href = notification.linkUrl ? contextPath + notification.linkUrl : contextPath + '/notifications';
-                item.innerHTML = '<div class="fw-semibold">' + escapeHtml(notification.message) + '</div>'
-                    + '<div class="text-muted">' + escapeHtml(notification.notificationType || 'NOTIFICATION') + '</div>';
-
-                if (prepend && list.firstChild) {
-                    list.insertBefore(item, list.firstChild);
-                } else {
-                    list.appendChild(item);
-                }
-            }
-
-            function loadRecentNotifications() {
-                fetch(contextPath + '/notifications/recent')
-                    .then(function (response) { return response.json(); })
-                    .then(function (data) {
-                        list.innerHTML = '';
-                        setBadge(data.unreadCount);
-                        if (!data.notifications || data.notifications.length === 0) {
-                            empty.style.display = 'block';
-                            return;
-                        }
-                        data.notifications.forEach(function (notification) {
-                            addNotification(notification, false);
-                        });
-                    });
-            }
-
-            function connectNotificationSocket() {
-                var socket = new SockJS(contextPath + '/ws-notifications');
-                var stompClient = Stomp.over(socket);
-                stompClient.debug = null;
-                stompClient.connect({}, function () {
-                    stompClient.subscribe('/topic/notifications/' + currentUserId, function (message) {
-                        var notification = JSON.parse(message.body);
-                        setBadge(unreadCount + 1);
-                        addNotification(notification, true);
-                    });
-                });
-            }
-
-            loadRecentNotifications();
-            connectNotificationSocket();
-        })();
-    </script>
+    
+ // 📌 ဤ Function သည် သင့်ကုဒ်တွင် ပျောက်နေသဖြင့် ပြန်လည် ထည့်သွင်းပေးထားပါသည်
+    function appendNotification(n) {
+        if(empty) empty.style.display = "none";
+        var item = document.createElement("li");
+        item.innerHTML = '<a class="dropdown-item notification-item" href="' + contextPath + n.linkUrl + '">' + n.message + '</a>';
+        list.insertBefore(item, list.firstChild);
+    }
+})(); 
+</script>
 </c:if>

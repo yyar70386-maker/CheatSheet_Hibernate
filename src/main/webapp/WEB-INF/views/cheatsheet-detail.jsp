@@ -116,6 +116,12 @@
                         </select>
                         <button type="button" id="rateSubmitBtn" onclick="submitRatingJS()" class="btn btn-sm btn-outline-warning text-dark fw-bold">Rate / Undo</button>
                     </div>
+                    
+                    <button type="button" id="shareBtn" onclick="shareCheatsheetJS()" class="btn btn-sm btn-primary fw-bold px-3">
+    <i class="bi bi-share-fill me-1"></i> <span id="shareBtnText">Share</span>
+</button>
+                    
+                    
                 </c:when>
 
                 <c:otherwise>
@@ -278,6 +284,55 @@
                 setTimeout(() => { btn.innerText = originalText; btn.classList.replace('btn-success', 'btn-outline-warning'); }, 2000);
             }).catch(err => alert("Error: " + err.message));
         }
+        
+     // 🌟 ဝက်ဘ်ဆိုက်တွင်း Database ထဲသို့ သိမ်းဆည်းပေးမည့် Real-work Share Flow
+        function shareCheatsheetJS() {
+            // ၁။ 🔒 Login မဝင်ထားရင် Share လို့မရအောင် တားဆီးခြင်း
+            if (!checkLogin()) return; 
+
+            // ၂။ Spring Boot Backend Controller ဆီသို့ AJAX (Fetch) ဖြင့် ဒေတာလှမ်းပို့ခြင်း
+            fetch(contextPath + '/interaction/share-post', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    cheatSheetId: currentSheetId // လက်ရှိကြည့်နေသော Cheatsheet ID ကို ပို့သည်
+                })
+            })
+            .then(res => {
+                // အကယ်၍ Session သက်တမ်းကုန်သွားခြင်း သို့မဟုတ် Unauthorized ဖြစ်ပါက
+                if (res.status === 401) { 
+                    alert("Please login first to share this post!"); 
+                    return; 
+                }
+                if (!res.ok) {
+                    // ပြန်လာတဲ့ Error response ကို JSON အနေနဲ့ဖတ်ပြီး message ထုတ်ပြရန်
+                    return res.json().then(errData => { throw new Error(errData.message); });
+                }
+                return res.json();
+            })
+            .then(data => {
+                // ၃။ ဒေတာဘေ့စ်ထဲ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါက UI ခလုတ်ကို "Shared!" အဖြစ် ပြောင်းလဲခြင်း
+                const shareBtn = document.getElementById('shareBtn');
+                const shareText = document.getElementById('shareBtnText');
+                
+                // Bootstrap Class ကို စိမ်းရောင်ပြောင်းပြီး စာသားကို Shared! ဟု ပြောင်းသည်
+                shareBtn.classList.replace('btn-primary', 'btn-success');
+                shareText.innerText = "Shared!";
+                
+                // ၂.၅ စက္ကန့်ပြည့်လျှင် မူလအပြာရောင် 'Share' ခလုတ်ပုံစံသို့ ပြန်ပြောင်းပေးခြင်း
+                setTimeout(() => {
+                    shareBtn.classList.replace('btn-success', 'btn-primary');
+                    shareText.innerText = "Share";
+                }, 2500);
+            })
+            .catch(err => {
+                // ယခင်က Share ထားပြီးသားဖြစ်စေ၊ Server အမှားဖြစ်စေ Alert ပြပေးမည်
+                alert(err.message);
+            });
+        }
+        
 
         function postMainCommentJS() {
             if (!checkLogin()) return;

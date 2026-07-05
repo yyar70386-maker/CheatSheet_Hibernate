@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
+    @Autowired(required = false) // ဒီလိုလေး ပြင်ပေးလိုက်ရင် Bean မရှိလည်း Error မတက်တော့ပါဘူး
     private JavaMailSender mailSender;
 
     @Autowired

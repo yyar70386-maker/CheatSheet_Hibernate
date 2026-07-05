@@ -2,8 +2,11 @@ package com.hibernate.service;
 
 import java.util.List;
 
-import com.hibernate.dto.NotificationDto;
+import org.springframework.stereotype.Service;
 
+import com.hibernate.dto.NotificationDto;
+import com.hibernate.entity.NotificationEntity;
+@Service
 public interface NotificationService {
 
     NotificationDto createNotification(Integer userId, Integer senderId, String message, String type, String linkUrl);
@@ -23,4 +26,6 @@ public interface NotificationService {
     void markAsRead(Integer notificationId, Integer userId);
 
     void markAllAsRead(Integer userId);
+    
+    void save(NotificationEntity notification);
 }

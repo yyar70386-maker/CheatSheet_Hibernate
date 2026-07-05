@@ -1,8 +1,11 @@
 package com.hibernate.repository;
 
 import java.util.List;
-import com.hibernate.entity.User;
 
+import org.springframework.stereotype.Repository;
+
+import com.hibernate.entity.User;
+@Repository
 public interface UserRepository {
     
     // 🌟 Impl ထဲမှာ ရေးထားသမျှ Method အားလုံးကို ဒီမှာ ခေါင်းစဉ် လာကြေညာပေးရပါတယ်

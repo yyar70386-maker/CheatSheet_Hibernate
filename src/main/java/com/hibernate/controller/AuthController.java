@@ -9,7 +9,7 @@ import com.hibernate.service.CheatsheetService;
 import com.hibernate.service.UserFollowService;
 import com.hibernate.service.TagService;
 import com.hibernate.service.UserService;
-import com.hibernate.websocket.NotificationSocketService;
+//import com.hibernate.websocket.NotificationSocketService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -45,8 +45,7 @@ public class AuthController {
     @Autowired
     private UserFollowService userFollowService;
     
-    @Autowired
-    private NotificationSocketService notificationSocketService;
+   
     
     @GetMapping("/")
     public String showHomePage(
@@ -149,27 +148,27 @@ public class AuthController {
         return "home";
     }
 
-    @GetMapping("/profile")
-    public String showProfile(HttpSession session, Model model) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "redirect:/login";
-        }
-
-        User user = userService.findById(currentUser.getId());
-        model.addAttribute("user", user);
-        model.addAttribute("targetUser", user); 
-
-        model.addAttribute("followersCount", userFollowService.getFollowersCount(user.getId()));
-        model.addAttribute("followingCount", userFollowService.getFollowingCount(user.getId()));
-
-        List<CheatsheetEntity> myCheatSheets = cheatsheetService.findByUserId(user.getId());
-        
-        model.addAttribute("cheatSheetsList", myCheatSheets);
-        model.addAttribute("cheatsheetlist", myCheatSheets);
-
-        return "profile"; 
-    }
+//    @GetMapping("/profile")
+//    public String showProfile(HttpSession session, Model model) {
+//        User currentUser = (User) session.getAttribute("currentUser");
+//        if (currentUser == null) {
+//            return "redirect:/login";
+//        }
+//
+//        User user = userService.findById(currentUser.getId());
+//        model.addAttribute("user", user);
+//        model.addAttribute("targetUser", user); 
+//
+//        model.addAttribute("followersCount", userFollowService.getFollowersCount(user.getId()));
+//        model.addAttribute("followingCount", userFollowService.getFollowingCount(user.getId()));
+//
+//        List<CheatsheetEntity> myCheatSheets = cheatsheetService.findByUserId(user.getId());
+//        
+//        model.addAttribute("cheatSheetsList", myCheatSheets);
+//        model.addAttribute("cheatsheetlist", myCheatSheets);
+//
+//        return "profile"; 
+//    }
     
     @GetMapping("/profile/show/followers")
     public String showMyFollowers(HttpSession session, Model model) {
@@ -234,7 +233,7 @@ public class AuthController {
             return "redirect:/login";
         }
         NotificationDto notification = userFollowService.followUser(currentUser.getId(), id);
-        notificationSocketService.broadcastToUser(id, notification);
+//        notificationSocketService.broadcastToUser(id, notification);
         return "redirect:/profile/" + id; 
     }
 

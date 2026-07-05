@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter
+@Setter // ဒီ annotation နှစ်ခုက setUnreadCount အပါအဝင် setter အားလုံးကို အလိုအလျောက် ဖန်တီးပေးပါတယ်
 public class NotificationDto {
 
     private Integer id;
@@ -19,6 +19,7 @@ public class NotificationDto {
     private String createdAt;
     private Integer senderId;
     private String senderName;
+    private int unreadCount; // ဒီ field အသစ်ကို ထည့်ပေးပါ
 
     public static NotificationDto fromEntity(NotificationEntity notification) {
         NotificationDto dto = new NotificationDto();
@@ -40,4 +41,6 @@ public class NotificationDto {
 
         return dto;
     }
+
+   
 }

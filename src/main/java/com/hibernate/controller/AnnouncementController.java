@@ -1,6 +1,6 @@
 package com.hibernate.controller;
 
-import java.util.List;
+
 
 import javax.servlet.http.HttpSession;
 
@@ -10,14 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.ModelAndView;
 
-import com.hibernate.dto.NotificationDto;
 import com.hibernate.entity.AnnouncementEntity;
 import com.hibernate.entity.User;
 import com.hibernate.service.AnnouncementService;
-import com.hibernate.service.NotificationService;
-import com.hibernate.websocket.NotificationSocketService;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,8 +23,8 @@ import lombok.RequiredArgsConstructor;
 public class AnnouncementController {
 
     private final AnnouncementService announcementService;
-    private final NotificationService notificationService;
-    private final NotificationSocketService notificationSocketService;
+    
+//    private final NotificationSocketService notificationSocketService;
 
     private boolean isAdmin(User user) {
         return user != null && user.getRole() == 1;
@@ -67,10 +64,10 @@ public class AnnouncementController {
             return "redirect:/login";
         }
 
-        Integer id = announcementService.save(announcement, currentUser);
-        List<NotificationDto> notifications = notificationService.createAnnouncementNotifications(
-                currentUser.getId(), id, announcement.getTitle());
-        notificationSocketService.broadcastNotifications(notifications);
+            announcementService.save(announcement, currentUser);
+//   List<NotificationDto> notifications = notificationService.createAnnouncementNotifications(
+//                currentUser.getId(), id, announcement.getTitle());
+//     notificationSocketService.broadcastNotifications(notifications);
         return "redirect:/admin/announcements";
     }
 

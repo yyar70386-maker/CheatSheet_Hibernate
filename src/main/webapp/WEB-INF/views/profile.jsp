@@ -248,13 +248,13 @@ body {
                             
                             <c:choose>
                                 <c:when test="${empty cheatSheetsList}">
-                                    <div class="text-center text-muted py-4 bg-white rounded-3 border border-dashed">
+                                    <div class="text-center text-muted py-4 bg-white rounded-3 border border-dashed mb-4">
                                         <i class="bi bi-folder2-open display-6 d-block mb-2 text-secondary"></i>
                                         You haven't published any cheat sheets yet.
                                     </div>
                                 </c:when>
                                 <c:otherwise>
-                                    <div class="row g-3">
+                                    <div class="row g-3 mb-4">
                                         <c:forEach items="${cheatSheetsList}" var="sheet">
                                             <div class="col-md-6">
                                                 <div class="cheatsheet-card">
@@ -270,7 +270,46 @@ body {
                                     </div>
                                 </c:otherwise>
                             </c:choose>
+
+                            <h5 class="fw-bold text-dark mb-3 pt-3 border-top">
+                                <i class="bi bi-share-fill me-2 text-success"></i>Share Cheat Sheets
+                            </h5>
+                            
+                            <c:choose>
+                                <c:when test="${empty sharedCheatSheetsList}">
+                                    <div class="text-center text-muted py-4 bg-white rounded-3 border border-dashed">
+                                        <i class="bi bi-share display-6 d-block mb-2 text-secondary"></i>
+                                        This place is show my share cheat sheets.
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="row g-3">
+                                        <c:forEach items="${sharedCheatSheetsList}" var="item">
+                                            <div class="col-md-6">
+                                                <div class="cheatsheet-card border-success-subtle shadow-sm">
+                                                    <h6 class="fw-bold mb-1">
+                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${item.cheatsheet.id}" class="text-decoration-none text-dark">
+                                                            <c:out value="${item.cheatsheet.title}"/>
+                                                        </a>
+                                                    </h6>
+                                                    <p class="text-secondary small text-truncate mb-2"><c:out value="${item.cheatsheet.description}"/></p>
+                                                    
+                                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
+                                                            by <c:out value="${item.cheatsheet.author.fullName}"/>
+                                                        </span>
+                                                        <small class="text-muted"><i class="bi bi-eye me-1"></i> ${item.cheatsheet.viewCount != null ? item.cheatsheet.viewCount : 0}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
+                        
+                        
+                        
                     </div>
 
                     <div class="tab-pane fade ${param.tab == 'security' ? 'show active' : ''}" id="security-pane" role="tabpanel">

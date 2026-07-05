@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -43,7 +44,10 @@ public class CheatsheetEntity {
 
     @Column(name = "view_count")
     private Integer viewCount = 0;
-
+    
+    @Column(name = "share_count")
+    private Integer shareCount = 0;
+    
     @Column(name = "visibility", columnDefinition = "ENUM('PUBLIC','PRIVATE','FRIEND-ONLY')")
     private String visibility = "PUBLIC";
 
@@ -65,4 +69,19 @@ public class CheatsheetEntity {
         inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<TagEntity> tags;
+    
+    
+    
+    
+    @OneToMany(mappedBy = "cheatsheet", fetch = FetchType.LAZY) // EAGER မှ LAZY သို့
+    @BatchSize(size = 20) // ဤ Annotation ကို ထည့်ပေးပါ
+    private List<SharedCheatsheetEntity> sharedList;
+
+    @Transient
+    public int getSharedCount() {
+        if (this.sharedList != null) {
+            return this.sharedList.size();
+        }
+        return 0;
+    }
 }

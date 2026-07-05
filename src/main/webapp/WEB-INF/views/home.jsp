@@ -481,6 +481,7 @@
                                                     <span class="tag-chip"><i class="bi bi-folder-fill text-secondary"></i> ${sheet.category.name}</span>
                                                     <span class="tag-chip"><i class="bi bi-eye-fill text-secondary"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</span>
                                                     <span class="tag-chip"><i class="bi bi-download text-secondary"></i> ${sheet.downloadCount != null ? sheet.downloadCount : 0}</span>
+                                                    <span class="tag-chip text-success border-success-subtle bg-success-subtle bg-opacity-10"><i class="bi bi-share-fill"></i> ${sheet.shareCount != null ? sheet.shareCount : 0}</span>
                                                 </div>
                                                 <a class="btn btn-library btn-sm px-4" href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}">Open</a>
                                             </div>
