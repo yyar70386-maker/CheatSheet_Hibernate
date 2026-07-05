@@ -1,334 +1,499 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Profile</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
 body {
-    background-color: #f8f9fa;
+	background-color: #f0f2f5;
+	font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	padding-top: 70px;
 }
 
-.nav-tabs .nav-link {
-    color: #495057;
-    font-weight: 500;
+/* 🌟 Navbar Styling (Fixed & High Z-Index) */
+.custom-navbar {
+	background: #ffffff;
+	border-bottom: 1px solid #e4e6eb;
+	z-index: 1030;
+	/* Profile ပုံတွေ၊ Modal တွေရဲ့ အောက်ကို ရောက်မသွားအောင် */
 }
 
-.nav-tabs .nav-link.active {
-    font-weight: bold;
-    color: #0d6efd;
+/* 🌟 Profile Card & Cover Photo */
+.profile-card {
+	border: none;
+	border-radius: 16px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+	overflow: hidden;
+	background: #ffffff;
 }
 
-.badge-link {
-    text-decoration: none;
-    transition: all 0.2s ease;
+.cover-photo {
+	height: 160px;
+	background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+	position: relative;
 }
 
-.badge-link:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08) !important;
-}
-
-.cheatsheet-card {
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.01);
-    transition: transform 0.2s ease;
-}
-
-.cheatsheet-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-}
-
-/* 🌟 Facebook Style Profile Avatar Layer */
+/* 🌟 Avatar Container */
 .profile-avatar-container {
-    position: relative;
-    width: 90px;
-    height: 90px;
-    display: inline-block;
+	position: relative;
+	width: 120px;
+	height: 120px;
+	display: inline-block;
+	margin-top: -60px; /* Pull up to overlap cover photo */
+	z-index: 2;
 }
 
 .profile-avatar-img {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    transition: transform 0.2s ease-in-out;
+	width: 120px;
+	height: 120px;
+	border-radius: 50%;
+	object-fit: cover;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+	border: 4px solid #ffffff !important;
+	background-color: #ffffff;
+	cursor: pointer;
+	transition: transform 0.2s ease-in-out;
 }
 
 .profile-avatar-img:hover {
-    transform: scale(1.03);
+	transform: scale(1.02);
 }
 
-/* 📷 Camera Overlay Button Design */
 .camera-overlay-btn {
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    background-color: #e4e6eb;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-    border: 2px solid #ffffff;
-    transition: background-color 0.2s, transform 0.2s;
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+	background-color: #e4e6eb;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+	border: 2px solid #ffffff;
+	transition: all 0.2s ease;
 }
 
 .camera-overlay-btn:hover {
-    background-color: #d8dadf;
-    transform: scale(1.1);
+	background-color: #d8dadf;
+	transform: scale(1.1);
+}
+
+/* 🌟 Stats Badges */
+.stat-badge {
+	background: #f8f9fa;
+	color: #495057;
+	border: 1px solid #e9ecef;
+	padding: 8px 16px;
+	border-radius: 50px;
+	text-decoration: none;
+	font-weight: 600;
+	transition: all 0.2s ease;
+}
+
+.stat-badge:hover {
+	background: #e9ecef;
+	transform: translateY(-2px);
+}
+
+/* 🌟 Custom Tabs */
+.custom-tabs {
+	border-bottom: 2px solid #f0f2f5;
+	margin-bottom: 20px;
+}
+
+.custom-tabs .nav-link {
+	color: #6c757d;
+	font-weight: 600;
+	border: none;
+	padding: 12px 20px;
+	background: transparent;
+	position: relative;
+}
+
+.custom-tabs .nav-link:hover {
+	color: #0d6efd;
+}
+
+.custom-tabs .nav-link.active {
+	color: #0d6efd;
+	border: none;
+	background: transparent;
+}
+
+.custom-tabs .nav-link.active::after {
+	content: '';
+	position: absolute;
+	bottom: -2px;
+	left: 0;
+	width: 100%;
+	height: 3px;
+	background-color: #0d6efd;
+	border-radius: 3px 3px 0 0;
+}
+
+/* 🌟 Form Controls */
+.form-control {
+	border-radius: 8px;
+	padding: 10px 15px;
+	border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+	box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+/* 🌟 CheatSheet Cards */
+.cheatsheet-card {
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 20px;
+	background: #ffffff;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+	transition: all 0.3s ease;
+	height: 100%;
+}
+
+.cheatsheet-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+	border-color: #0d6efd;
 }
 </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-dark bg-dark px-4 shadow-sm">
-        <a href="${pageContext.request.contextPath}/home" class="navbar-brand mb-0 h1"> 
-            <i class="bi bi-speedometer2 me-2"></i>Dashboard
-        </a> 
-        <a href="${pageContext.request.contextPath}/logout" class="btn btn-outline-danger btn-sm">Logout</a>
-    </nav>
 
-    <div class="container mt-5" style="max-width: 700px;">
+	<nav class="navbar custom-navbar px-4 shadow-sm fixed-top">
+		<a href="${pageContext.request.contextPath}/home"
+			class="navbar-brand mb-0 h1 fw-bold text-primary"> <i
+			class="bi bi-code-square me-2"></i>DevHub
+		</a> <a href="${pageContext.request.contextPath}/home"
+			class="btn btn-outline-secondary px-4 rounded-pill fw-bold shadow-sm d-flex align-items-center">
+			<i class="bi bi-arrow-left me-2"></i> Back to Dashboard
+		</a>
 
-        <c:if test="${not empty message}">
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </c:if>
-        <c:if test="${not empty error}">
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>${error}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </c:if>
+	</nav>
 
-        <div class="card shadow border-0 rounded-3">
+	<div class="container mb-5" style="max-width: 800px;">
 
-            <div class="card-header bg-white border-0 pt-3 px-4">
-                <ul class="nav nav-tabs card-header-tabs" id="profileTab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link ${param.tab != 'security' ? 'active' : ''}"
-                            id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab">
-                            <i class="bi bi-person-vcard me-2"></i>Profile Info
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link ${param.tab == 'security' ? 'active' : ''}"
-                            id="security-tab" data-bs-toggle="tab" data-bs-target="#security-pane" type="button" role="tab">
-                            <i class="bi bi-shield-lock me-2"></i>Change Password
-                        </button>
-                    </li>
-                </ul>
-            </div>
+		<!-- Alerts -->
+		<c:if test="${not empty message}">
+			<div
+				class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm"
+				role="alert">
+				<i class="bi bi-check-circle-fill me-2"></i>${message}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"
+					aria-label="Close"></button>
+			</div>
+		</c:if>
+		<c:if test="${not empty error}">
+			<div
+				class="alert alert-danger alert-dismissible fade show rounded-4 border-0 shadow-sm"
+				role="alert">
+				<i class="bi bi-exclamation-triangle-fill me-2"></i>${error}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"
+					aria-label="Close"></button>
+			</div>
+		</c:if>
 
-            <div class="card-body p-4">
-                <div class="tab-content" id="profileTabContent">
+		<!-- 🃏 Profile Main Card -->
+		<div class="profile-card">
 
-                    <div class="tab-pane fade ${param.tab != 'security' ? 'show active' : ''}" id="info-pane" role="tabpanel">
+			<!-- 🎨 Cover Photo -->
+			<div class="cover-photo"></div>
 
-                        <form id="profileAvatarForm" action="${pageContext.request.contextPath}/profile/upload-avatar" method="POST" enctype="multipart/form-data" class="mb-4 pb-4 border-bottom">
-                            <div class="d-flex align-items-center">
-                                
-                                <div class="profile-avatar-container me-4">
-                                    <c:choose>
-                                        <c:when test="${not empty user.avatarPath}">
-                                            <img src="${pageContext.request.contextPath}/profile/avatar/${user.avatarPath}"
-                                                class="profile-avatar-img"
-                                                style="border: 3px solid #0d6efd;"
-                                                data-bs-toggle="modal" data-bs-target="#avatarViewModal"
-                                                title="Click to view full image">
-                                        </c:when>
-                                        <c:otherwise>
-                                            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                                class="profile-avatar-img"
-                                                style="border: 3px solid #ccc;"
-                                                data-bs-toggle="modal" data-bs-target="#avatarViewModal"
-                                                title="Click to view full image">
-                                        </c:otherwise>
-                                    </c:choose>
-                                    
-                                    <label for="avatarFile" class="camera-overlay-btn" title="Change Profile Picture">
-                                        <i class="bi bi-camera-fill text-dark fs-6"></i>
-                                    </label>
-                                    
-                                    <input type="file" id="avatarFile" name="avatarFile" accept="image/*" style="display: none;" required>
-                                </div>
+			<div class="card-body px-4 pb-4">
 
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1 fw-bold text-dark">Profile Picture</h6>
-                                    <p class="text-muted small mb-0">Click the camera icon to select and instantly upload a new photo.</p>
-                                    <div class="form-text small text-muted">Accepts JPG, PNG formats.</div>
-                                    
-                                    <div id="fileError" class="text-danger small mt-1 fw-bold" style="display: none;"></div>
-                                </div>
+				<!-- 👤 Avatar & Stats Header -->
+				<div class="d-flex justify-content-between align-items-end mb-3">
 
-                                <script>
-                                    document.getElementById('avatarFile').addEventListener('change', function() {
-                                        const file = this.files[0];
-                                        const errorDiv = document.getElementById('fileError');
-                                        const form = document.getElementById('profileAvatarForm');
+					<!-- Avatar Upload Form -->
+					<form id="profileAvatarForm"
+						action="${pageContext.request.contextPath}/profile/upload-avatar"
+						method="POST" enctype="multipart/form-data">
+						<div class="profile-avatar-container">
+							<c:choose>
+								<c:when test="${not empty user.avatarPath}">
+									<img
+										src="${pageContext.request.contextPath}/profile/avatar/${user.avatarPath}"
+										class="profile-avatar-img" data-bs-toggle="modal"
+										data-bs-target="#avatarViewModal" style="cursor: pointer;"
+										title="Click to view full image">
+								</c:when>
+								<c:otherwise>
+									<img
+										src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+										class="profile-avatar-img" data-bs-toggle="modal"
+										data-bs-target="#avatarViewModal"
+										title="Click to view full image">
+								</c:otherwise>
+							</c:choose>
 
-                                        if (file) {
-                                            if (!file.type.startsWith('image/')) {
-                                                errorDiv.textContent = "❌ Invalid file! Please select an image file (JPG, PNG) only.";
-                                                errorDiv.style.display = "block";
-                                                this.value = ""; 
-                                            } else {
-                                                errorDiv.style.display = "none";
-                                                form.submit(); 
-                                            }
-                                        }
-                                    });
-                                </script>
-                            </div>
-                        </form>
+							<label for="avatarFile" class="camera-overlay-btn"
+								title="Change Profile Picture"> <i
+								class="bi bi-camera-fill text-dark fs-6"></i>
+							</label> <input type="file" id="avatarFile" name="avatarFile"
+								accept="image/*" style="display: none;" required>
+						</div>
+					</form>
 
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <div class="d-flex align-items-center">
-                                <h5 class="card-title text-secondary mb-0">Personal Details</h5>
-                                <span class="badge ${user.role == 1 ? 'bg-danger' : 'bg-primary'} ms-3">
-                                    <c:out value="${user.role == 1 ? 'Admin' : 'Regular User'}" />
-                                </span>
-                            </div>
-                            
-                            <div class="d-flex gap-2">
-                                <a href="${pageContext.request.contextPath}/profile/show/followers" class="badge bg-light text-dark border py-2 px-3 badge-link shadow-sm text-hover-primary">
-                                    <i class="bi bi-people-fill text-primary me-1"></i> <strong>${followersCount != null ? followersCount : 0}</strong> Followers
-                                </a>
-                                
-                                <a href="${pageContext.request.contextPath}/profile/show/following" class="badge bg-light text-dark border py-2 px-3 badge-link shadow-sm text-hover-success">
-                                    <i class="bi bi-person-plus-fill text-success me-1"></i> <strong>${followingCount != null ? followingCount : 0}</strong> Following
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <form action="${pageContext.request.contextPath}/profile/update" method="POST" class="border-bottom pb-4 mb-4">
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">Full Name</label> 
-                                <input type="text" name="fullName" value="${user.fullName}" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">Email Address</label> 
-                                <input type="email" name="email" value="${user.email}" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">Bio / About Me</label>
-                                <textarea name="bio" class="form-control" rows="3" placeholder="Tell us about yourself..."><c:out value="${user.bio}" /></textarea>
-                            </div>
-                            
-                            <div class="d-flex justify-content-between pt-2">
-                                <a href="${pageContext.request.contextPath}/home" class="btn btn-outline-secondary px-3 btn-sm"> 
-                                    <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
-                                </a>
-                                <button type="submit" class="btn btn-primary px-4 btn-sm">
-                                    <i class="bi bi-save me-2"></i>Update Profile
-                                </button>
-                            </div>
-                        </form>
+					<!-- Stats Badges -->
+					<div class="d-flex gap-2 pb-2">
+						<a
+							href="${pageContext.request.contextPath}/profile/show/followers"
+							class="stat-badge"> <i
+							class="bi bi-people-fill text-primary me-1"></i> <span
+							class="fs-5">${followersCount != null ? followersCount : 0}</span>
+							<span class="text-muted small">Followers</span>
+						</a> <a
+							href="${pageContext.request.contextPath}/profile/show/following"
+							class="stat-badge"> <i
+							class="bi bi-person-plus-fill text-success me-1"></i> <span
+							class="fs-5">${followingCount != null ? followingCount : 0}</span>
+							<span class="text-muted small">Following</span>
+						</a>
+					</div>
+				</div>
 
-                        <div class="mt-4">
-                            <h5 class="fw-bold text-dark mb-3">
-                                <i class="bi bi-file-earmark-code me-2 text-primary"></i>My Cheat Sheets
-                            </h5>
-                            
-                            <c:choose>
-                                <c:when test="${empty cheatSheetsList}">
-                                    <div class="text-center text-muted py-4 bg-white rounded-3 border border-dashed">
-                                        <i class="bi bi-folder2-open display-6 d-block mb-2 text-secondary"></i>
-                                        You haven't published any cheat sheets yet.
-                                    </div>
-                                </c:when>
-                                <c:otherwise>
-                                    <div class="row g-3">
-                                        <c:forEach items="${cheatSheetsList}" var="sheet">
-                                            <div class="col-md-6">
-                                                <div class="cheatsheet-card">
-                                                    <h6 class="fw-bold mb-1 text-dark">${sheet.title}</h6>
-                                                    <p class="text-secondary small text-truncate mb-2">${sheet.description}</p>
-                                                    <div class="d-flex justify-content-between align-items-center mt-2">
-                                                        <span class="badge bg-light text-dark border rounded-pill">${sheet.category.name}</span>
-                                                        <small class="text-muted"><i class="bi bi-eye me-1"></i> ${sheet.viewCount != null ? sheet.viewCount : 0}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </c:forEach>
-                                    </div>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-                    </div>
+				<div id="fileError" class="text-danger small mb-3 fw-bold"
+					style="display: none;"></div>
 
-                    <div class="tab-pane fade ${param.tab == 'security' ? 'show active' : ''}" id="security-pane" role="tabpanel">
-                        <h5 class="card-title text-danger mb-2">Account Security</h5>
-                        <p class="text-muted small mb-4">Please type your current password to authorize changing to a new password.</p>
+				<!-- 📛 User Info Name -->
+				<div class="mb-4">
+					<h3 class="fw-bold text-dark mb-1">${user.fullName}</h3>
 
-                        <form action="${pageContext.request.contextPath}/profile/change-password" method="POST">
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">Old Password</label> 
-                                <input type="password" name="oldPassword" class="form-control" placeholder="Enter current password" required>
-                            </div>
+					<c:if test="${user.role == 1}">
+						<span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm">
+							<i class="bi bi-shield-lock-fill me-1"></i> Administrator
+						</span>
+					</c:if>
+				</div>
+				<!-- 📑 Profile Tabs -->
+				<ul class="nav nav-tabs custom-tabs" id="profileTab" role="tablist">
+					<li class="nav-item" role="presentation">
+						<button
+							class="nav-link ${param.tab != 'security' ? 'active' : ''}"
+							id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane"
+							type="button" role="tab">
+							<i class="bi bi-person-lines-fill me-2"></i>About Me
+						</button>
+					</li>
+					<li class="nav-item" role="presentation">
+						<button
+							class="nav-link ${param.tab == 'security' ? 'active' : ''}"
+							id="security-tab" data-bs-toggle="tab"
+							data-bs-target="#security-pane" type="button" role="tab">
+							<i class="bi bi-shield-lock-fill me-2"></i>Security
+						</button>
+					</li>
+				</ul>
 
-                            <div class="mb-3">
-                                <label class="form-label text-muted small fw-bold">New Password</label> 
-                                <input type="password" name="newPassword" class="form-control" placeholder="At least 6 characters" required>
-                            </div>
+				<!-- 📝 Tab Contents -->
+				<div class="tab-content" id="profileTabContent">
 
-                            <div class="text-end pt-2">
-                                <button type="submit" class="btn btn-dark px-4 btn-sm">
-                                    <i class="bi bi-key me-2"></i>Change Password
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+					<!-- Tab 1: Info Pane -->
+					<div
+						class="tab-pane fade ${param.tab != 'security' ? 'show active' : ''}"
+						id="info-pane" role="tabpanel">
 
-                </div>
-            </div>
+						<form action="${pageContext.request.contextPath}/profile/update"
+							method="POST"
+							class="bg-light p-4 rounded-4 mb-4 border border-white shadow-sm">
+							<h5 class="fw-bold mb-3">
+								<i class="bi bi-pencil-square me-2 text-muted"></i>Edit Details
+							</h5>
+							<div class="row g-3">
+								<div class="col-md-6">
+									<label class="form-label text-muted small fw-bold">Full
+										Name</label> <input type="text" name="fullName"
+										value="${user.fullName}" class="form-control" required>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label text-muted small fw-bold">Email
+										Address</label> <input type="email" name="email" value="${user.email}"
+										class="form-control" required>
+								</div>
+								<div class="col-12">
+									<label class="form-label text-muted small fw-bold">Bio
+										/ About Me</label>
+									<textarea name="bio" class="form-control" rows="3"
+										placeholder="Tell us about yourself..."><c:out
+											value="${user.bio}" /></textarea>
+								</div>
+							</div>
 
-        </div>
-    </div>
 
-    <div class="modal fade" id="avatarViewModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-md">
-            <div class="modal-content bg-dark border-0 shadow-lg">
-                <div class="modal-header border-0 pb-0">
-                    <h6 class="modal-title text-white-50">Profile Picture</h6>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center p-3">
-                    <c:choose>
-                        <c:when test="${not empty user.avatarPath}">
-                            <img src="${pageContext.request.contextPath}/profile/avatar/${user.avatarPath}" 
-                                 class="img-fluid rounded shadow" 
-                                 style="max-height: 75vh; object-fit: contain;" 
-                                 alt="Full Profile">
-                        </c:when>
-                        <c:otherwise>
-                            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" 
-                                 class="img-fluid rounded shadow bg-light p-4" 
-                                 style="max-height: 50vh; width: 250px; object-fit: contain;" 
-                                 alt="Default Profile">
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </div>
-        </div>
-    </div>
+							<div class="d-flex justify-content-end pt-4">
+								<button type="submit"
+									class="btn btn-primary px-4 rounded-pill fw-bold shadow-sm d-flex align-items-center">
+									<i class="bi bi-save me-2"></i> Save Changes
+								</button>
+							</div>
+						</form>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+						<!-- My Cheat Sheets Section -->
+						<div class="mt-5">
+							<h5 class="fw-bold text-dark mb-4 border-bottom pb-2">
+								<i class="bi bi-file-earmark-code-fill me-2 text-primary"></i>My
+								Published Cheat Sheets
+							</h5>
+
+							<c:choose>
+								<c:when test="${empty cheatSheetsList}">
+									<div
+										class="text-center text-muted py-5 bg-light rounded-4 border border-dashed">
+										<i
+											class="bi bi-folder2-open display-4 d-block mb-3 text-secondary opacity-50"></i>
+										<h6 class="fw-bold">No cheat sheets found</h6>
+										<p class="small mb-0">You haven't published any cheat
+											sheets yet.</p>
+									</div>
+								</c:when>
+								<c:otherwise>
+									<div class="row g-4">
+										<c:forEach items="${cheatSheetsList}" var="sheet">
+											<div class="col-md-6">
+												<div class="cheatsheet-card d-flex flex-column">
+													<h6 class="fw-bold text-dark mb-2">${sheet.title}</h6>
+													<p class="text-secondary small mb-3 flex-grow-1">${sheet.description}</p>
+													<div
+														class="d-flex justify-content-between align-items-center pt-3 border-top">
+														<span
+															class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill px-3 py-2">
+															${sheet.category.name} </span> <span
+															class="text-muted fw-bold small"><i
+															class="bi bi-eye-fill me-1 text-secondary"></i>
+															${sheet.viewCount != null ? sheet.viewCount : 0}</span>
+													</div>
+												</div>
+											</div>
+										</c:forEach>
+									</div>
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+
+					<!-- Tab 2: Security Pane -->
+					<div
+						class="tab-pane fade ${param.tab == 'security' ? 'show active' : ''}"
+						id="security-pane" role="tabpanel">
+						<div
+							class="bg-light p-4 rounded-4 border border-white shadow-sm mt-2">
+							<h5 class="text-danger fw-bold mb-2">
+								<i class="bi bi-shield-lock-fill me-2"></i>Change Password
+							</h5>
+							<p class="text-muted small mb-4 pb-2 border-bottom">Ensure
+								your account is using a long, random password to stay secure.</p>
+
+							<form
+								action="${pageContext.request.contextPath}/profile/change-password"
+								method="POST" style="max-width: 500px;">
+								<div class="mb-3">
+									<label class="form-label text-muted small fw-bold">Current
+										Password</label> <input type="password" name="oldPassword"
+										class="form-control" placeholder="Enter current password"
+										required>
+								</div>
+
+								<div class="mb-4">
+									<label class="form-label text-muted small fw-bold">New
+										Password</label> <input type="password" name="newPassword"
+										class="form-control" placeholder="At least 6 characters"
+										required>
+								</div>
+
+								<div>
+									<button type="submit"
+										class="btn btn-dark px-4 rounded-pill fw-bold shadow-sm">
+										<i class="bi bi-key-fill me-2"></i>Update Password
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 📷 Avatar View Modal -->
+	<div class="modal fade" id="avatarViewModal" tabindex="-1"
+		aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content bg-transparent border-0">
+				<div class="modal-header border-0 pb-0 justify-content-end">
+					<button type="button" class="btn-close btn-close-white fs-4"
+						data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-dialog modal-dialog-centered modal-xl">
+					<c:choose>
+						<c:when test="${not empty user.avatarPath}">
+							<img
+								src="${pageContext.request.contextPath}/profile/avatar/${user.avatarPath}"
+								class="img-fluid shadow-lg rounded"
+								style="max-width: 100%; max-height: 80vh;" alt="Profile Image">
+						</c:when>
+						<c:otherwise>
+							<img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+								class="img-fluid shadow-lg rounded"
+								style="max-width: 100%; max-height: 80vh;" alt="Default Profile">
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 🌟 Scripts -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<script>
+		// Avatar File Upload Validation Script
+		document
+				.getElementById('avatarFile')
+				.addEventListener(
+						'change',
+						function() {
+							const file = this.files[0];
+							const errorDiv = document
+									.getElementById('fileError');
+							const form = document
+									.getElementById('profileAvatarForm');
+
+							if (file) {
+								if (!file.type.startsWith('image/')) {
+									errorDiv.innerHTML = "<i class='bi bi-x-circle-fill me-1'></i> Invalid file! Please select an image file (JPG, PNG) only.";
+									errorDiv.style.display = "block";
+									this.value = "";
+								} else {
+									errorDiv.style.display = "none";
+									form.submit();
+								}
+							}
+						});
+		setTimeout(function() {
+			const alerts = document.querySelectorAll('.alert');
+			alerts.forEach(function(alert) {
+
+				const bsAlert = new bootstrap.Alert(alert);
+				bsAlert.close();
+			});
+		}, 3000);
+	</script>
 </body>
 </html>

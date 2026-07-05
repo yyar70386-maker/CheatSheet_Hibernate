@@ -102,6 +102,7 @@
         </button>
         
         <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Left Side: Navigation Links (ထည့်ထားသမျှ Menu တွေအကုန် စုစည်းပေးထားပါတယ်) -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active" href="${pageContext.request.contextPath}/home">
@@ -125,6 +126,7 @@
                 </li>
             </ul>
             
+            <!-- Right Side: User Controls (Notification & Profile Dropdown) -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
                 <c:choose>
                     <%-- ==================== 🔓 CASE 1: USER IS NOT LOGGED IN ==================== --%>
@@ -143,6 +145,7 @@
                     
                     <%-- ==================== 🔒 CASE 2: USER IS LOGGED IN ==================== --%>
                     <c:otherwise>
+                        <!-- Notification Dropdown -->
                         <li class="nav-item dropdown me-lg-2">
                             <a class="nav-link notification-button" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-bell fs-5"></i>
@@ -159,13 +162,12 @@
                             </ul>
                         </li>
 
+                        <!-- User Profile Dropdown -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <c:choose>
                                     <c:when test="${not empty sessionScope.currentUser.avatarPath}">
-                                        <img src="${pageContext.request.contextPath}/uploads/${sessionScope.currentUser.avatarPath}" 
-                                             class="rounded-circle me-2 nav-avatar" 
-                                             width="32" height="32">
+                                        <img src="${pageContext.request.contextPath}/uploads/${sessionScope.currentUser.avatarPath}" class="rounded-circle me-2 nav-avatar" width="32" height="32">
                                     </c:when>
                                     <c:otherwise>
                                         <i class="bi bi-person-circle me-2 text-secondary" style="font-size: 1.4rem;"></i>
@@ -173,7 +175,6 @@
                                 </c:choose>
                                 <span class="fw-medium">${sessionScope.currentUser.fullName}</span>
                             </a>
-                            
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li>
                                     <a class="dropdown-item" href="${pageContext.request.contextPath}/profile">
@@ -182,7 +183,7 @@
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout">
+                                    <a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout" onclick="confirmLogout(event)">
                                         <i class="bi bi-box-arrow-right me-2"></i> Logout
                                     </a>
                                 </li>
@@ -250,7 +251,8 @@
                 var toast = document.getElementById('notificationToast');
                 var title = document.getElementById('notificationToastTitle');
                 var message = document.getElementById('notificationToastMessage');
-                title.textContent = notification.title || notification.notificationType || 'New notification';
+                var titleText = notification.title || notification.notificationType || 'New notification';
+                title.textContent = titleText;
                 message.textContent = notification.message || '';
                 toast.style.display = 'block';
                 window.clearTimeout(window.cheatSheetNotificationTimer);
@@ -292,5 +294,26 @@
             loadRecentNotifications();
             connectNotificationSocket();
         })();
+
+        function confirmLogout(event) {
+            event.preventDefault(); 
+            const logoutUrl = event.currentTarget.getAttribute('href'); 
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you really want to log out of your account?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, logout!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true 
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = logoutUrl;
+                }
+            });
+        }
     </script>
 </c:if>

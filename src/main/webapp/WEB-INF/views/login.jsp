@@ -1,127 +1,306 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Sign In - Cheat Sheet Project</title>
+
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
 	rel="stylesheet">
+
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: "Segoe UI", sans-serif;
+}
+
 body {
-	background-color: #f8f9fa;
-	height: 100vh;
+	min-height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: linear-gradient(135deg, #4facfe, #00c6fb);
+	padding: 20px;
 }
 
 .login-card {
-	border: none;
-	border-radius: 12px;
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-	max-width: 420px;
 	width: 100%;
-	background: #ffffff;
+	max-width: 430px;
+	background: rgba(255, 255, 255, .95);
+	border: none;
+	border-radius: 20px;
+	padding: 35px;
+	box-shadow: 0 25px 50px rgba(0, 0, 0, .15);
+	backdrop-filter: blur(15px);
+	animation: fadeUp .6s ease;
+}
+
+.logo {
+	width: 80px;
+	height: 80px;
+	margin: auto;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #0d6efd, #4facfe);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 35px;
+	color: white;
+	margin-bottom: 20px;
+	box-shadow: 0 10px 20px rgba(13, 110, 253, .3);
+}
+
+h2 {
+	font-weight: bold;
+	color: #222;
+}
+
+.subtitle {
+	color: #777;
+	font-size: 15px;
+	margin-bottom: 30px;
+}
+
+.form-label {
+	font-weight: 600;
+	color: #555;
+}
+
+.input-group-text {
+	background: #fff;
+	border-right: none;
+	border-radius: 12px 0 0 12px;
 }
 
 .form-control {
-	background-color: #edf2f9;
-	border: 1px solid #edf2f9;
-	padding: 10px 14px;
+	height: 50px;
+	border-left: none;
+	border-radius: 0 12px 12px 0;
 }
 
 .form-control:focus {
-	background-color: #fff;
-	border-color: #cbd5e1;
 	box-shadow: none;
+	border-color: #0d6efd;
+}
+
+.input-group:focus-within .input-group-text {
+	border-color: #0d6efd;
+}
+
+.password-btn {
+	border-radius: 0 12px 12px 0;
 }
 
 .btn-login {
-	background-color: #198754;
-	color: white;
+	height: 50px;
 	border: none;
-	padding: 10px;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #0d6efd, #4facfe);
+	font-weight: 600;
+	transition: .3s;
 }
 
 .btn-login:hover {
-	background-color: #157347;
-	color: white;
+	transform: translateY(-2px);
+	box-shadow: 0 10px 20px rgba(13, 110, 253, .3);
 }
 
 .btn-cancel {
-	padding: 10px;
+	height: 50px;
+	border-radius: 12px;
+	font-weight: 600;
+}
+
+.register-text {
+	font-size: 14px;
+	color: #666;
+}
+
+.alert {
+	border-radius: 12px;
+}
+
+@
+keyframes fadeUp {from { opacity:0;
+	transform: translateY(30px);
+}
+
+to {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.logo-text {
+	width: 90px;
+	height: 90px;
+	margin: auto;
+	margin-bottom: 20px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #0d6efd, #4facfe);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: white;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: center;
+	box-shadow: 0 10px 20px rgba(13, 110, 253, .3);
+}
 }
 </style>
-</head>
-<body class="d-flex align-items-center justify-content-center">
 
-	<div class="card login-card p-4 mx-3">
-		<h2 class="text-center fw-bold mb-4" style="color: #212529;">Sign
-			In</h2>
+</head>
+
+<body>
+
+	<div class="login-card">
+
+		<h2 class="text-center">Welcome Back</h2>
+
+		<p class="text-center subtitle">Sign in to continue</p>
 
 		<c:if test="${not empty loginError}">
-			<div class="alert alert-danger text-center small fw-bold mb-3"
-				role="alert">⚠️ ${loginError}</div>
+			<div class="alert alert-danger text-center">
+				<i class="bi bi-exclamation-triangle-fill"></i> ${loginError}
+			</div>
 		</c:if>
+
 		<c:if test="${param.success == 'password_changed'}">
-			<div class="alert alert-success alert-dismissible fade show"
-				role="alert">
-				<i class="bi bi-check-circle-fill me-2"></i> Password changed
-				successfully! Please login again with your new password.
-				<button type="button" class="btn-close" data-bs-dismiss="alert"
-					aria-label="Close"></button>
+			<div class="alert alert-success">
+				<i class="bi bi-check-circle-fill"></i> Password changed
+				successfully! Please login again.
 			</div>
 		</c:if>
 
 		<form action="${pageContext.request.contextPath}/login" method="POST">
+
 			<div class="mb-3">
-				<label class="form-label text-secondary small fw-medium">Email
-					Address</label> <input type="email" name="email" class="form-control"
-					placeholder="Enter your email" required>
+
+				<label class="form-label"> Email Address </label>
+
+				<div class="input-group">
+
+					<span class="input-group-text"> <i
+						class="bi bi-envelope-fill"></i>
+					</span> <input type="email" name="email" class="form-control"
+						placeholder="Enter your email" required>
+
+				</div>
+
 			</div>
 
-			<div class="mb-2">
-				<label class="form-label text-secondary small fw-medium">Password</label>
-				<input type="password" name="password" class="form-control"
-					placeholder="••••" required>
+			<div class="mb-3">
+
+				<label class="form-label"> Password </label>
+
+				<div class="input-group">
+
+					<span class="input-group-text"> <i class="bi bi-lock-fill"></i>
+					</span> <input type="password" name="password" id="password"
+						class="form-control" placeholder="Enter password" required>
+
+					<button type="button"
+						class="btn btn-outline-secondary password-btn"
+						onclick="togglePassword()">
+
+						<i class="bi bi-eye" id="eyeIcon"></i>
+
+					</button>
+
+				</div>
+
 			</div>
 
-			<div class="text-end mb-4">
+			<div class="d-flex justify-content-end align-items-center mb-4">
+
 				<a href="${pageContext.request.contextPath}/forgot-password"
-					class="text-decoration-none small text-primary"> <i
-					class="bi bi-question-circle me-1"></i>Forgot Password?
-				</a>
+					class="text-decoration-none"> Forgot Password? </a>
+
 			</div>
 
-			<div class="d-flex gap-2 mb-3">
+			<div class="d-grid gap-2">
+
+				<button type="submit" class="btn btn-login text-white">
+
+					<i class="bi bi-box-arrow-in-right"></i> Login
+
+				</button>
+
 				<a href="${pageContext.request.contextPath}/"
-					class="btn btn-outline-secondary btn-cancel flex-fill"> <i
-					class="bi bi-x-circle me-1"></i> Cancel
+					class="btn btn-outline-secondary btn-cancel"> <i
+					class="bi bi-arrow-left-circle"></i> Back Home
+
 				</a>
-				<button type="submit" class="btn btn-login flex-fill fw-medium">
-					Login</button>
+
 			</div>
 
-			<div class="text-center pt-2">
-				<span class="text-muted small">Don't have an account yet? </span> <a
-					href="${pageContext.request.contextPath}/register"
-					class="text-decoration-none small text-primary fw-medium">Register</a>
-			</div>
 		</form>
+
+		<hr>
+
+		<div class="text-center register-text">
+
+			Don't have an account? <a
+				href="${pageContext.request.contextPath}/register"
+				class="fw-bold text-decoration-none"> Register Now </a>
+
+		</div>
+
 	</div>
 
 	<c:if test="${param.error == 'login_required'}">
-		<div class="alert alert-danger text-center font-weight-bold">⚠️
-			Please login first to access that page!</div>
+		<div class="position-fixed top-0 start-50 translate-middle-x mt-3">
+			<div class="alert alert-danger shadow">⚠️ Please login first!</div>
+		</div>
 	</c:if>
 
 	<c:if test="${param.error == 'admin_only'}">
-		<div class="alert alert-danger text-center font-weight-bold">🚫
-			Access Denied: Admin privileges required!</div>
+		<div class="position-fixed top-0 start-50 translate-middle-x mt-3">
+			<div class="alert alert-danger shadow">🚫 Admin access only!</div>
+		</div>
 	</c:if>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+		
+	</script>
+
+	<script>
+		function togglePassword() {
+
+			const password = document.getElementById("password");
+			const eye = document.getElementById("eyeIcon");
+
+			if (password.type === "password") {
+
+				password.type = "text";
+
+				eye.classList.remove("bi-eye");
+				eye.classList.add("bi-eye-slash");
+
+			} else {
+
+				password.type = "password";
+
+				eye.classList.remove("bi-eye-slash");
+				eye.classList.add("bi-eye");
+
+			}
+
+		}
+	</script>
+
 </body>
 </html>
