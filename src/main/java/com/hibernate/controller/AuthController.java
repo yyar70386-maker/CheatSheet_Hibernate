@@ -3,10 +3,12 @@ package com.hibernate.controller;
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.User;
 import com.hibernate.dto.NotificationDto;
+import com.hibernate.service.AuditLogService;
 import com.hibernate.service.CategoryService;
 import com.hibernate.service.AnnouncementService;
 import com.hibernate.service.CheatsheetService;
 import com.hibernate.service.UserFollowService;
+import com.hibernate.service.TagService;
 import com.hibernate.service.UserService;
 import com.hibernate.websocket.NotificationSocketService;
 
@@ -33,16 +35,22 @@ public class AuthController {
     private CategoryService categoryService; 
 
     @Autowired
+    private CheatsheetService cheatsheetService;
+
+    @Autowired
+    private TagService tagService;
+
+    @Autowired
     private AnnouncementService announcementService;
     
     @Autowired
     private UserFollowService userFollowService;
     
     @Autowired
-    private CheatsheetService cheatsheetService;
+    private NotificationSocketService notificationSocketService;
 
     @Autowired
-    private NotificationSocketService notificationSocketService;
+    private AuditLogService auditLogService;
     
     @GetMapping("/")
     public String showHomePage(
@@ -51,13 +59,21 @@ public class AuthController {
             HttpSession session,
             Model model) {
         int pageSize = 6;
-        model.addAttribute("categorylist", categoryService.findAll());
+        
+        // Active ဖြစ်နေတဲ့ Category list ကိုသာ ဆွဲထုတ်ပြသခြင်း
+        model.addAttribute("categorylist", categoryService.findAllActive());
         model.addAttribute("announcements", announcementService.findLatest(3));
         model.addAttribute("cheatsheetlist", cheatsheetService.findLatestPublic(query, page, pageSize));
         model.addAttribute("searchQuery", query);
         model.addAttribute("currentPage", page);
+        
         long total = cheatsheetService.countLatestPublic(query);
         model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / pageSize)));
+        
+        // သူငယ်ချင်းဖြစ်သူ ထည့်သွင်းထားသော Total Count Metrics များ
+        model.addAttribute("totalSheets", cheatsheetService.getTotalSheetsCount());
+        model.addAttribute("totalTags", tagService.getTotalTagsCount());
+        
         return "home";
     }
    
@@ -87,18 +103,20 @@ public class AuthController {
     }
 
     @GetMapping("/login")
-    public String showLoginForm() { 
+    public String showLoginForm() {
         return "login"; 
     }
 
     @PostMapping("/login")
     public String processLogin(@RequestParam("email") String email, 
                                @RequestParam("password") String password,
+                               HttpServletRequest request,
                                HttpSession session, 
                                RedirectAttributes redirectAttributes) { 
         User user = userService.authenticateByEmail(email, password);
         if (user != null) {
             session.setAttribute("currentUser", user);
+            auditLogService.log(user, "Login", "User", user.getId(), "User logged in.", request.getRemoteAddr());
             return "redirect:/home";
         } else {
             redirectAttributes.addFlashAttribute("loginError", "Invalid Email or Password!");
@@ -107,7 +125,11 @@ public class AuthController {
     }
     
     @GetMapping("/logout")
-    public String handleLogout(HttpSession session) {
+    public String handleLogout(HttpServletRequest request, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser != null) {
+            auditLogService.log(currentUser, "Logout", "User", currentUser.getId(), "User logged out.", request.getRemoteAddr());
+        }
         session.invalidate(); 
         return "redirect:/"; 
     }
@@ -122,17 +144,21 @@ public class AuthController {
         if (currentUser != null) {
             model.addAttribute("currentUser", currentUser);
         }
-        model.addAttribute("categorylist", categoryService.findAll());
+        model.addAttribute("categorylist", categoryService.findAllActive());
         model.addAttribute("announcements", announcementService.findLatest(3));
         model.addAttribute("cheatsheetlist", cheatsheetService.findLatestPublic(query, page, 6));
         model.addAttribute("searchQuery", query);
         model.addAttribute("currentPage", page);
+        
         long total = cheatsheetService.countLatestPublic(query);
         model.addAttribute("totalPages", Math.max(1, (int) Math.ceil((double) total / 6)));
+        
+        model.addAttribute("totalSheets", cheatsheetService.getTotalSheetsCount());
+        model.addAttribute("totalTags", tagService.getTotalTagsCount());
+        
         return "home";
     }
 
-    // 👤 မိမိကိုယ်ပိုင် Profile ကိုကြည့်ရှုခြင်း
     @GetMapping("/profile")
     public String showProfile(HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
@@ -149,7 +175,6 @@ public class AuthController {
 
         List<CheatsheetEntity> myCheatSheets = cheatsheetService.findByUserId(user.getId());
         
-        // 🌟 [FIXED] JSP ထဲက အခေါ်အဝေါ် မလွဲစေရန် ကာကွယ်ရေးအနေဖြင့် နာမည်နှစ်မျိုးလုံးဖြင့် ပို့ပေးလိုက်ပါသည်
         model.addAttribute("cheatSheetsList", myCheatSheets);
         model.addAttribute("cheatsheetlist", myCheatSheets);
 
@@ -180,7 +205,6 @@ public class AuthController {
         return "follow_list"; 
     }
     
-    // 🔍 တခြားသူ၏ Profile ကို သွားရောက်ကြည့်ရှုခြင်း
     @GetMapping("/profile/{id}")
     public String viewTargetProfile(@PathVariable Integer id, HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
@@ -207,7 +231,6 @@ public class AuthController {
 
         List<CheatsheetEntity> targetUserCheatSheets = cheatsheetService.findByUserId(id); 
         
-        // 🌟 [FIXED] user-profile.jsp ထဲတွင် ${cheatsheetlist} ဟု ရေးထားသောကြောင့် စာလုံးအသေးဖြင့် ကွက်တိ ပို့ပေးလိုက်ပါပြီ
         model.addAttribute("cheatsheetlist", targetUserCheatSheets);
         model.addAttribute("cheatSheetsList", targetUserCheatSheets); 
 
@@ -236,7 +259,7 @@ public class AuthController {
     }
 
     @GetMapping("/forgot-password")
-    public String showForgotPasswordForm() { 
+    public String showForgotPasswordForm() {
         return "forgot-password"; 
     }
 
@@ -255,7 +278,7 @@ public class AuthController {
     @GetMapping("/reset-password")
     public String showResetPasswordForm(@RequestParam("token") String token, Model model) {
         model.addAttribute("token", token);
-        return "reset-password";
+        return "reset-password"; 
     }
 
     @PostMapping("/reset-password")

@@ -1,6 +1,10 @@
 package com.hibernate.controller;
 
+import java.io.InputStream;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
@@ -10,9 +14,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.hibernate.entity.CheatsheetEntity;
 import com.hibernate.entity.TagEntity;
 import com.hibernate.entity.User;
+import com.hibernate.dto.NotificationDto;
+import com.hibernate.service.AuditLogService;
 import com.hibernate.service.CategoryService;
 import com.hibernate.service.CheatsheetService;
-import com.hibernate.service.AuditLogService;
 import com.hibernate.service.NotificationService;
 import com.hibernate.service.TagService;
 import com.hibernate.websocket.NotificationSocketService;
@@ -27,9 +32,9 @@ public class CheatsheetController {
     private final CheatsheetService cheatsheetService;
     private final CategoryService categoryService;
     private final TagService tagService;
+    private final AuditLogService auditLogService;
     private final NotificationService notificationService;
     private final NotificationSocketService notificationSocketService;
-    private final AuditLogService auditLogService;
 
     @GetMapping("/list")
     public ModelAndView list() {
@@ -47,6 +52,7 @@ public class CheatsheetController {
     public ModelAndView save(
             @ModelAttribute("cheatsheet") CheatsheetEntity cheatsheet,
             @RequestParam(value = "tagIds", required = false) List<Integer> tagIds,
+            HttpServletRequest request,
             HttpSession session) {
 
         User currentUser = (User) session.getAttribute("currentUser");
@@ -59,12 +65,13 @@ public class CheatsheetController {
             cheatsheet.setTags(tags);
         }
 
-        Integer sheetId = cheatsheetService.save(cheatsheet);
-        if (currentUser != null && sheetId != null) {
-            notificationSocketService.broadcastNotifications(
-                    notificationService.createCheatsheetNotificationsForFollowers(
-                            currentUser.getId(), sheetId, cheatsheet.getTitle()));
-            auditLogService.log(currentUser, "New CheatSheet Created", "Cheatsheet", sheetId);
+        Integer id = cheatsheetService.save(cheatsheet);
+        auditLogService.log(currentUser, "Create Cheatsheet", "Cheatsheet", id,
+                "Created cheatsheet: " + cheatsheet.getTitle(), request.getRemoteAddr());
+        if (currentUser != null && "PUBLIC".equalsIgnoreCase(cheatsheet.getVisibility())) {
+            List<NotificationDto> notifications = notificationService.createCheatsheetNotificationsForFollowers(
+                    currentUser.getId(), id, cheatsheet.getTitle());
+            notificationSocketService.broadcastNotifications(notifications);
         }
         return new ModelAndView("redirect:/cheatsheet/list");
     }
@@ -73,6 +80,7 @@ public class CheatsheetController {
     public ModelAndView edit(@PathVariable Integer id) {
         CheatsheetEntity cheatsheet = cheatsheetService.findById(id);
         
+        // 🌟 Fix: Cheatsheet မရှိရင် list ကို ပြန်မောင်းထုတ်ပြီး NPE ကာကွယ်ခြင်း
         if (cheatsheet == null) {
             return new ModelAndView("redirect:/cheatsheet/list");
         }
@@ -90,8 +98,10 @@ public class CheatsheetController {
     public ModelAndView update(
             @ModelAttribute("cheatsheet") CheatsheetEntity cheatsheet,
             @RequestParam(value = "tagIds", required = false) List<Integer> tagIds,
-            HttpSession session) { 
+            HttpServletRequest request,
+            HttpSession session) { // 🌟 Author မပျောက်သွားစေရန် session ယူလိုက်သည်
 
+        // 🌟 Fix: Update လုပ်တဲ့အခါ Author တန်ဖိုး null ဖြစ်မသွားအောင် မူလ DB ထဲက Author ကို ပြန်ထည့်ပေးခြင်း
         CheatsheetEntity existingSheet = cheatsheetService.findById(cheatsheet.getId());
         if (existingSheet != null) {
             cheatsheet.setAuthor(existingSheet.getAuthor());
@@ -105,12 +115,16 @@ public class CheatsheetController {
         }
 
         cheatsheetService.update(cheatsheet);
+        auditLogService.log((User) session.getAttribute("currentUser"), "Update Cheatsheet", "Cheatsheet", cheatsheet.getId(),
+                "Updated cheatsheet: " + cheatsheet.getTitle(), request.getRemoteAddr());
         return new ModelAndView("redirect:/cheatsheet/list");
     }
 
     @GetMapping("/delete/{id}")
-    public ModelAndView delete(@PathVariable Integer id) {
+    public ModelAndView delete(@PathVariable Integer id, HttpServletRequest request, HttpSession session) {
         cheatsheetService.delete(id);
+        auditLogService.log((User) session.getAttribute("currentUser"), "Delete Cheatsheet", "Cheatsheet", id,
+                "Cheatsheet deactivated.", request.getRemoteAddr());
         return new ModelAndView("redirect:/cheatsheet/list");
     }
 
@@ -119,6 +133,7 @@ public class CheatsheetController {
     public String tagsByCategory(@PathVariable Integer categoryId) {
         List<TagEntity> tags = tagService.findByCategoryId(categoryId);
         
+        // 🌟 Fix: null စစ်ပြီး StringBuilder သုံးကာ Performance မြှင့်တင်ခြင်း
         if (tags == null) return "";
         
         StringBuilder html = new StringBuilder();
@@ -133,17 +148,14 @@ public class CheatsheetController {
         return html.toString();
     }
 
+
     @GetMapping("/category/{categoryId}")
-    public ModelAndView browseByCategory(
-            @PathVariable("categoryId") Integer categoryId,
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            HttpSession session) {
-        
+    public ModelAndView browseByCategory(@PathVariable("categoryId") Integer categoryId, @RequestParam(value = "page", defaultValue = "1") int page, HttpSession session) {
         int pageSize = 3;
         User currentUser = (User) session.getAttribute("currentUser");
         Integer currentUserId = (currentUser != null) ? currentUser.getId() : 0;
         
-        // 🌟 [CORRECTED] Service ထဲတွင် နာမည်ပြောင်းလဲထားမှုအရ မက်သတ်အမည်များကို ညှိနှိုင်းပြင်ဆင်ထားပါသည်
+        // 🌟 [CORRECTED] Service ထဲတွင် နာမည်ပြောင်းလဲထားမှုအရ မက်သတ်အမည်များကို ညှိနှိင်းပြင်ဆင်ထားပါသည်
         List<CheatsheetEntity> cheatsheets = cheatsheetService.findByCategoryIdWithPagination(categoryId, page, pageSize, currentUserId);
         long totalCheatsheets = cheatsheetService.countByCategoryId(categoryId, currentUserId); 
         
@@ -152,19 +164,13 @@ public class CheatsheetController {
         if (totalPages == 0) totalPages = 1;
         
         List<TagEntity> categoryTags = cheatsheetService.findTagsByCategoryId(categoryId);
-        
         var currentCategory = categoryService.findById(categoryId);
         String categoryName = (currentCategory != null) ? currentCategory.getName() : "Unknown";
-
         ModelAndView mv = new ModelAndView("cheatsheet-browse");
-        mv.addObject("cheatsheetlist", cheatsheets);
-        mv.addObject("taglist", categoryTags);
-        mv.addObject("currentPage", page);
-        mv.addObject("totalPages", totalPages);
-        mv.addObject("categoryId", categoryId);
-        mv.addObject("categoryName", categoryName);
+        mv.addObject("cheatsheetlist", cheatsheets); mv.addObject("taglist", categoryTags);
+        mv.addObject("currentPage", page); mv.addObject("totalPages", totalPages);
+        mv.addObject("categoryId", categoryId); mv.addObject("categoryName", categoryName);
         mv.addObject("totalCount", totalCheatsheets); 
-        
         return mv;
     }
 
@@ -179,12 +185,14 @@ public class CheatsheetController {
         User currentUser = (User) session.getAttribute("currentUser");
         Integer currentUserId = (currentUser != null) ? currentUser.getId() : 0;
         
+        // 🌟 Fix: cheatsheet.getAuthor() ကို null-safe ဖြစ်အောင် အရင်စစ်ဆေးခြင်း
         boolean isOwner = cheatsheet.getAuthor() != null && 
                           cheatsheet.getAuthor().getId() != null && 
                           cheatsheet.getAuthor().getId().equals(currentUserId);
                           
         boolean isPrivate = "PRIVATE".equalsIgnoreCase(cheatsheet.getVisibility());
         
+        // 🌟 Fix [SECURITY]: Private ဖြစ်ပြီး Owner မဟုတ်ရင် ကြည့်ခွင့်မပေးဘဲ မောင်းထုတ်ခြင်း
         if (isPrivate && !isOwner) {
             return new ModelAndView("redirect:/home"); 
         }
@@ -200,8 +208,7 @@ public class CheatsheetController {
 
     @GetMapping("/tag/{tagId}")
     public ModelAndView browseByTag(@PathVariable("tagId") Integer tagId) {
-        // 🌟 [CORRECTED] Service မက်သတ်အမည်နှင့် ကိုက်ညီအောင် ပြင်ဆင်ထားပါသည်
-        List<CheatsheetEntity> cheatsheets = cheatsheetService.findPublicCheatsheetsByTagId(tagId);
+        List<CheatsheetEntity> cheatsheets = cheatsheetService.getPublicCheatsheetsByTagId(tagId);
         
         var tagObj = tagService.findById(tagId); 
         String tagName = (tagObj != null) ? tagObj.getName() : "Unknown";
@@ -214,4 +221,69 @@ public class CheatsheetController {
         
         return mv;
     }
+    
+    
+
+    @GetMapping("/view-pdf/{id}")
+    public void viewPdf(
+            @PathVariable("id") Integer id, 
+            HttpServletResponse response, 
+            HttpSession session) { // 🌟 Fix 1: Login User ဒေတာ ယူရန် session ကို ထည့်သွင်းလိုက်ပါသည်
+        try {
+            // ၁။ Service Layer မှတစ်ဆင့် Data ရှာဖွေခြင်း
+            CheatsheetEntity cheatsheet = cheatsheetService.findById(id);
+            
+            if (cheatsheet != null) {
+                // Null-safe ဖြစ်အောင် စစ်ဆေးပြီး download count ကို ၁ တိုးပေးခြင်း
+                int currentDownloads = (cheatsheet.getDownloadCount() != null) ? cheatsheet.getDownloadCount() : 0;
+                cheatsheet.setDownloadCount(currentDownloads + 1);
+                
+                // ၂။ Service ရဲ့ @Transactional update ကို ခေါ်ပြီး DB တွင် သွားသိမ်းခြင်း
+                cheatsheetService.update(cheatsheet);
+                
+                // ၃။ Jasper Report ဖြင့် PDF တည်ဆောက်ခြင်း
+                InputStream reportStream = this.getClass().getResourceAsStream("/reports/cheatsheet_template.jasper");
+                
+                List<CheatsheetEntity> dataList = java.util.Collections.singletonList(cheatsheet);
+                net.sf.jasperreports.engine.data.JRBeanCollectionDataSource dataSource = 
+                        new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(dataList);
+
+                java.util.Map<String, Object> parameters = new java.util.HashMap<>();
+                
+                // 🌟 Fix 2: Session ထဲမှ လက်ရှိ Login ဝင်ထားသော User ကို ဆွဲထုတ်ခြင်း
+                User currentUser = (User) session.getAttribute("currentUser");
+                
+                // User ရဲ့ နာမည်ကို စစ်ဆေးခြင်း (မရှိလျှင် Guest User ဟု ပြသမည်)
+                String username = "Guest User";
+                if (currentUser != null) {
+                    // သင့် User entity ထဲက နာမည်ယူတဲ့ method က getUsername() သို့မဟုတ် getFullName() ဖြစ်ပါက ၎င်းအတိုင်း ပြောင်းလဲပေးနိုင်ပါတယ်
+                    if (currentUser.getUsername() != null) {
+                        username = currentUser.getUsername();
+                    }
+                }
+                
+                // 🌟 Fix 3: Jaspersoft Studio က Parameter သို့ တန်ဖိုးကို ကွက်တိ လှမ်းထည့်ပေးခြင်း
+                parameters.put("DownloadedBy", username); 
+                
+                net.sf.jasperreports.engine.JasperPrint jasperPrint = 
+                        net.sf.jasperreports.engine.JasperFillManager.fillReport(reportStream, parameters, dataSource);
+                
+                // ၄။ Browser တွင် ဒေါင်းလုဒ်မကျဘဲ Inline (တန်းပွင့်) ပြသရန် Header သတ်မှတ်ခြင်း
+                response.setContentType("application/pdf");
+                String filename = (cheatsheet.getTitle() != null) ? cheatsheet.getTitle() : "cheatsheet";
+                response.setHeader("Content-Disposition", "inline; filename=\"" + filename + ".pdf\"");
+
+                // ၅။ PDF Output Stream ထုတ်လွှတ်ခြင်း
+                java.io.OutputStream out = response.getOutputStream();
+                net.sf.jasperreports.engine.JasperExportManager.exportReportToPdfStream(jasperPrint, out);
+                out.flush();
+            } else {
+                response.sendRedirect(response.encodeRedirectURL("/cheatsheet/list"));
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

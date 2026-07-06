@@ -20,4 +20,6 @@ public interface TagService {
 
     List<TagEntity> findByIds(List<Integer> ids);
 
+	int getTotalTagsCount();
+
 }

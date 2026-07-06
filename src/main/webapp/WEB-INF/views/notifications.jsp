@@ -34,7 +34,8 @@
                     <c:forEach items="${notifications}" var="notification">
                         <div class="list-group-item d-flex justify-content-between gap-3 ${notification.isRead ? '' : 'list-group-item-primary'}">
                             <div>
-                                <div class="fw-semibold">${notification.message}</div>
+                                <div class="fw-semibold"><c:out value="${empty notification.title ? notification.notificationType : notification.title}" /></div>
+                                <div><c:out value="${notification.message}" /></div>
                                 <div class="text-muted small">${notification.createdAt}</div>
                                 <c:if test="${not empty notification.linkUrl}">
                                     <a class="small text-decoration-none" href="${pageContext.request.contextPath}${notification.linkUrl}">
@@ -42,13 +43,20 @@
                                     </a>
                                 </c:if>
                             </div>
-                            <c:if test="${not notification.isRead}">
-                                <form method="post" action="${pageContext.request.contextPath}/notifications/${notification.id}/read">
+                            <div class="d-flex gap-2 align-items-start">
+                                <c:if test="${not notification.isRead}">
+                                    <form method="post" action="${pageContext.request.contextPath}/notifications/${notification.id}/read">
+                                        <button class="btn btn-sm btn-light" type="submit" title="Mark as read">
+                                            <i class="bi bi-check2"></i>
+                                        </button>
+                                    </form>
+                                </c:if>
+                                <form method="post" action="${pageContext.request.contextPath}/notifications/${notification.id}/delete" onsubmit="return confirm('Delete this notification?');">
                                     <button class="btn btn-sm btn-light" type="submit">
-                                        <i class="bi bi-check2"></i>
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
-                            </c:if>
+                            </div>
                         </div>
                     </c:forEach>
                 </div>

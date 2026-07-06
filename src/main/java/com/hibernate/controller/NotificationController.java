@@ -10,11 +10,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.hibernate.dto.NotificationDto;
 import com.hibernate.entity.User;
 import com.hibernate.service.NotificationService;
+import com.hibernate.websocket.NotificationSocketService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +26,11 @@ import lombok.RequiredArgsConstructor;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final NotificationSocketService notificationSocketService;
+
+    private boolean isAdmin(User user) {
+        return user != null && user.getRole() == 1;
+    }
 
     @GetMapping("/notifications")
     public String list(HttpSession session, Model model) {
@@ -79,5 +87,46 @@ public class NotificationController {
 
         notificationService.markAllAsRead(currentUser.getId());
         return new ModelAndView("redirect:/notifications");
+    }
+
+    @PostMapping("/notifications/{id}/delete")
+    public ModelAndView delete(@PathVariable Integer id, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+        notificationService.delete(id, currentUser.getId());
+        return new ModelAndView("redirect:/notifications");
+    }
+
+    @GetMapping("/admin/notifications")
+    public String adminForm(HttpSession session, Model model) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (!isAdmin(currentUser)) {
+            return "redirect:/login";
+        }
+        return "admin-notifications";
+    }
+
+    @PostMapping("/admin/notifications/send")
+    public String send(
+            @RequestParam(value = "userId", required = false) Integer userId,
+            @RequestParam("title") String title,
+            @RequestParam("message") String message,
+            HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (!isAdmin(currentUser)) {
+            return "redirect:/login";
+        }
+        if (userId == null) {
+            java.util.List<NotificationDto> notifications = notificationService.broadcast(
+                    currentUser.getId(), title, message, "ADMIN", "/notifications");
+            notificationSocketService.broadcastNotifications(notifications);
+        } else {
+            NotificationDto notification = notificationService.createNotification(
+                    userId, currentUser.getId(), title, message, "ADMIN", "/notifications");
+            notificationSocketService.broadcastToUser(userId, notification);
+        }
+        return "redirect:/admin/notifications";
     }
 }

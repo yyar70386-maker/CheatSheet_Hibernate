@@ -8,5 +8,11 @@ public interface AuditLogRepository {
 
     Integer save(AuditLogEntity auditLog);
 
+    AuditLogEntity findById(Integer id);
+
     List<AuditLogEntity> findRecent(int limit);
+
+    List<AuditLogEntity> search(String keyword, String entityType, int page, int size);
+
+    long countSearch(String keyword, String entityType);
 }

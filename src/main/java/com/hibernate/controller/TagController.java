@@ -1,7 +1,5 @@
 package com.hibernate.controller;
 
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -11,8 +9,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.hibernate.entity.TagEntity;
+import com.hibernate.entity.User;
+import com.hibernate.service.AuditLogService;
 import com.hibernate.service.CategoryService;
 import com.hibernate.service.TagService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +26,7 @@ public class TagController {
 
     private final TagService tagService;
     private final CategoryService categoryService;
+    private final AuditLogService auditLogService;
 
     @GetMapping("/list")
     public ModelAndView tagList() {
@@ -41,16 +45,20 @@ public class TagController {
 
         mv.addObject(
                 "categorylist",
-                categoryService.findAll());
+                categoryService.findAllActive());
 
         return mv;
     }
 
     @PostMapping("/save")
     public ModelAndView save(
-            @ModelAttribute("tag") TagEntity tag) {
+            @ModelAttribute("tag") TagEntity tag,
+            HttpServletRequest request,
+            HttpSession session) {
 
-        tagService.save(tag);
+        Integer id = tagService.save(tag);
+        auditLogService.log((User) session.getAttribute("currentUser"), "Create Tag", "Tag", id,
+                "Created tag: " + tag.getName(), request.getRemoteAddr());
 
         return new ModelAndView("redirect:/tag/list");
     }
@@ -67,25 +75,33 @@ public class TagController {
 
         mv.addObject(
                 "categorylist",
-                categoryService.findAll());
+                categoryService.findAllActive());
 
         return mv;
     }
 
     @PostMapping("/update")
     public ModelAndView update(
-            @ModelAttribute("tag") TagEntity tag) {
+            @ModelAttribute("tag") TagEntity tag,
+            HttpServletRequest request,
+            HttpSession session) {
 
         tagService.update(tag);
+        auditLogService.log((User) session.getAttribute("currentUser"), "Update Tag", "Tag", tag.getId(),
+                "Updated tag: " + tag.getName(), request.getRemoteAddr());
 
         return new ModelAndView("redirect:/tag/list");
     }
 
     @GetMapping("/delete/{id}")
     public ModelAndView delete(
-            @PathVariable Integer id) {
+            @PathVariable Integer id,
+            HttpServletRequest request,
+            HttpSession session) {
 
         tagService.delete(id);
+        auditLogService.log((User) session.getAttribute("currentUser"), "Delete Tag", "Tag", id,
+                "Tag deactivated.", request.getRemoteAddr());
 
         return new ModelAndView("redirect:/tag/list");
     }

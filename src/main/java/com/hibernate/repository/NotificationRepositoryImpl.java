@@ -92,4 +92,19 @@ public class NotificationRepositoryImpl implements NotificationRepository {
                 .setParameter("userId", userId)
                 .executeUpdate();
     }
+
+    @Override
+    public void delete(Integer id, Integer userId) {
+        getSession()
+                .createQuery("delete from NotificationEntity n where n.id = :id and n.user.id = :userId")
+                .setParameter("id", id)
+                .setParameter("userId", userId)
+                .executeUpdate();
+    }
+
+    @Override
+    public long countAll() {
+        Long count = getSession().createQuery("select count(n) from NotificationEntity n", Long.class).uniqueResult();
+        return count != null ? count : 0;
+    }
 }

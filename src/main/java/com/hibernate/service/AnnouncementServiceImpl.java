@@ -32,12 +32,14 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     @Transactional
     public void update(AnnouncementEntity announcement) {
         announcementRepository.update(announcement);
+        auditLogService.log(null, "Announcement Updated", "Announcement", announcement.getId());
     }
 
     @Override
     @Transactional
     public void delete(Integer id) {
         announcementRepository.delete(id);
+        auditLogService.log(null, "Announcement Deleted", "Announcement", id);
     }
 
     @Override
@@ -54,6 +56,12 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<AnnouncementEntity> findAll() {
+        return announcementRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<AnnouncementEntity> findLatest(int limit) {
         return announcementRepository.findLatest(limit);
     }
@@ -62,5 +70,13 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     @Transactional(readOnly = true)
     public long countAllActive() {
         return announcementRepository.countAllActive();
+    }
+
+    @Override
+    @Transactional
+    public void updateStatus(Integer id, String status, User admin) {
+        announcementRepository.updateStatus(id, status);
+        auditLogService.log(admin, "Announcement Status Changed", "Announcement", id,
+                "Status changed to " + status + ".", null);
     }
 }

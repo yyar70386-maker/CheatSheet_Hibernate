@@ -15,6 +15,13 @@ import lombok.RequiredArgsConstructor;
 public class CheatsheetRepositoryImpl implements CheatsheetRepository {
 
     private final SessionFactory sessionFactory;
+    
+    @Override
+    public int getTotalSheetsCount() {
+        String hql = "SELECT COUNT(c) FROM CheatsheetEntity c"; 
+        Long count = (Long) getSession().createQuery(hql).uniqueResult();
+        return count != null ? count.intValue() : 0;
+    }
 
     public Session getSession() {
         return sessionFactory.getCurrentSession();
@@ -50,7 +57,6 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
                 .uniqueResult();
     }
 
-    // 🌟 [FIXED] User ID အလိုက် အသက်ဝင်နေသော Cheatsheets အားလုံးကို ဆွဲထုတ်ပေးမည့် Query
     @Override
     public List<CheatsheetEntity> findByUserId(Integer userId) {
         String hql = "select distinct c from CheatsheetEntity c "
@@ -214,5 +220,24 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
                 .createQuery("select count(c) from CheatsheetEntity c where c.status = 'active'", Long.class)
                 .uniqueResult();
         return count != null ? count : 0;
+    }
+
+    // 🌟 ADMIN Dashboard အတွက် Sorting Queries
+    @Override
+    public List<CheatsheetEntity> findAllSortedByLikes() {
+        String hql = "SELECT c FROM CheatsheetEntity c " +
+                     "LEFT JOIN SheetReactionEntity r ON r.cheatSheet.id = c.id AND r.isLike = true " +
+                     "WHERE c.status = 'active' " +
+                     "GROUP BY c.id ORDER BY COUNT(r.id) DESC";
+        return getSession().createQuery(hql, CheatsheetEntity.class).list();
+    }
+
+    @Override
+    public List<CheatsheetEntity> findAllSortedByDislikes() {
+        String hql = "SELECT c FROM CheatsheetEntity c " +
+                     "LEFT JOIN SheetReactionEntity r ON r.cheatSheet.id = c.id AND r.isLike = false " +
+                     "WHERE c.status = 'active' " +
+                     "GROUP BY c.id ORDER BY COUNT(r.id) DESC";
+        return getSession().createQuery(hql, CheatsheetEntity.class).list();
     }
 }
