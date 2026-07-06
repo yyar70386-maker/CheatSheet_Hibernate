@@ -122,8 +122,12 @@ body{
 
 <div class="container mt-5 mb-5" style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
 <div class="page-header">
-
-    <h1 class="page-title">Cheatsheet List</h1>
+    <div style="display:flex; align-items:center; gap: 15px;">
+        <a href="javascript:history.back()" style="padding: 8px 15px; border-radius: 8px; text-decoration: none; border: 1px solid #6c757d; color: #6c757d; font-weight: bold; transition: 0.2s;" onmouseover="this.style.background='#6c757d'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='#6c757d';">
+            &#8592; Back
+        </a>
+        <h1 class="page-title">Cheatsheet List</h1>
+    </div>
 
     <a href="${pageContext.request.contextPath}/cheatsheet/add"
        class="btn-add">

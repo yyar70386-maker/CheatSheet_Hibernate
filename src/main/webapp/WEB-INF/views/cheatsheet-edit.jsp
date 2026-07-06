@@ -8,6 +8,70 @@
 <title>Edit Cheatsheet</title>
 
 <style>
+/* =========================================
+   Header & Navigation Fixes (Added)
+   ========================================= */
+ul {
+    list-style-type: none; /* Bullet အစက်များ ဖျောက်ရန် */
+    padding: 0;
+    margin: 0;
+}
+
+a {
+    text-decoration: none; /* မျဉ်းသားထားသည်များ ဖျောက်ရန် */
+    color: inherit;
+}
+
+/* Header ကို အလျားလိုက်တန်းစီရန် */
+header, nav, .navbar {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 15px 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+}
+
+header ul {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+}
+
+/* Dropdown/Notification အထပ်များ ရှင်းလင်းရန် */
+header li {
+    position: relative;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Notification Box ကို Form အပေါ်ထပ်တင်ရန် (Overlap Fix) */
+header li ul, .notifications-box {
+    display: none; /* ပုံမှန်အချိန်တွင် ဖျောက်ထားရန် */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    min-width: 300px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    z-index: 9999; /* Form ထက် အပေါ်ရောက်နေစေရန် */
+    padding: 15px;
+    border-radius: 12px;
+    max-height: 350px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+}
+
+/* Hover လုပ်မှ Notification ပေါ်စေရန် */
+header li:hover > ul {
+    display: block;
+}
+
+/* =========================================
+   Original Form Styles
+   ========================================= */
 *{
     margin:0;
     padding:0;
@@ -140,6 +204,7 @@ textarea{
 
 </head>
 <body>
+
 <jsp:include page="header.jsp" />
 
 <div class="container">

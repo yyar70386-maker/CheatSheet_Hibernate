@@ -180,13 +180,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void suspendUser(int id, User admin, String ipAddress) {
+    public void suspendUser(int id, String reason, User admin, String ipAddress) {
         User user = userRepository.findById(id);
         if (user != null) {
             user.setSuspended(true);
             user.setSuspendedAt(LocalDateTime.now());
+            user.setSuspendReason(reason);
             userRepository.update(user);
-            auditLogService.log(admin, "User Suspended", "User", id, "Suspended user: " + user.getUsername(), ipAddress);
+            auditLogService.log(admin, "User Suspended", "User", id, "Suspended user: " + user.getUsername() + ". Reason: " + reason, ipAddress);
         }
     }
 
@@ -197,6 +198,7 @@ public class UserServiceImpl implements UserService {
         if (user != null) {
             user.setSuspended(false);
             user.setSuspendedAt(null);
+            user.setSuspendReason(null);
             if (user.isAccountLocked()) {
                 user.setAccountLocked(false);
                 user.setFailedLoginAttempts(0);
@@ -214,6 +216,7 @@ public class UserServiceImpl implements UserService {
             user.setAccountLocked(false);
             user.setSuspended(false);
             user.setSuspendedAt(null);
+            user.setSuspendReason(null);
             user.setFailedLoginAttempts(0);
             userRepository.update(user);
             auditLogService.log(admin, "Account Unlocked", "User", id, "Unlocked account for user: " + user.getUsername(), ipAddress);

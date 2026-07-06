@@ -168,11 +168,9 @@
                                                                 </form>
                                                             </c:when>
                                                             <c:otherwise>
-                                                                <form method="post" action="${pageContext.request.contextPath}/admin/users/${u.id}/suspend" class="d-inline" onsubmit="return confirm('Suspend user \'${u.username}\'?');">
-                                                                    <button type="submit" class="btn btn-sm btn-warning rounded-2 px-3 py-1">
-                                                                        <i class="bi bi-pause me-1"></i> Suspend
-                                                                    </button>
-                                                                </form>
+                                                                <button type="button" class="btn btn-sm btn-warning rounded-2 px-3 py-1" onclick="openSuspendModal(${u.id}, '${u.username}')">
+                                                                    <i class="bi bi-pause me-1"></i> Suspend
+                                                                </button>
                                                             </c:otherwise>
                                                         </c:choose>
 
@@ -234,6 +232,62 @@
         </div> <%-- /main-content-area --%>
     </div> <%-- /app-container --%>
 
+    <!-- Suspend User Modal -->
+    <div class="modal fade" id="suspendUserModal" tabindex="-1" aria-labelledby="suspendUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="suspendUserForm" method="post" action="">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold text-danger" id="suspendUserModalLabel">Suspend User</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-3 text-muted small">Are you sure you want to suspend <strong id="suspendUserName" class="text-dark"></strong>?</p>
+                        <p class="mb-2 fw-semibold">Please select a reason:</p>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="reason" id="suspendReasonSpam" value="Spam" required>
+                            <label class="form-check-label" for="suspendReasonSpam">Spam</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="reason" id="suspendReasonInappropriate" value="Inappropriate Content">
+                            <label class="form-check-label" for="suspendReasonInappropriate">Inappropriate Content</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="reason" id="suspendReasonHarassment" value="Harassment">
+                            <label class="form-check-label" for="suspendReasonHarassment">Harassment</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="reason" id="suspendReasonViolation" value="Violation of Terms">
+                            <label class="form-check-label" for="suspendReasonViolation">Violation of Terms</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="reason" id="suspendReasonOther" value="Other">
+                            <label class="form-check-label" for="suspendReasonOther">Other</label>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="suspendDescription" class="form-label fw-semibold text-secondary">Additional Details (Optional)</label>
+                            <textarea name="description" id="suspendDescription" class="form-control" rows="2" placeholder="Enter additional details..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Suspend User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openSuspendModal(userId, username) {
+            document.getElementById('suspendUserName').innerText = username;
+            document.getElementById('suspendUserForm').action = '${pageContext.request.contextPath}/admin/users/' + userId + '/suspend';
+            var suspendModal = new bootstrap.Modal(document.getElementById('suspendUserModal'));
+            suspendModal.show();
+        }
+    </script>
 </body>
 </html>

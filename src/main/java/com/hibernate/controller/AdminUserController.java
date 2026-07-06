@@ -73,7 +73,7 @@ public class AdminUserController {
     }
 
     @PostMapping("/admin/users/{id}/suspend")
-    public String suspend(@PathVariable int id, HttpServletRequest request, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String suspend(@PathVariable int id, @RequestParam(value = "reason", defaultValue = "Other") String reason, @RequestParam(value = "description", required = false) String description, HttpServletRequest request, HttpSession session, RedirectAttributes redirectAttributes) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (!isAdmin(currentUser)) {
             return "redirect:/login";
@@ -82,7 +82,11 @@ public class AdminUserController {
             redirectAttributes.addFlashAttribute("errorMsg", "You cannot suspend yourself!");
             return "redirect:/admin/users";
         }
-        userService.suspendUser(id, currentUser, request.getRemoteAddr());
+        String finalReason = reason;
+        if (description != null && !description.trim().isEmpty()) {
+            finalReason += " - " + description.trim();
+        }
+        userService.suspendUser(id, finalReason, currentUser, request.getRemoteAddr());
         redirectAttributes.addFlashAttribute("successMsg", "User suspended successfully.");
         return "redirect:/admin/users";
     }

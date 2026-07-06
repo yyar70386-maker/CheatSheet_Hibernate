@@ -90,16 +90,20 @@ public class AdminCheatsheetController {
     }
 
     @PostMapping("/admin/cheatsheets/{id}/ban")
-    public String ban(@PathVariable Integer id, @RequestParam("reason") String reason, HttpServletRequest request, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String ban(@PathVariable Integer id, @RequestParam("reason") String reason, @RequestParam(value = "description", required = false) String description, HttpServletRequest request, HttpSession session, RedirectAttributes redirectAttributes) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (!isAdmin(currentUser)) {
             return "redirect:/login";
         }
-        if (reason == null || reason.trim().isEmpty()) {
+        String finalReason = reason;
+        if (description != null && !description.trim().isEmpty()) {
+            finalReason += " - " + description.trim();
+        }
+        if (finalReason == null || finalReason.trim().isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMsg", "Ban reason is required!");
             return "redirect:/admin/cheatsheets";
         }
-        NotificationDto notification = cheatsheetService.banCheatsheet(id, reason, currentUser, request.getRemoteAddr());
+        NotificationDto notification = cheatsheetService.banCheatsheet(id, finalReason, currentUser, request.getRemoteAddr());
         if (notification != null && notification.getUserId() != null) {
             notificationSocketService.broadcastToUser(notification.getUserId(), notification);
         }

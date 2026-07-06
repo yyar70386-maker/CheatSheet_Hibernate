@@ -132,13 +132,15 @@
 
                     <div class="vr mx-2"></div>
 
-                    <button type="button" id="shareBtn" onclick="shareCheatsheetJS()" class="btn btn-sm btn-primary fw-bold px-3 me-2">
-                        <i class="bi bi-share-fill me-1"></i> <span id="shareBtnText">Share</span>
-                    </button>
-                    
-                    <button type="button" class="action-btn text-danger ms-auto" data-bs-toggle="modal" data-bs-target="#reportSheetModal">
-                        <i class="bi bi-flag"></i> Report
-                    </button>
+                    <div class="ms-auto d-flex align-items-center gap-2">
+                        <button type="button" id="shareBtn" onclick="shareCheatsheetJS()" class="btn btn-sm btn-primary fw-bold px-3">
+                            <i class="bi bi-share-fill me-1"></i> <span id="shareBtnText">Share</span>
+                        </button>
+                        
+                        <button type="button" class="action-btn text-danger" data-bs-toggle="modal" data-bs-target="#reportSheetModal">
+                            <i class="bi bi-flag"></i> Report
+                        </button>
+                    </div>
                 </c:when>
 
                 <c:otherwise>
@@ -226,6 +228,56 @@
                         </div>
                     </c:if>
                 </c:forEach>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Sheet Modal -->
+    <div class="modal fade" id="reportSheetModal" tabindex="-1" aria-labelledby="reportSheetModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="${pageContext.request.contextPath}/reports/create" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold" id="reportSheetModalLabel">Report Cheatsheet</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="targetType" value="CHEATSHEET">
+                        <input type="hidden" name="targetId" value="${sheet.id}">
+                        
+                        <p class="mb-3 text-muted small">Please select a reason for reporting this cheatsheet:</p>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="reason" id="reasonSpam" value="Spam" required>
+                            <label class="form-check-label" for="reasonSpam">Spam</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="reason" id="reasonPlagiarism" value="Plagiarism">
+                            <label class="form-check-label" for="reasonPlagiarism">Plagiarism</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="reason" id="reasonInappropriate" value="Inappropriate Content">
+                            <label class="form-check-label" for="reasonInappropriate">Inappropriate Content</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="reason" id="reasonHarassment" value="Harassment">
+                            <label class="form-check-label" for="reasonHarassment">Harassment</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="reason" id="reasonOther" value="Other">
+                            <label class="form-check-label" for="reasonOther">Other</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="reportDescription" class="form-label fw-bold">Additional Details (Optional)</label>
+                            <textarea class="form-control" name="description" id="reportDescription" rows="3" placeholder="Please provide any additional details..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Submit Report</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

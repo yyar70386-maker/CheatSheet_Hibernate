@@ -270,9 +270,32 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <p class="mb-2 fw-semibold">Please select a reason for banning:</p>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="reason" id="banReasonSpam" value="Spam" required>
+                            <label class="form-check-label" for="banReasonSpam">Spam / Misleading</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="reason" id="banReasonPlagiarism" value="Plagiarism / Copyright">
+                            <label class="form-check-label" for="banReasonPlagiarism">Plagiarism / Copyright Violation</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="reason" id="banReasonInappropriate" value="Inappropriate Content">
+                            <label class="form-check-label" for="banReasonInappropriate">Inappropriate Content</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="reason" id="banReasonQuality" value="Low Quality / Not Useful">
+                            <label class="form-check-label" for="banReasonQuality">Low Quality / Not Useful</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="reason" id="banReasonOther" value="Other">
+                            <label class="form-check-label" for="banReasonOther">Other</label>
+                        </div>
+                        
                         <div class="mb-3">
-                            <label for="banReason" class="form-label fw-semibold text-secondary">Reason for Banning</label>
-                            <textarea name="reason" id="banReason" class="form-control" rows="3" required placeholder="Enter why this cheatsheet violates guidelines..."></textarea>
+                            <label for="banDescription" class="form-label fw-semibold text-secondary">Additional Details (Optional)</label>
+                            <textarea name="description" id="banDescription" class="form-control" rows="2" placeholder="Enter additional details..."></textarea>
                         </div>
                     </div>
                     <div class="modal-footer border-0">

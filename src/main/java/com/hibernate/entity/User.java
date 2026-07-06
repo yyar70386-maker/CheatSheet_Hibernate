@@ -48,6 +48,9 @@ public class User {
     @Column(name = "suspended_at")
     private LocalDateTime suspendedAt;
 
+    @Column(name = "suspend_reason")
+    private String suspendReason;
+
     @javax.persistence.Transient
     public String getObfuscatedId() {
         return com.hibernate.util.IdObfuscator.encode(this.id);

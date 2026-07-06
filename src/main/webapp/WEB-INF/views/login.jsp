@@ -168,6 +168,11 @@ to {
 
 	<div class="login-card">
 
+        <div class="logo">
+            <i class="bi bi-shield-lock"></i>
+        </div>
+        <h3 class="text-center fw-bold mb-3" style="color: #ff3366;">CheatSheet</h3>
+
 		<h2 class="text-center">Welcome Back</h2>
 
 		<p class="text-center subtitle">Sign in to continue</p>
