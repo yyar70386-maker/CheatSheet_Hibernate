@@ -41,13 +41,35 @@
                     <p class="text-muted m-0 small">Generate and export CheatSheet data reports.</p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
-                    <a class="btn btn-danger text-white" href="${pageContext.request.contextPath}/admin/reports/cheatsheet/pdf" download="cheatsheet-report.pdf">
+                    <a class="btn btn-danger text-white" href="${pageContext.request.contextPath}/admin/reports/cheatsheet/pdf?startDate=${param.startDate}&endDate=${param.endDate}" download="cheatsheet-report.pdf">
                         <i class="bi bi-filetype-pdf me-1"></i> View PDF
                     </a>
-                    <a class="btn btn-success text-white" href="${pageContext.request.contextPath}/admin/reports/cheatsheet/excel" download="cheatsheet-report.xlsx">
+                    <a class="btn btn-success text-white" href="${pageContext.request.contextPath}/admin/reports/cheatsheet/excel?startDate=${param.startDate}&endDate=${param.endDate}" download="cheatsheet-report.xlsx">
                         <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Excel
                     </a>
                 </div>
+            </div>
+
+            <%-- Date Filter Card --%>
+            <div class="card border-0 shadow-sm rounded-3 p-4 mb-4 bg-white">
+                <form action="${pageContext.request.contextPath}/admin/reports/cheatsheet" method="get" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold text-secondary">Start Date</label>
+                        <input type="date" name="startDate" class="form-control" value="${param.startDate}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold text-secondary">End Date</label>
+                        <input type="date" name="endDate" class="form-control" value="${param.endDate}">
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1" style="background-color: #ff3366 !important; border-color: #ff3366 !important;">
+                            <i class="bi bi-filter me-1"></i> Filter
+                        </button>
+                        <a href="${pageContext.request.contextPath}/admin/reports/cheatsheet" class="btn btn-outline-secondary">
+                            Reset
+                        </a>
+                    </div>
+                </form>
             </div>
 
             <%-- Summary Cards --%>
@@ -74,7 +96,7 @@
                             <div>
                                 <div class="text-secondary small fw-medium">Export PDF</div>
                                 <div class="fs-6 fw-semibold text-dark">
-                                    <a href="${pageContext.request.contextPath}/admin/reports/cheatsheet/pdf" class="text-decoration-none text-success" download="cheatsheet-report.pdf">
+                                    <a href="${pageContext.request.contextPath}/admin/reports/cheatsheet/pdf?startDate=${param.startDate}&endDate=${param.endDate}" class="text-decoration-none text-success" download="cheatsheet-report.pdf">
                                         <i class="bi bi-box-arrow-up-right me-1"></i>Download
                                     </a>
                                 </div>
@@ -91,7 +113,7 @@
                             <div>
                                 <div class="text-secondary small fw-medium">Export Excel</div>
                                 <div class="fs-6 fw-semibold text-dark">
-                                    <a href="${pageContext.request.contextPath}/admin/reports/cheatsheet/excel" class="text-decoration-none text-warning" download="cheatsheet-report.xlsx">
+                                    <a href="${pageContext.request.contextPath}/admin/reports/cheatsheet/excel?startDate=${param.startDate}&endDate=${param.endDate}" class="text-decoration-none text-warning" download="cheatsheet-report.xlsx">
                                         <i class="bi bi-box-arrow-up-right me-1"></i>Download
                                     </a>
                                 </div>

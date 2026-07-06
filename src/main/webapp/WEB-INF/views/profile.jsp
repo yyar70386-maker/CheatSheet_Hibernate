@@ -386,7 +386,7 @@ body {
                                                     <div>
                                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                                             <h5 class="fw-bold m-0">
-                                                                <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none hover-underline fs-5">
+                                                                <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.obfuscatedId}" class="text-dark text-decoration-none hover-underline fs-5">
                                                                     ${sheet.title}
                                                                 </a>
                                                             </h5>
@@ -475,7 +475,7 @@ body {
                                             <div class="col-md-6">
                                                 <div class="cheatsheet-card border-success-subtle shadow-sm">
                                                     <h6 class="fw-bold mb-1">
-                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${item.cheatsheet.id}" class="text-decoration-none text-dark">
+                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${item.cheatsheet.obfuscatedId}" class="text-decoration-none text-dark">
                                                             <c:out value="${item.cheatsheet.title}"/>
                                                         </a>
                                                     </h6>

@@ -276,7 +276,7 @@ public class CheatsheetServiceImpl implements CheatsheetService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CheatSheetReportEntity> getCheatsheetReportData() {
-        return cheatsheetRepository.findCheatsheetReportData();
+    public List<CheatSheetReportEntity> getCheatsheetReportData(String startDate, String endDate) {
+        return cheatsheetRepository.findCheatsheetReportData(startDate, endDate);
     }
 }

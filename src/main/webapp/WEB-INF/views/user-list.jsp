@@ -188,7 +188,7 @@
                                                         <%-- Delete Button --%>
                                                         <form method="post" action="${pageContext.request.contextPath}/admin/users/${u.id}/delete" class="d-inline" onsubmit="return confirm('Delete user \'${u.username}\' permanently?');">
                                                             <button type="submit" class="btn btn-sm btn-outline-danger rounded-2 px-3 py-1">
-                                                                <i class="bi bi-trash me-1"></i> Delete
+                                                                <i class="bi bi-trash3-fill me-1"></i> Delete
                                                             </button>
                                                         </form>
                                                         

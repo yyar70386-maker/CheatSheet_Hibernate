@@ -52,13 +52,20 @@
 
     <div class="detail-container">
         
+        <%-- Cover Photo --%>
+        <c:if test="${not empty sheet.imagePath}">
+            <div class="mb-4 text-center">
+                <img src="${pageContext.request.contextPath}${sheet.imagePath}" alt="${sheet.title}" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: cover; width: 100%;">
+            </div>
+        </c:if>
+
         <%-- Title & Author --%>
         <div>
             <h1 class="sheet-title">${sheet.title}</h1>
             <span class="author-text">by 
                 <c:choose>
                     <c:when test="${sheet.author != null}">
-                        <a href="${pageContext.request.contextPath}/profile/${sheet.author.id}" 
+                        <a href="${pageContext.request.contextPath}/profile/${sheet.author.obfuscatedId}" 
                             class="text-dark fw-bold text-decoration-none" 
                            style="border-bottom: 2px solid #ff3366; padding-bottom: 2px;">
                             <c:out value="${sheet.author.username}" />

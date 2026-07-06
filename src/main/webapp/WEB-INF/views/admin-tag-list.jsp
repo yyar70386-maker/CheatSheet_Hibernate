@@ -16,10 +16,10 @@
         .sidebar-container { width: 280px; flex-shrink: 0; }
         .content-container { flex-grow: 1; padding: 40px; overflow-x: auto; }
         .management-card { background: white; border-radius: 16px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03); padding: 30px; }
-        .custom-table th { background-color: #1976d2 !important; color: white !important; padding: 15px; font-weight: 600; }
+        .custom-table th { background-color: #ff3366 !important; color: white !important; padding: 15px; font-weight: 600; }
         .custom-table td { padding: 15px; vertical-align: middle; border-bottom: 1px solid #f1f3f5; }
-        .btn-add-tag { background-color: #1976d2; color: white; font-weight: 600; border-radius: 8px; transition: all 0.2s; }
-        .btn-add-tag:hover { background-color: #0d47a1; color: white; transform: translateY(-1px); }
+        .btn-add-tag { background-color: #ff3366; color: white; font-weight: 600; border-radius: 8px; transition: all 0.2s; }
+        .btn-add-tag:hover { background-color: #e62e5c; color: white; transform: translateY(-1px); }
         .badge-status { padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
         .badge-active { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
         .badge-inactive { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; }

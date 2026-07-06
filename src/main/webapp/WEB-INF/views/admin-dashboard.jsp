@@ -316,16 +316,12 @@
             }
         });
 
-        // Mock Data for Content Growth Bar Chart
+        // Real Data for Content Growth Bar Chart
         const growthCtx = document.getElementById('growthChart').getContext('2d');
         
-        // Let's fake the labels based on months
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'];
-        // Just mocking up visual data to look like the screenshot's Sales Revenue chart
-        const totalSheets = ${summary.totalCheatsheets} > 0 ? ${summary.totalCheatsheets} : 100;
-        
-        const data1 = Array.from({length: 9}, () => Math.floor(Math.random() * (totalSheets/3)) + 10);
-        const data2 = Array.from({length: 9}, () => Math.floor(Math.random() * (totalSheets/4)) + 5);
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthlySheets = ${summary.monthlyCheatsheetCounts};
+        const monthlyUsers = ${summary.monthlyActiveUserCounts};
 
         new Chart(growthCtx, {
             type: 'bar',
@@ -334,7 +330,7 @@
                 datasets: [
                     {
                         label: 'CheatSheets Created',
-                        data: data1,
+                        data: monthlySheets,
                         backgroundColor: '#3b82f6',
                         borderRadius: 4,
                         barPercentage: 0.6,
@@ -342,7 +338,7 @@
                     },
                     {
                         label: 'Active Users',
-                        data: data2,
+                        data: monthlyUsers,
                         backgroundColor: '#93c5fd',
                         borderRadius: 4,
                         barPercentage: 0.6,

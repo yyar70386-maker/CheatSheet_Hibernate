@@ -9,7 +9,13 @@
 </head>
 <body class="bg-light">
 <jsp:include page="header.jsp" />
-<main class="container py-4">
+
+<div class="app-container">
+    <jsp:include page="sidebar.jsp">
+        <jsp:param name="activePage" value="notifications" />
+    </jsp:include>
+
+    <div class="main-content-area">
     <h3 class="fw-bold mb-3">Send Notification</h3>
     <div class="bg-white border rounded-3 p-4 shadow-sm">
         <form method="post" action="${pageContext.request.contextPath}/admin/notifications/send">
@@ -28,7 +34,8 @@
             <button class="btn btn-primary" type="submit">Send Notification</button>
         </form>
     </div>
-</main>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -110,7 +110,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="fw-semibold text-truncate" style="max-width: 180px;">
-                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${c.cheatSheet.id}" class="text-decoration-none text-dark hover-brand">
+                                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${c.cheatSheet.obfuscatedId}" class="text-decoration-none text-dark hover-brand">
                                                             <c:out value="${c.cheatSheet.title}" />
                                                         </a>
                                                     </div>
@@ -158,7 +158,7 @@
                                                         <%-- Delete Action --%>
                                                         <form method="post" action="${pageContext.request.contextPath}/admin/comments/${c.id}/delete" class="d-inline" onsubmit="return confirm('Delete comment permanently?');">
                                                             <button type="submit" class="btn btn-sm btn-outline-danger rounded-2 px-3 py-1">
-                                                                <i class="bi bi-trash"></i>
+                                                                <i class="bi bi-trash3-fill"></i>
                                                             </button>
                                                         </form>
                                                         

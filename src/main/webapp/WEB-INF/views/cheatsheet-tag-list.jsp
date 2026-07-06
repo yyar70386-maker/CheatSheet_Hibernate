@@ -120,10 +120,10 @@
                     <c:forEach items="${cheatsheetlist}" var="sheet">
                         <div class="col-md-6 col-lg-4 grid-item">
                             
-                            <div class="cheatsheet-card" style="cursor: pointer;" onclick="window.location.href='${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}'">
+                            <div class="cheatsheet-card" style="cursor: pointer;" onclick="window.location.href='${pageContext.request.contextPath}/cheatsheet/detail/${sheet.obfuscatedId}'">
                                 <div>
                                     <h3 class="fw-bold mb-2 d-flex align-items-center justify-content-between">
-                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.id}" class="text-dark text-decoration-none fs-4">
+                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.obfuscatedId}" class="text-dark text-decoration-none fs-4">
                                             ${sheet.title}
                                         </a>
                                         

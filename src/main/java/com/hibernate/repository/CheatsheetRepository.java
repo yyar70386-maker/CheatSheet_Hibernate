@@ -40,5 +40,6 @@ public interface CheatsheetRepository {
     long countSearchAll(String keyword, String categoryId, String status, String banned);
     long countBanned();
     long countPublished();
-    List<CheatSheetReportEntity> findCheatsheetReportData();
+    List<CheatSheetReportEntity> findCheatsheetReportData(String startDate, String endDate);
+    List<Object[]> getMonthlyCheatsheetCounts(int year);
 }

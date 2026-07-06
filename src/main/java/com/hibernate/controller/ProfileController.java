@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.hibernate.entity.User;
 import com.hibernate.entity.CheatsheetEntity;
@@ -68,5 +69,51 @@ public class ProfileController {
 
         // forward ခံနေစရာမလိုဘဲ တိုက်ရိုက် profile.jsp ကို လှမ်းဖွင့်ခိုင်းလိုက်ပါမည်
         return "profile";
+    }
+
+    @GetMapping("/profile/{id}")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public String showUserProfilePage(@PathVariable("id") String encodedId, HttpSession session, Model model) {
+        Integer userId = com.hibernate.util.IdObfuscator.decode(encodedId);
+        if (userId == null) {
+            try {
+                userId = Integer.parseInt(encodedId);
+            } catch (NumberFormatException e) {
+                return "redirect:/home";
+            }
+        }
+        
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser != null && currentUser.getId().equals(userId)) {
+            return "redirect:/profile";
+        }
+
+        User targetUser = userService.findById(userId);
+        if (targetUser == null) {
+            return "redirect:/home";
+        }
+
+        model.addAttribute("user", currentUser);
+        model.addAttribute("targetUser", targetUser); 
+        model.addAttribute("followersCount", userFollowService.getFollowersCount(userId));
+        model.addAttribute("followingCount", userFollowService.getFollowingCount(userId));
+
+        List<String> visibilities = new java.util.ArrayList<>();
+        visibilities.add("PUBLIC");
+        if (currentUser != null && userFollowService.isFollowing(currentUser.getId(), userId)) {
+            visibilities.add("FRIEND-ONLY");
+        }
+        List<CheatsheetEntity> targetCheatSheets = cheatsheetService.findByUserIdAndVisibility(userId, visibilities);
+        model.addAttribute("cheatSheetsList", targetCheatSheets);
+        model.addAttribute("cheatsheetlist", targetCheatSheets);
+
+        try {
+            List<SharedCheatsheetEntity> sharedList = sharedCheatsheetRepository.findMySharedWithDetails(userId);
+            model.addAttribute("sharedCheatSheetsList", sharedList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "user-profile";
     }
 }

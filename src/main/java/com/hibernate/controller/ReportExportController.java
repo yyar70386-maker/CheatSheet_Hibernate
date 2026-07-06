@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.hibernate.entity.CheatSheetReportEntity;
 import com.hibernate.entity.User;
@@ -44,13 +45,16 @@ public class ReportExportController {
      * Display the CheatSheet Report page with PDF and Excel export options.
      */
     @GetMapping("/admin/reports/cheatsheet")
-    public String cheatsheetReportPage(HttpSession session, Model model) {
+    public String cheatsheetReportPage(
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate,
+            HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (!isAdmin(currentUser)) {
             return "redirect:/login";
         }
 
-        List<CheatSheetReportEntity> reportData = cheatsheetService.getCheatsheetReportData();
+        List<CheatSheetReportEntity> reportData = cheatsheetService.getCheatsheetReportData(startDate, endDate);
 
         // Assign row numbers
         for (int i = 0; i < reportData.size(); i++) {
@@ -67,7 +71,10 @@ public class ReportExportController {
      * Generate and stream the CheatSheet Report as PDF.
      */
     @GetMapping("/admin/reports/cheatsheet/pdf")
-    public void exportPdf(HttpServletResponse response, HttpSession session) {
+    public void exportPdf(
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate,
+            HttpServletResponse response, HttpSession session) {
         try {
             User currentUser = (User) session.getAttribute("currentUser");
             if (!isAdmin(currentUser)) {
@@ -75,7 +82,7 @@ public class ReportExportController {
                 return;
             }
 
-            List<CheatSheetReportEntity> reportData = cheatsheetService.getCheatsheetReportData();
+            List<CheatSheetReportEntity> reportData = cheatsheetService.getCheatsheetReportData(startDate, endDate);
             for (int i = 0; i < reportData.size(); i++) {
                 reportData.get(i).setNo(i + 1);
             }
@@ -116,7 +123,10 @@ public class ReportExportController {
      * Generate and stream the CheatSheet Report as Excel (XLSX).
      */
     @GetMapping("/admin/reports/cheatsheet/excel")
-    public void exportExcel(HttpServletResponse response, HttpSession session) {
+    public void exportExcel(
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate,
+            HttpServletResponse response, HttpSession session) {
         try {
             User currentUser = (User) session.getAttribute("currentUser");
             if (!isAdmin(currentUser)) {
@@ -124,7 +134,7 @@ public class ReportExportController {
                 return;
             }
 
-            List<CheatSheetReportEntity> reportData = cheatsheetService.getCheatsheetReportData();
+            List<CheatSheetReportEntity> reportData = cheatsheetService.getCheatsheetReportData(startDate, endDate);
             for (int i = 0; i < reportData.size(); i++) {
                 reportData.get(i).setNo(i + 1);
             }

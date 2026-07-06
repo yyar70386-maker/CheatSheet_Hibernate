@@ -10,7 +10,13 @@
 </head>
 <body class="bg-light">
 <jsp:include page="header.jsp" />
-<main class="container py-4" style="max-width: 820px;">
+
+<div class="app-container">
+    <jsp:include page="sidebar.jsp">
+        <jsp:param name="activePage" value="announcements" />
+    </jsp:include>
+
+    <div class="main-content-area">
     <div class="bg-white border rounded-4 p-4 shadow-sm">
         <h3 class="fw-bold mb-4">${announcement.id == null ? 'Create Announcement' : 'Edit Announcement'}</h3>
         <form action="${pageContext.request.contextPath}/admin/announcements/${announcement.id == null ? 'save' : 'update'}" method="post">
@@ -31,7 +37,8 @@
             </div>
         </form>
     </div>
-</main>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

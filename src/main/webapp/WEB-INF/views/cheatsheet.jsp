@@ -171,11 +171,13 @@
     <!-- Top Banner -->
     <div class="header-banner shadow-sm">
         <h2 class="fw-bold text-dark mb-2">Create Cheatsheet</h2>
-        <p class="text-muted m-0">Create cheatsheet with category, tags, color, cover photo and sections.</p>
+        <p class="text-muted m-0">Create cheatsheet with category, tags, cover photo and cheatsheet content.</p>
     </div>
 
-    <form:form modelAttribute="cheatsheet" action="${pageContext.request.contextPath}/cheatsheet/save" method="post" id="createForm">
+    <form:form modelAttribute="cheatsheet" action="${pageContext.request.contextPath}/cheatsheet/save" method="post" id="createForm" enctype="multipart/form-data">
         
+        <!-- Publication settings managed via select dropdowns below -->
+
         <!-- Main Two Column Layout -->
         <div class="row g-4">
             
@@ -187,8 +189,8 @@
                     
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label>Parent Category</label>
-                            <form:select path="category.id" cssClass="form-select" id="categorySelect">
+                            <label>Category</label>
+                            <form:select path="category.id" cssClass="form-select" id="categorySelect" required="true">
                                 <form:option value="">-- Select Category --</form:option>
                                 <c:forEach items="${categorylist}" var="c">
                                     <form:option value="${c.id}">${c.name}</form:option>
@@ -196,149 +198,81 @@
                             </form:select>
                         </div>
                         <div class="col-md-6">
-                            <label>Child Category</label>
-                            <select class="form-select">
-                                <option>-- Select Child --</option>
-                            </select>
+                            <label>Cover Photo</label>
+                            <input type="file" name="imageFile" class="form-control" accept="image/*" />
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label>Title</label>
-                        <form:input path="title" cssClass="form-control" id="titleInput" placeholder="Enter title" />
+                        <form:input path="title" cssClass="form-control" id="titleInput" placeholder="Enter title" required="true" />
                     </div>
 
                     <div class="mb-3">
                         <label>Description</label>
-                        <form:textarea path="description" cssClass="form-control" rows="4" placeholder="Write cheatsheet description" />
+                        <form:textarea path="description" cssClass="form-control" rows="3" placeholder="Write a short cheatsheet description..." />
                     </div>
+                </div>
 
-                    <!-- Visual Only Fields (Theme Color, Cover Photo) -->
-                    <div class="row g-3 mb-3 align-items-end">
+                <div class="glass-box mb-4">
+                    <div class="section-title">Publication Settings</div>
+                    <div class="row g-3">
                         <div class="col-md-6">
-                            <label>Theme Color</label>
-                            <div class="d-flex align-items-center gap-3">
-                                <input type="color" class="form-control form-control-color" value="#ff3366" title="Choose your color" style="width: 50px; padding: 5px;">
-                                <span class="text-muted small">Choose your custom color</span>
-                            </div>
+                            <label>Visibility</label>
+                            <form:select path="visibility" cssClass="form-select" id="visibilitySelect">
+                                <form:option value="PUBLIC">PUBLIC</form:option>
+                                <form:option value="FRIEND-ONLY">FRIEND-ONLY</form:option>
+                                <form:option value="PRIVATE">PRIVATE</form:option>
+                            </form:select>
                         </div>
                         <div class="col-md-6">
-                            <label>Cover Photo</label>
-                            <input type="file" class="form-control" />
+                            <label>Publish Status</label>
+                            <form:select path="status" cssClass="form-select" id="statusSelect">
+                                <form:option value="active">Public Post</form:option>
+                                <form:option value="draft">Draft Post</form:option>
+                            </form:select>
                         </div>
                     </div>
-
-                    <!-- Hidden actual content and visibility -->
-                    <form:hidden path="content" id="hiddenContent" value="" />
-                    <form:hidden path="visibility" id="hiddenVisibility" value="PUBLIC" />
                 </div>
 
                 <div class="glass-box mb-4">
                     <div class="section-title">Tags Association Hub</div>
-                    
-                    <div id="tagContainer" class="mb-3">
+                    <div id="tagContainer" class="mb-2">
                         <span class="text-muted small">Select category first to see available tags.</span>
-                    </div>
-
-                    <label class="mt-3">Request Custom Tag</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="e.g. django">
-                        <button class="btn btn-primary" type="button" style="padding: 10px 20px;"><i class="bi bi-plus me-1"></i> Request Tag</button>
                     </div>
                 </div>
 
                 <div class="glass-box mb-4">
-                    <div class="section-title">Cheatsheet Tree Data Layout Builder</div>
-                    
-                    <!-- Builder Area (UI only) -->
-                    <div class="builder-box">
-                        <div class="mb-3">
-                            <label>Section Header Name</label>
-                            <input type="text" class="form-control" placeholder="Section Title">
-                        </div>
-
-                        <!-- Sample Row -->
-                        <div class="d-flex gap-2 mb-3 align-items-end">
-                            <div class="flex-grow-1">
-                                <label>Row Title</label>
-                                <input type="text" class="form-control" placeholder="e.g. Variables">
-                            </div>
-                            <div class="flex-grow-1">
-                                <label>Syntax / Code</label>
-                                <input type="text" class="form-control" placeholder="Code block">
-                            </div>
-                            <div class="flex-grow-1">
-                                <label>Output / Rule</label>
-                                <input type="text" class="form-control" placeholder="Description">
-                            </div>
-                            <button type="button" class="btn-remove"><i class="bi bi-dash"></i></button>
-                        </div>
-
-                        <!-- Sample Note -->
-                        <div class="d-flex gap-2 mb-3 align-items-center">
-                            <div style="flex: 1;">
-                                <label>Note Title</label>
-                                <input type="text" class="form-control h-100">
-                            </div>
-                            <div style="flex: 3;">
-                                <label>Note Statement</label>
-                                <textarea class="form-control" rows="2" placeholder="Add helpful note statement..."></textarea>
-                            </div>
-                            <button type="button" class="btn-remove align-self-end h-auto p-2" style="height: 62px !important;"><i class="bi bi-dash"></i></button>
-                        </div>
-
-                        <div class="d-flex gap-2 mb-2">
-                            <button type="button" class="btn btn-outline btn-sm px-3 rounded-pill"><i class="bi bi-plus me-1"></i>Row</button>
-                            <button type="button" class="btn btn-outline btn-sm px-3 rounded-pill"><i class="bi bi-plus me-1"></i>Note</button>
-                        </div>
+                    <div class="section-title">Cheatsheet Content</div>
+                    <div class="mb-3">
+                        <label>Code / Text Content</label>
+                        <form:textarea path="content" cssClass="form-control" id="contentInput" rows="12" placeholder="Write your cheat sheet syntax, code snippets, or documentation details here..." style="font-family: monospace; font-size: 0.95rem; line-height: 1.5;" required="true" />
                     </div>
-
-                    <button type="button" class="btn btn-outline w-100 rounded"><i class="bi bi-plus me-1"></i> Add Section</button>
                 </div>
 
                 <!-- Form Submit Actions -->
-                <div class="d-flex gap-3">
-                    <button type="button" class="btn btn-secondary w-50" onclick="submitForm('PRIVATE')">Draft Cheatsheet</button>
-                    <button type="button" class="btn btn-primary w-50" onclick="submitForm('PUBLIC')">Public Cheatsheet</button>
+                <div class="d-flex gap-3 mb-5">
+                    <a href="${pageContext.request.contextPath}/cheatsheet/list" class="btn btn-secondary w-50 d-flex align-items-center justify-content-center">Cancel</a>
+                    <button type="button" class="btn btn-primary w-50" onclick="submitForm()">Save Cheatsheet</button>
                 </div>
 
             </div>
 
-            <!-- Right Column: Preview & Tag Queue -->
+            <!-- Right Column: Preview & Sticky Details -->
             <div class="col-lg-4">
                 
-                <div class="glass-card mb-4" id="previewCard">
-                    <div class="terminal-box">
+                <div class="glass-card mb-4" id="previewCard" style="position: sticky; top: 90px;">
+                    <div class="terminal-box" style="min-height: 250px;">
                         <div class="terminal-header">
                             <div class="terminal-dot dot-red"></div>
                             <div class="terminal-dot dot-yellow"></div>
                             <div class="terminal-dot dot-green"></div>
                         </div>
-                        <div class="text-white small" style="font-family: monospace; opacity: 0.5;">// Code preview</div>
+                        <div class="text-white small" id="previewContent" style="font-family: monospace; opacity: 0.9; white-space: pre-wrap; font-size: 0.85rem; max-height: 350px; overflow-y: auto;">// Content preview will appear here as you type...</div>
                     </div>
                     
                     <h4 class="fw-bold text-dark mb-1" id="previewTitle">My Cheat Sheet</h4>
-                    <div class="text-muted small mb-2" id="previewCategory">Category: Help</div>
-                    <div class="fw-semibold text-dark small mb-3">Section Layer</div>
-                    <div class="text-muted small" style="font-size: 0.8rem;">Selected tags will appear after choosing category</div>
-                </div>
-
-                <div class="glass-box p-3">
-                    <h6 class="fw-bold text-danger mb-3 border-bottom pb-2">Requested Tag Queue</h6>
-                    <table class="table table-borderless table-sm small mb-0">
-                        <thead>
-                            <tr class="text-muted">
-                                <th>Tag</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td colspan="3" class="text-center text-muted py-3">No pending tags in queue.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="text-muted small mb-2" id="previewCategory">Category: None</div>
                 </div>
 
             </div>
@@ -357,16 +291,22 @@
     // Dynamic Preview Updating
     const titleInput = document.getElementById('titleInput');
     const categorySelect = document.getElementById('categorySelect');
+    const contentInput = document.getElementById('contentInput');
     const previewTitle = document.getElementById('previewTitle');
     const previewCategory = document.getElementById('previewCategory');
+    const previewContent = document.getElementById('previewContent');
 
     titleInput.addEventListener('input', function() {
         previewTitle.textContent = this.value || 'My Cheat Sheet';
     });
 
+    contentInput.addEventListener('input', function() {
+        previewContent.textContent = this.value || '// Content preview will appear here as you type...';
+    });
+
     categorySelect.addEventListener('change', function() {
         const selectedText = this.options[this.selectedIndex].text;
-        previewCategory.textContent = this.value ? 'Category: ' + selectedText : 'Category: Help';
+        previewCategory.textContent = this.value ? 'Category: ' + selectedText : 'Category: None';
         
         // Load tags
         let categoryId = this.value;
@@ -383,14 +323,22 @@
     });
 
     // Handle Form Submission
-    function submitForm(visibility) {
-        document.getElementById('hiddenVisibility').value = visibility;
+    function submitForm() {
+        const titleVal = titleInput.value.trim();
+        const categoryVal = categorySelect.value;
+        const contentVal = contentInput.value.trim();
         
-        // Normally you'd gather Tree Layout data and stringify into JSON to store in hiddenContent.
-        // For now, we just pass dummy content if empty so the backend doesn't reject it.
-        const contentInput = document.getElementById('hiddenContent');
-        if(!contentInput.value) {
-            contentInput.value = '<p>Content generated via Layout Builder.</p>';
+        if(!categoryVal) {
+            alert('Please select a Category.');
+            return;
+        }
+        if(!titleVal) {
+            alert('Please enter a Title.');
+            return;
+        }
+        if(!contentVal) {
+            alert('Please fill out the Cheatsheet Content.');
+            return;
         }
         
         document.getElementById('createForm').submit();

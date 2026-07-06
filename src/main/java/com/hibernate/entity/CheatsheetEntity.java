@@ -1,4 +1,3 @@
-
 package com.hibernate.entity;
 
 import java.sql.Timestamp;
@@ -58,6 +57,22 @@ public class CheatsheetEntity {
     @Column(name = "banned", nullable = false)
     private Boolean banned = false;
     
+    @Column(name = "banned_reason", length = 500)
+    private String bannedReason;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "banned_by")
+    private User bannedBy;
+
+    @Column(name = "banned_at")
+    private Timestamp bannedAt;
+
+    @Column(name = "deleted_at")
+    private Timestamp deletedAt;
+
+    @Column(name = "image_path", length = 255)
+    private String imagePath;
+    
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Timestamp createdAt;
@@ -73,12 +88,9 @@ public class CheatsheetEntity {
         inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<TagEntity> tags;
-    
-    
-    
-    
-    @OneToMany(mappedBy = "cheatsheet", fetch = FetchType.LAZY) // EAGER မှ LAZY သို့
-    @BatchSize(size = 20) // ဤ Annotation ကို ထည့်ပေးပါ
+
+    @OneToMany(mappedBy = "cheatsheet", fetch = FetchType.LAZY)
+    @BatchSize(size = 20)
     private List<SharedCheatsheetEntity> sharedList;
 
     @Transient
@@ -87,5 +99,10 @@ public class CheatsheetEntity {
             return this.sharedList.size();
         }
         return 0;
+    }
+
+    @Transient
+    public String getObfuscatedId() {
+        return com.hibernate.util.IdObfuscator.encode(this.id);
     }
 }

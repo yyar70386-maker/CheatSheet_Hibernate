@@ -30,4 +30,9 @@ public class CategoryEntity {
     // 📌 UI ဘက်က Badge ပုံစံတွေနဲ့ ကိုက်ညီစေဖို့ Default Value ကို စာလုံးကြီး "ACTIVE" သို့မဟုတ် "INACTIVE" သို့ ပြောင်းလဲပေးထားပါတယ်
     @Column(length = 45)
     private String status = "ACTIVE"; 
+
+    @Transient
+    public String getObfuscatedId() {
+        return com.hibernate.util.IdObfuscator.encode(this.id);
+    }
 }

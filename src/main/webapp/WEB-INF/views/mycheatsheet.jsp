@@ -11,16 +11,23 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,sans-serif;
+body{
+    background: radial-gradient(circle at 50% 50%, #fef3f6 0%, #e8dbe5 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-body{
-    background:#eef3fb;
-    padding:20px 10px;
+.glass-box {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    margin-bottom: 40px;
 }
 
 .page-header{
@@ -28,38 +35,43 @@ body{
     justify-content:space-between;
     align-items:center;
     margin-bottom:25px;
+    border-bottom: 2px solid rgba(255, 51, 102, 0.2);
+    padding-bottom: 15px;
 }
 
 .page-title{
-    color:#1976d2;
+    color:#ff3366;
     font-size:28px;
     font-weight:bold;
+    margin: 0;
 }
 
 .btn-add{
-    background:#1976d2;
+    background:#ff3366;
     color:white;
-    padding:12px 20px;
+    padding:10px 20px;
     text-decoration:none;
     border-radius:8px;
     font-weight:bold;
+    transition: background 0.3s;
 }
 
 .btn-add:hover{
-    background:#0d47a1;
+    background:#e62e5c;
+    color: white;
 }
 
 .table{
     width:100%;
     border-collapse:collapse;
-    background:white;
+    background: rgba(255, 255, 255, 0.6);
     border-radius:12px;
     overflow:hidden;
-    box-shadow:0 4px 20px rgba(21,101,192,0.15);
+    box-shadow:0 4px 20px rgba(0,0,0,0.03);
 }
 
 .table th{
-    background:#1976d2;
+    background:#ff3366;
     color:white;
     padding:16px;
     text-align:left;
@@ -67,18 +79,17 @@ body{
 
 .table td{
     padding:16px;
-    border-bottom:1px solid #e3f2fd;
-    vertical-align: middle; /* ဒေတာများ အလယ်ကွက်တိ ဖြစ်စေရန် */
+    border-bottom:1px solid rgba(0,0,0,0.05);
+    vertical-align: middle;
 }
 
 .table tr:last-child td{
     border-bottom:none;
 }
 
-/* 🌟 Tags Badge Styles */
 .tag-badge {
-    background-color: #e2e8f0;
-    color: #4a5568;
+    background-color: rgba(255, 51, 102, 0.1);
+    color: #ff3366;
     padding: 3px 10px;
     border-radius: 12px;
     font-size: 12px;
@@ -89,9 +100,8 @@ body{
     margin-top: 4px;
 }
 
-/* 🌟 Action Icon Buttons Styles */
 .btn-icon-edit {
-    color: #2196f3;
+    color: #ff3366;
     font-size: 20px;
     margin-right: 12px;
     transition: color 0.2s ease;
@@ -99,7 +109,7 @@ body{
 }
 
 .btn-icon-edit:hover {
-    color: #0b7dda;
+    color: #e62e5c;
 }
 
 .btn-icon-delete {
@@ -125,85 +135,109 @@ body{
 </head>
 <body>
 
-<div class="page-header">
-    <h1 class="page-title">My Cheatsheet List</h1>
+<jsp:include page="header.jsp" />
 
-    <a href="${pageContext.request.contextPath}/cheatsheet/add" class="btn-add">
-        + Add Cheatsheet
-    </a>
+<div class="container py-5">
+    <div class="glass-box">
+        <div class="page-header">
+            <h1 class="page-title">My Cheatsheet List</h1>
+
+            <a href="${pageContext.request.contextPath}/cheatsheet/add" class="btn-add">
+                <i class="bi bi-plus-circle me-1"></i> Add Cheatsheet
+            </a>
+        </div>
+
+        <c:choose>
+            <c:when test="${empty cheatsheetlist}">
+                <div class="no-data py-5">
+                    <i class="bi bi-file-earmark-code display-1 d-block mb-3 text-muted"></i>
+                    You haven't created any cheat sheets yet!
+                </div>
+            </c:when>
+            <c:otherwise>
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Tags</th>
+                                <th>Visibility</th>
+                                <th>Status</th>
+                                <th>Views</th>
+                                <th>Downloads</th>
+                                <th>Updated At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${cheatsheetlist}" var="c">
+                                <tr>
+                                    <td>${c.id}</td>
+                                    <td>
+                                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${c.obfuscatedId}" style="color:#ff3366; text-decoration:none; font-weight:bold;">
+                                            ${c.title}
+                                        </a>
+                                    </td>
+                                    <td>${c.category.name}</td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${empty c.tags}">
+                                                <span class="text-muted small">-</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:forEach items="${c.tags}" var="tag">
+                                                    <span class="tag-badge">#${tag.name}</span>
+                                                </c:forEach>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary text-white px-2 py-1 rounded small">${c.visibility}</span>
+                                    </td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${c.status == 'draft'}">
+                                                <span class="badge bg-warning text-dark px-2 py-1 rounded small">Draft</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="badge bg-success text-white px-2 py-1 rounded small">Published</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>${c.viewCount != null ? c.viewCount : 0}</td>
+                                    <td>${c.downloadCount != null ? c.downloadCount : 0}</td>
+                                    <td>${c.updatedAt}</td>
+                                    <td>
+                                        <a class="btn-icon-edit" 
+                                           href="${pageContext.request.contextPath}/cheatsheet/edit/${c.obfuscatedId}" 
+                                           title="Edit Cheatsheet">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+
+                                        <a class="btn-icon-delete"
+                                           href="${pageContext.request.contextPath}/cheatsheet/delete/${c.obfuscatedId}"
+                                           onclick="return confirm('Are you sure you want to delete this cheat sheet?');"
+                                           title="Delete Cheatsheet">
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+
+            </c:otherwise>
+        </c:choose>
+    </div>
 </div>
 
-<c:choose>
-    <c:when test="${empty cheatsheetlist}">
-        <div class="no-data">
-            You haven't created any cheat sheets yet!
-        </div>
-    </c:when>
-    <c:otherwise>
+<jsp:include page="footer.jsp" />
 
-        <table class="table">
-            <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Tags</th> <!-- 🌟 Tags Column အသစ် ထည့်သွင်းခြင်း -->
-                <th>Visibility</th>
-                <th>Views</th>
-                <th>Downloads</th>
-                <th>Updated At</th>
-                <th>Actions</th>
-            </tr>
-
-            <c:forEach items="${cheatsheetlist}" var="c">
-                <tr>
-                    <td>${c.id}</td>
-                    <td>
-                        <a href="${pageContext.request.contextPath}/cheatsheet/detail/${c.id}" style="color:#1976d2; text-decoration:none; font-weight:bold;">
-                            ${c.title}
-                        </a>
-                    </td>
-                    <td>${c.category.name}</td>
-                    
-                    <!-- 🌟 Tags List ပြသပေးသည့် အပိုင်း -->
-                    <td>
-                        <c:choose>
-                            <c:when test="${empty c.tags}">
-                                <span class="text-muted small">-</span>
-                            </c:when>
-                            <c:otherwise>
-                                <c:forEach items="${c.tags}" var="tag">
-                                    <span class="tag-badge">#${tag.name}</span>
-                                </c:forEach>
-                            </c:otherwise>
-                        </c:choose>
-                    </td>
-
-                    <td>${c.visibility}</td>
-                    <td>${c.viewCount != null ? c.viewCount : 0}</td>
-                    <td>${c.downloadCount != null ? c.downloadCount : 0}</td>
-                    <td>${c.updatedAt}</td>
-                    <td>
-                        <!-- 🌟 စာသားအစား Pencil Icon ပြောင်းလဲခြင်း -->
-                        <a class="btn-icon-edit" 
-                           href="${pageContext.request.contextPath}/cheatsheet/edit/${c.id}" 
-                           title="Edit Cheatsheet">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-
-                        <!-- 🌟 စာသားအစား Trash Icon ပြောင်းလဲခြင်း -->
-                        <a class="btn-icon-delete"
-						   href="${pageContext.request.contextPath}/cheatsheet/delete/${c.id}"
-						   onclick="return confirm('Are you sure you want to delete this cheat sheet?');"
-                           title="Delete Cheatsheet">
-						    <i class="bi bi-trash3-fill"></i>
-						</a>
-                    </td>
-                </tr>
-            </c:forEach>
-        </table>
-
-    </c:otherwise>
-</c:choose>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

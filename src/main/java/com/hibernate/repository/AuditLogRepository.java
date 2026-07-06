@@ -15,4 +15,5 @@ public interface AuditLogRepository {
     List<AuditLogEntity> search(String keyword, String entityType, int page, int size);
 
     long countSearch(String keyword, String entityType);
+    List<Object[]> getMonthlyActiveUserCounts(int year);
 }

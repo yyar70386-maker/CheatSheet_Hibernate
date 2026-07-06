@@ -37,4 +37,9 @@ public class TagEntity {
     
     @ManyToMany(mappedBy = "tags")
     private List<CheatsheetEntity> cheatsheets;
+
+    @javax.persistence.Transient
+    public String getObfuscatedId() {
+        return com.hibernate.util.IdObfuscator.encode(this.id);
+    }
 }
