@@ -44,6 +44,13 @@
         .btn-outline-primary { color: #ff3366 !important; border-color: #ff3366 !important; }
         .btn-outline-primary:hover { background-color: #ff3366 !important; color: white !important; }
         .text-primary { color: #ff3366 !important; }
+
+        /* အဖျက်ခံရတဲ့ Row ပျောက်သွားချိန်မှာ သုံးမယ့် Animation Effect */
+        .fade-out-row {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.4s ease;
+        }
     </style>
 </head>
 <body style="background-color: #ffffff;">
@@ -70,7 +77,7 @@
             <div class="card border-0 shadow-sm rounded-3">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table table-hover align-middle mb-0" id="categoryTable">
                             <thead style="background: rgba(255, 51, 102, 0.9); color: white;" class="small fw-bold text-uppercase">
                                 <tr>
                                     <th class="ps-4" style="width: 10%;">No</th>
@@ -83,25 +90,27 @@
                                 <c:choose>
                                     <c:when test="${not empty categorylist}">
                                         <c:forEach var="c" items="${categorylist}" varStatus="statusLoop">
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-secondary">${statusLoop.index + 1}</td>
+                                            <!-- 🌟 Row တစ်ခုချင်းစီကို UI ကနေ လှမ်းဖျက်လို့ရအောင် ID သတ်မှတ်ပေးထားပါတယ် -->
+                                            <tr id="categoryRow_${c.id}">
+                                                <td class="ps-4 fw-bold text-secondary row-number">${statusLoop.index + 1}</td>
                                                 <td><span class="fw-semibold text-dark">${c.name}</span></td>
                                                 <td>${c.createdAt}</td>
                                                 <td class="text-end pe-4">
                                                     <a href="${pageContext.request.contextPath}/category/edit/${c.id}" class="btn btn-sm btn-outline-primary me-1 rounded-2">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </a>
-                                                    <a href="${pageContext.request.contextPath}/category/delete/${c.id}" 
-                                                       class="btn btn-sm btn-outline-danger rounded-2" 
-                                                       onclick="return confirm('Are you sure you want to delete this category?');">
+                                                    <!-- 🌟 UI ချော်မထွက်စေရန် AJAX စနစ်ဖြင့် ဖျက်နိုင်အောင် ပြောင်းလဲပြင်ဆင်ထားပါတယ် -->
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-outline-danger rounded-2" 
+                                                            onclick="deleteCategoryAjax('${c.id}')">
                                                         <i class="bi bi-trash3-fill"></i>
-                                                    </a>
+                                                    </button>
                                                 </td>
                                             </tr>
                                         </c:forEach>
                                     </c:when>
                                     <c:otherwise>
-                                        <tr>
+                                        <tr id="noCategoryRow">
                                             <td colspan="4" class="text-center py-5 text-muted">
                                                 <i class="bi bi-folder-x display-4 d-block mb-3" style="color: #ff3366;"></i>
                                                 No Category Found!
@@ -119,5 +128,61 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function deleteCategoryAjax(categoryId) {
+            if (!confirm('Are you sure you want to delete this category?')) {
+                return;
+            }
+
+            const contextPath = '${pageContext.request.contextPath}';
+            
+            // Backend Controller ဆီ သွားဖျက်ဖို့ လှမ်းပို့ခြင်း
+            fetch(contextPath + '/category/delete/' + categoryId, {
+                method: 'GET' // သင့် Controller က standard GET Mapping သုံးထားလို့ GET ပဲ ထားပေးထားပါတယ်
+            })
+            .then(response => {
+                // ဖျက်တာ အောင်မြင်သွားရင် UI ဘက်က Row ကို ချက်ချင်း ဖျောက်ချပစ်မယ်
+                const row = document.getElementById('categoryRow_' + categoryId);
+                if (row) {
+                    row.classList.add('fade-out-row');
+                    
+                    // Animation ပြီးသွားရင် Row ကို HTML ထဲကပါ လုံးဝ ဖြုတ်ချပစ်ခြင်း
+                    setTimeout(() => {
+                        row.remove();
+                        recalculateRowNumbers(); // စဉ်နံပါတ် (No) တွေကို ၁၊ ၂၊ ၃ ပြန်စီပေးခြင်း
+                    }, 400);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting category:', error);
+                alert('Failed to update UI. Please refresh the page.');
+            });
+        }
+
+        // Row တွေ ဖျက်ပြီးတိုင်း "No" စဉ်နံပါတ်တွေကို Auto ပြန်စီပေးမည့် Function
+        function recalculateRowNumbers() {
+            const rows = document.querySelectorAll('#categoryTable tbody tr:not(#noCategoryRow)');
+            if (rows.length === 0) {
+                // အကယ်၍ အကုန်ဖျက်လို့ ကတ်တဂိုရီ မကျန်တော့ရင် No Category Found စာတန်း ပြန်ပြမယ်
+                const tbody = document.querySelector('#categoryTable tbody');
+                tbody.innerHTML = `
+                    <tr id="noCategoryRow">
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            <i class="bi bi-folder-x display-4 d-block mb-3" style="color: #ff3366;"></i>
+                            No Category Found!
+                        </td>
+                    </tr>`;
+                return;
+            }
+            
+            rows.forEach((row, index) => {
+                const noCell = row.querySelector('.row-number');
+                if (noCell) {
+                    noCell.textContent = index + 1;
+                }
+            });
+        }
+    </script>
 </body>
 </html>
