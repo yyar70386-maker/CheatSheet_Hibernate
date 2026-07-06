@@ -45,7 +45,6 @@ public class CheatsheetController {
     private final InteractionServiceImpl interactionService;
     private final RatingService ratingService;
 
-    // ==================== 🌟 My Cheatsheets Personal List ====================
     @GetMapping("/list")
     public ModelAndView list(HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
@@ -64,7 +63,7 @@ public class CheatsheetController {
         }
 
         ModelAndView mv = new ModelAndView("cheatsheet", "cheatsheet", new CheatsheetEntity());
-        mv.addObject("categorylist", categoryService.findAll());
+        mv.addObject("categorylist", categoryService.findAllActive());
         return mv;
     }
 
@@ -79,6 +78,13 @@ public class CheatsheetController {
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
             return new ModelAndView("redirect:/login");
+        }
+
+        if (cheatsheet.getDescription() == null || cheatsheet.getDescription().trim().isEmpty()) {
+            ModelAndView mv = new ModelAndView("cheatsheet", "cheatsheet", cheatsheet);
+            mv.addObject("categorylist", categoryService.findAllActive());
+            mv.addObject("error", "Description is required and cannot be empty!");
+            return mv;
         }
 
         cheatsheet.setAuthor(currentUser);
@@ -137,7 +143,7 @@ public class CheatsheetController {
         }
         
         ModelAndView mv = new ModelAndView("cheatsheet-edit", "cheatsheet", cheatsheet);
-        mv.addObject("categorylist", categoryService.findAll());
+        mv.addObject("categorylist", categoryService.findAllActive());
 
         if (cheatsheet.getCategory() != null) {
             mv.addObject("taglist", tagService.findByCategoryId(cheatsheet.getCategory().getId()));
@@ -150,8 +156,19 @@ public class CheatsheetController {
             @ModelAttribute("cheatsheet") CheatsheetEntity cheatsheet,
             @RequestParam(value = "tagIds", required = false) List<Integer> tagIds,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestParam(value = "removePhoto", required = false) Boolean removePhoto, // 🌟 [ADDED] Checkbox တန်ဖိုးလက်ခံခြင်း
             HttpServletRequest request,
             HttpSession session) {
+
+        if (cheatsheet.getDescription() == null || cheatsheet.getDescription().trim().isEmpty()) {
+            ModelAndView mv = new ModelAndView("cheatsheet-edit", "cheatsheet", cheatsheet);
+            mv.addObject("categorylist", categoryService.findAllActive());
+            if (cheatsheet.getCategory() != null) {
+                mv.addObject("taglist", tagService.findByCategoryId(cheatsheet.getCategory().getId()));
+            }
+            mv.addObject("error", "Description cannot be empty!");
+            return mv;
+        }
 
         CheatsheetEntity existingSheet = cheatsheetService.findById(cheatsheet.getId());
         if (existingSheet != null) {
@@ -168,7 +185,11 @@ public class CheatsheetController {
             if (cheatsheet.getDownloadCount() == null) {
                 cheatsheet.setDownloadCount(existingSheet.getDownloadCount());
             }
-            if (imageFile != null && !imageFile.isEmpty()) {
+            
+            // 🌟 [ADDED LOGIC] ပုံဖြုတ်ရန် checkbox ခြစ်ထားပါက imagePath အား null သတ်မှတ်မည်
+            if (Boolean.TRUE.equals(removePhoto)) {
+                cheatsheet.setImagePath(null);
+            } else if (imageFile != null && !imageFile.isEmpty()) {
                 try {
                     String uploadDir = "C:/my_project_uploads/";
                     java.io.File dir = new java.io.File(uploadDir);
@@ -281,7 +302,6 @@ public class CheatsheetController {
         return mv;
     }
 
-    // ==================== 🌟 Cheatsheet Detail View (Conflict ရှင်းပြီးသား ဗားရှင်း) ====================
     @GetMapping("/detail/{id}")
     public ModelAndView viewDetail(@PathVariable("id") String encodedId, 
                                    @RequestParam(value = "commentSort", defaultValue = "latest") String commentSort,
@@ -319,7 +339,6 @@ public class CheatsheetController {
         ModelAndView mv = new ModelAndView("cheatsheet-detail");
         mv.addObject("sheet", sheet);
         
-        // Interaction & Rating Data များကို View ထဲသို့ ထည့်ပေးခြင်း
         mv.addObject("avgRating", ratingService.getAverageRatingBySheetId(id));
         mv.addObject("sheetLikes", interactionService.countSheetReactions(id, true));
         mv.addObject("sheetDislikes", interactionService.countSheetReactions(id, false));
@@ -336,7 +355,6 @@ public class CheatsheetController {
             mv.addObject("userRating", userRatingEntity != null ? userRatingEntity.getStars() : 0);
         }
         
-        // UI ဘက်တွင် Edit/Delete ခလုတ်ပြရန်/ဖျောက်ရန်အတွက် ပေါင်းစည်းပေးထားပါတယ်
         mv.addObject("isOwner", isOwner); 
         
         return mv;
@@ -385,7 +403,6 @@ public class CheatsheetController {
         return mv;
     }
     
-    // ==================== 🌟 [.JASPER HARD-FIXED] View PDF Report System ====================
     @GetMapping("/view-pdf/{id}")
     public void viewPdf(@PathVariable("id") String encodedId, HttpServletResponse response, HttpSession session) {
         try {
