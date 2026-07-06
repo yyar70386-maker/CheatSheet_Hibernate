@@ -241,6 +241,7 @@ public class CheatsheetController {
             @PathVariable("categoryId") String encodedCategoryId, 
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "filter", defaultValue = "ALL") String filter, 
+            @RequestParam(value = "sortBy", defaultValue = "latest") String sortBy, 
             HttpSession session) {
             
         Integer categoryId = com.hibernate.util.IdObfuscator.decode(encodedCategoryId);
@@ -256,7 +257,7 @@ public class CheatsheetController {
         User currentUser = (User) session.getAttribute("currentUser");
         Integer currentUserId = (currentUser != null) ? currentUser.getId() : 0;
         
-        List<CheatsheetEntity> cheatsheets = cheatsheetService.findByCategoryIdWithPagination(categoryId, page, pageSize, currentUserId, filter);
+        List<CheatsheetEntity> cheatsheets = cheatsheetService.findByCategoryIdWithPagination(categoryId, page, pageSize, currentUserId, filter, sortBy);
         long totalCheatsheets = cheatsheetService.countByCategoryId(categoryId, currentUserId, filter); 
         
         int totalPages = (int) Math.ceil((double) totalCheatsheets / pageSize);
@@ -275,13 +276,16 @@ public class CheatsheetController {
         mv.addObject("categoryName", categoryName);
         mv.addObject("totalCount", totalCheatsheets); 
         mv.addObject("currentFilter", filter.toUpperCase()); 
+        mv.addObject("sortBy", sortBy); 
         
         return mv;
     }
 
     // ==================== 🌟 Cheatsheet Detail View (Conflict ရှင်းပြီးသား ဗားရှင်း) ====================
     @GetMapping("/detail/{id}")
-    public ModelAndView viewDetail(@PathVariable("id") String encodedId, HttpSession session) {
+    public ModelAndView viewDetail(@PathVariable("id") String encodedId, 
+                                   @RequestParam(value = "commentSort", defaultValue = "latest") String commentSort,
+                                   HttpSession session) {
         Integer id = com.hibernate.util.IdObfuscator.decode(encodedId);
         if (id == null) {
             try {
@@ -319,7 +323,8 @@ public class CheatsheetController {
         mv.addObject("avgRating", ratingService.getAverageRatingBySheetId(id));
         mv.addObject("sheetLikes", interactionService.countSheetReactions(id, true));
         mv.addObject("sheetDislikes", interactionService.countSheetReactions(id, false));
-        mv.addObject("commentsList", interactionService.getCommentsBySheetId(id, currentUserId));
+        mv.addObject("commentsList", interactionService.getCommentsBySheetId(id, currentUserId, commentSort));
+        mv.addObject("commentSort", commentSort);
         
         if (currentUser != null) {
             var favorite = favoriteService.getByUserIdAndSheetId(currentUser.getId(), id);
@@ -342,6 +347,7 @@ public class CheatsheetController {
             @PathVariable("tagId") String encodedTagId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "filter", defaultValue = "ALL") String filter,
+            @RequestParam(value = "sortBy", defaultValue = "latest") String sortBy,
             HttpSession session) {
             
         Integer tagId = com.hibernate.util.IdObfuscator.decode(encodedTagId);
@@ -357,7 +363,7 @@ public class CheatsheetController {
         User currentUser = (User) session.getAttribute("currentUser");
         Integer currentUserId = (currentUser != null) ? currentUser.getId() : 0;
         
-        List<CheatsheetEntity> cheatsheets = cheatsheetService.findPublicCheatsheetsByTagId(tagId, page, pageSize, currentUserId, filter);
+        List<CheatsheetEntity> cheatsheets = cheatsheetService.findPublicCheatsheetsByTagId(tagId, page, pageSize, currentUserId, filter, sortBy);
         long totalCheatsheets = cheatsheetService.countByTagId(tagId, currentUserId, filter);
         
         int totalPages = (int) Math.ceil((double) totalCheatsheets / pageSize);
@@ -374,6 +380,7 @@ public class CheatsheetController {
         mv.addObject("totalPages", totalPages);
         mv.addObject("tagId", encodedTagId);
         mv.addObject("currentFilter", filter.toUpperCase());
+        mv.addObject("sortBy", sortBy);
         
         return mv;
     }

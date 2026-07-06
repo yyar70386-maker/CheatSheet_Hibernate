@@ -13,7 +13,7 @@ public interface CheatsheetRepository {
     void update(CheatsheetEntity cheatsheet);
     void delete(Integer id);
 
-    List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId, String filter);
+    List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId, String filter, String sortBy);
     long countByCategoryId(Integer categoryId, Integer currentUserId, String filter);
     
     List<TagEntity> findTagsByCategoryId(Integer categoryId);
@@ -21,7 +21,7 @@ public interface CheatsheetRepository {
     // 🌟 [STORED PROCEDURE CALL] Native Procedure Signature
     List<Object[]> callStoredProcedureForTagCounts(Integer categoryId, Integer currentUserId);
     
-    List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter);
+    List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter, String sortBy);
     long countByTagId(Integer tagId, Integer currentUserId, String filter);
     
     List<CheatsheetEntity> findByUserId(Integer userId);

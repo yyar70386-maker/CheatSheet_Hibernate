@@ -104,6 +104,38 @@
                         </li>
                     </ul>
                 </div>
+                
+                <div class="dropdown mt-3 mt-md-0 ms-2">
+                    <button class="btn filter-dropdown-btn dropdown-toggle d-flex align-items-center gap-2" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-sort-down"></i> 
+                        Sort: 
+                        <c:choose>
+                            <c:when test="${sortBy == 'likes'}">Most Likes</c:when>
+                            <c:when test="${sortBy == 'dislikes'}">Most Dislikes</c:when>
+                            <c:otherwise>Latest</c:otherwise>
+                        </c:choose>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="sortDropdown">
+                        <li>
+                            <a class="dropdown-item ${sortBy == 'latest' || empty sortBy ? 'active bg-brand-primary' : ''}" 
+                               href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?filter=${currentFilter}&sortBy=latest">
+                                <i class="bi bi-clock-history me-2"></i> Latest
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item ${sortBy == 'likes' ? 'active bg-brand-primary' : ''}" 
+                               href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?filter=${currentFilter}&sortBy=likes">
+                                <i class="bi bi-hand-thumbs-up-fill me-2"></i> Most Likes
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item ${sortBy == 'dislikes' ? 'active bg-brand-primary' : ''}" 
+                               href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?filter=${currentFilter}&sortBy=dislikes">
+                                <i class="bi bi-hand-thumbs-down-fill me-2"></i> Most Dislikes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </c:if>
         </div>
 
@@ -209,15 +241,15 @@
                 <nav class="d-flex justify-content-center mt-5">
                     <ul class="pagination pagination-md">
                         <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                            <a class="page-link" href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?page=${currentPage - 1}&filter=${currentFilter}">Previous</a>
+                            <a class="page-link" href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?page=${currentPage - 1}&filter=${currentFilter}&sortBy=${sortBy}">Previous</a>
                         </li>
                         <c:forEach begin="1" end="${totalPages}" var="i">
                             <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?page=${i}&filter=${currentFilter}">${i}</a>
+                                <a class="page-link" href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?page=${i}&filter=${currentFilter}&sortBy=${sortBy}">${i}</a>
                             </li>
                         </c:forEach>
                         <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
-                            <a class="page-link" href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?page=${currentPage + 1}&filter=${currentFilter}">Next</a>
+                            <a class="page-link" href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?page=${currentPage + 1}&filter=${currentFilter}&sortBy=${sortBy}">Next</a>
                         </li>
                     </ul>
                 </nav>

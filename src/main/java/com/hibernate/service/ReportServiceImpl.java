@@ -42,6 +42,30 @@ public class ReportServiceImpl implements ReportService {
         Integer id = reportRepository.save(report);
         auditLogService.log(reporter, "Report Created", "Report", id,
                 report.getTargetType() + " #" + report.getTargetId() + " reported.", null);
+
+        // Auto-ban/delete logic
+        long distinctReporters = reportRepository.countDistinctUsersByTarget(report.getTargetType(), report.getTargetId());
+        if (distinctReporters >= 10) {
+            if ("CHEATSHEET".equalsIgnoreCase(report.getTargetType())) {
+                com.hibernate.entity.CheatsheetEntity sheet = cheatsheetRepository.findById(report.getTargetId());
+                if (sheet != null && !sheet.isBanned()) {
+                    sheet.setBanned(true);
+                    sheet.setBannedReason("Auto-banned due to 10 or more reports.");
+                    sheet.setBannedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+                    cheatsheetRepository.update(sheet);
+                }
+            } else if ("COMMENT".equalsIgnoreCase(report.getTargetType())) {
+                com.hibernate.entity.CommentEntity comment = commentRepository.getById(report.getTargetId());
+                if (comment != null && comment.getDeletedAt() == null) {
+                    comment.setDeletedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+                    comment.setBanned(true);
+                    comment.setBannedReason("Auto-deleted due to 10 or more reports.");
+                    comment.setBannedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+                    commentRepository.updateComment(comment);
+                }
+            }
+        }
+
         return id;
     }
 

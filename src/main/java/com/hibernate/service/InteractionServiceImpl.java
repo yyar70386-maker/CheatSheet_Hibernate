@@ -69,7 +69,7 @@ public class InteractionServiceImpl {
     }
 
     @Transactional
-    public List<CommentEntity> getCommentsBySheetId(Integer sheetId, Integer currentUserId) {
+    public List<CommentEntity> getCommentsBySheetId(Integer sheetId, Integer currentUserId, String sortBy) {
         List<CommentEntity> comments = commentRepo.getCommentsBySheetId(sheetId);
         for (CommentEntity c : comments) {
             c.setLikeCount(reactionRepo.countCommentReactions(c.getId(), true));
@@ -79,6 +79,13 @@ public class InteractionServiceImpl {
                 if (userReact != null) c.setCurrentUserReaction(userReact.getIsLike());
             }
         }
+        
+        if ("likes".equalsIgnoreCase(sortBy)) {
+            comments.sort((a, b) -> Long.compare(b.getLikeCount(), a.getLikeCount()));
+        } else if ("dislikes".equalsIgnoreCase(sortBy)) {
+            comments.sort((a, b) -> Long.compare(b.getDislikeCount(), a.getDislikeCount()));
+        }
+        
         return comments;
     }
 

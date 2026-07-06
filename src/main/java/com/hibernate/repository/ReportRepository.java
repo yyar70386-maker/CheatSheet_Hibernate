@@ -25,4 +25,6 @@ public interface ReportRepository {
     long countByStatus(String status);
 
     List<ReportEntity> findLatest(int limit);
+
+    long countDistinctUsersByTarget(String targetType, Integer targetId);
 }

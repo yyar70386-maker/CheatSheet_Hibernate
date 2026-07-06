@@ -155,6 +155,11 @@
                     <button type="button" class="action-btn text-danger ms-auto" data-bs-toggle="modal" data-bs-target="#reportSheetModal">
                         <i class="bi bi-flag"></i> Report
                     </button>
+                    <c:if test="${isOwner && sheet.banned}">
+                        <button type="button" class="action-btn text-warning ms-auto" data-bs-toggle="modal" data-bs-target="#appealSheetModal">
+                            <i class="bi bi-shield-exclamation"></i> Appeal Ban
+                        </button>
+                    </c:if>
                 </c:when>
 
                 <c:otherwise>
@@ -163,10 +168,33 @@
                 </c:otherwise>
             </c:choose>
         </div>
+        
+        <c:if test="${sheet.banned}">
+            <div class="alert alert-danger mt-3 mb-0 shadow-sm" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>This CheatSheet has been banned.</strong> Reason: ${sheet.bannedReason}
+            </div>
+        </c:if>
 
         <%-- COMMENTS SECTION --%>
         <div class="comment-section">
-            <h3 class="mb-4"><i class="bi bi-chat-dots-fill text-primary"></i> Comments</h3>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0"><i class="bi bi-chat-dots-fill text-primary"></i> Comments</h3>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="commentSortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Sort by: <c:choose>
+                            <c:when test="${commentSort == 'likes'}">Most Likes</c:when>
+                            <c:when test="${commentSort == 'dislikes'}">Most Dislikes</c:when>
+                            <c:otherwise>Latest</c:otherwise>
+                        </c:choose>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="commentSortDropdown">
+                        <li><a class="dropdown-item ${commentSort == 'latest' || empty commentSort ? 'active' : ''}" href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.obfuscatedId}?commentSort=latest">Latest</a></li>
+                        <li><a class="dropdown-item ${commentSort == 'likes' ? 'active' : ''}" href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.obfuscatedId}?commentSort=likes">Most Likes</a></li>
+                        <li><a class="dropdown-item ${commentSort == 'dislikes' ? 'active' : ''}" href="${pageContext.request.contextPath}/cheatsheet/detail/${sheet.obfuscatedId}?commentSort=dislikes">Most Dislikes</a></li>
+                    </ul>
+                </div>
+            </div>
 
             <c:choose>
                 <c:when test="${not empty sessionScope.currentUser}">
@@ -190,18 +218,33 @@
                         <div id="commentThread_${comment.id}">
                             <div class="comment-box">
                                 <div class="comment-author"><i class="fa-solid fa-circle-user text-primary me-1"></i> ${comment.user.username}</div>
-                                <div class="comment-text">${comment.content}</div>
+                                <c:choose>
+                                    <c:when test="${comment.banned}">
+                                        <div class="comment-text text-danger fst-italic">[This comment was automatically deleted due to reports]</div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="comment-text">${comment.content}</div>
+                                    </c:otherwise>
+                                </c:choose>
                                 
-                                <div class="mt-2">
+                                <div class="mt-2 d-flex align-items-center">
                                     <c:choose>
                                         <c:when test="${not empty sessionScope.currentUser}">
-                                            <button type="button" id="cLikeBtn_${comment.id}" onclick="reactCommentJS(${comment.id}, true)" class="btn btn-sm btn-link text-decoration-none p-0 me-2 ${comment.currentUserReaction == true ? 'text-primary fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-up-fill"></i> <span id="cLikeCount_${comment.id}">${comment.likeCount}</span></button>
-                                            <button type="button" id="cDislikeBtn_${comment.id}" onclick="reactCommentJS(${comment.id}, false)" class="btn btn-sm btn-link text-decoration-none p-0 me-3 ${comment.currentUserReaction == false ? 'text-danger fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-down-fill"></i> <span id="cDislikeCount_${comment.id}">${comment.dislikeCount}</span></button>
-                                            <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-muted" onclick="document.getElementById('replyForm_${comment.id}').style.display='block';"><i class="bi bi-reply"></i> Reply</button>
+                                            <c:if test="${!comment.banned}">
+                                                <button type="button" id="cLikeBtn_${comment.id}" onclick="reactCommentJS(${comment.id}, true)" class="btn btn-sm btn-link text-decoration-none p-0 me-2 ${comment.currentUserReaction == true ? 'text-primary fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-up-fill"></i> <span id="cLikeCount_${comment.id}">${comment.likeCount}</span></button>
+                                                <button type="button" id="cDislikeBtn_${comment.id}" onclick="reactCommentJS(${comment.id}, false)" class="btn btn-sm btn-link text-decoration-none p-0 me-3 ${comment.currentUserReaction == false ? 'text-danger fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-down-fill"></i> <span id="cDislikeCount_${comment.id}">${comment.dislikeCount}</span></button>
+                                                <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-muted" onclick="document.getElementById('replyForm_${comment.id}').style.display='block';"><i class="bi bi-reply"></i> Reply</button>
+                                            </c:if>
+                                            
+                                            <c:if test="${comment.banned && comment.user.id == sessionScope.currentUser.id}">
+                                                <button type="button" class="btn btn-sm btn-outline-warning ms-auto" onclick="openAppealModal('COMMENT', ${comment.id})"><i class="bi bi-shield-exclamation"></i> Appeal Deletion</button>
+                                            </c:if>
                                         </c:when>
                                         <c:otherwise>
-                                            <span class="text-muted me-3" style="font-size: 13px;"><i class="bi bi-hand-thumbs-up"></i> ${comment.likeCount}</span>
-                                            <span class="text-muted me-3" style="font-size: 13px;"><i class="bi bi-hand-thumbs-down"></i> ${comment.dislikeCount}</span>
+                                            <c:if test="${!comment.banned}">
+                                                <span class="text-muted me-3" style="font-size: 13px;"><i class="bi bi-hand-thumbs-up"></i> ${comment.likeCount}</span>
+                                                <span class="text-muted me-3" style="font-size: 13px;"><i class="bi bi-hand-thumbs-down"></i> ${comment.dislikeCount}</span>
+                                            </c:if>
                                         </c:otherwise>
                                     </c:choose>
                                 </div>
@@ -213,12 +256,25 @@
                                     <c:if test="${reply.parentComment != null && reply.parentComment.id == comment.id}">
                                         <div class="comment-box reply-box">
                                             <div class="comment-author"><i class="fa-solid fa-reply text-info me-1"></i> ${reply.user.username} <span class="text-muted fw-normal" style="font-size:12px;">replied to ${comment.user.username}</span></div>
-                                            <div class="comment-text">${reply.content}</div>
-                                            <div class="mt-2">
+                                            <c:choose>
+                                                <c:when test="${reply.banned}">
+                                                    <div class="comment-text text-danger fst-italic">[This reply was automatically deleted due to reports]</div>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="comment-text">${reply.content}</div>
+                                                </c:otherwise>
+                                            </c:choose>
+                                            <div class="mt-2 d-flex align-items-center">
                                                 <c:if test="${not empty sessionScope.currentUser}">
-                                                    <button type="button" id="cLikeBtn_${reply.id}" onclick="reactCommentJS(${reply.id}, true)" class="btn btn-sm btn-link text-decoration-none p-0 me-2 ${reply.currentUserReaction == true ? 'text-primary fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-up-fill"></i> <span id="cLikeCount_${reply.id}">${reply.likeCount}</span></button>
-                                                    <button type="button" id="cDislikeBtn_${reply.id}" onclick="reactCommentJS(${reply.id}, false)" class="btn btn-sm btn-link text-decoration-none p-0 me-3 ${reply.currentUserReaction == false ? 'text-danger fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-down-fill"></i> <span id="cDislikeCount_${reply.id}">${reply.dislikeCount}</span></button>
-                                                    <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-muted" onclick="document.getElementById('replyForm_${comment.id}').style.display='block'; document.getElementById('replyInput_${comment.id}').value='@${reply.user.username} '"><i class="bi bi-reply"></i> Reply</button>
+                                                    <c:if test="${!reply.banned}">
+                                                        <button type="button" id="cLikeBtn_${reply.id}" onclick="reactCommentJS(${reply.id}, true)" class="btn btn-sm btn-link text-decoration-none p-0 me-2 ${reply.currentUserReaction == true ? 'text-primary fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-up-fill"></i> <span id="cLikeCount_${reply.id}">${reply.likeCount}</span></button>
+                                                        <button type="button" id="cDislikeBtn_${reply.id}" onclick="reactCommentJS(${reply.id}, false)" class="btn btn-sm btn-link text-decoration-none p-0 me-3 ${reply.currentUserReaction == false ? 'text-danger fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-down-fill"></i> <span id="cDislikeCount_${reply.id}">${reply.dislikeCount}</span></button>
+                                                        <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-muted" onclick="document.getElementById('replyForm_${comment.id}').style.display='block'; document.getElementById('replyInput_${comment.id}').value='@${reply.user.username} '"><i class="bi bi-reply"></i> Reply</button>
+                                                    </c:if>
+                                                    
+                                                    <c:if test="${reply.banned && reply.user.id == sessionScope.currentUser.id}">
+                                                        <button type="button" class="btn btn-sm btn-outline-warning ms-auto" onclick="openAppealModal('COMMENT', ${reply.id})"><i class="bi bi-shield-exclamation"></i> Appeal Deletion</button>
+                                                    </c:if>
                                                 </c:if>
                                             </div>
                                         </div>
@@ -283,6 +339,66 @@
         </div>
     </div>
 
+    <!-- Appeal Ban Modal -->
+    <c:if test="${isOwner && sheet.banned}">
+    <div class="modal fade" id="appealSheetModal" tabindex="-1" aria-labelledby="appealSheetModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                <div class="modal-header" style="border-bottom: 1px solid rgba(0,0,0,0.08); background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 152, 0, 0.1)); border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                    <h5 class="modal-title fw-bold text-dark" id="appealSheetModalLabel"><i class="bi bi-shield-exclamation text-warning me-2"></i> Appeal CheatSheet Ban</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="${pageContext.request.contextPath}/appeals/submit" method="post">
+                    <div class="modal-body p-4">
+                        <input type="hidden" name="targetType" value="CHEATSHEET">
+                        <input type="hidden" name="targetId" value="${sheet.id}">
+                        
+                        <p class="text-muted small mb-3">If you believe your cheatsheet was incorrectly banned, you can submit an appeal. Our moderators will review it.</p>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary small">Appeal Reason</label>
+                            <textarea name="reason" class="form-control" rows="4" placeholder="Explain why your cheatsheet should be restored..." required style="border-radius: 8px; resize: none;"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid rgba(0,0,0,0.08);">
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                        <button type="submit" class="btn btn-warning px-4" style="border-radius: 8px;">Submit Appeal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </c:if>
+
+    <!-- Dynamic Appeal Modal -->
+    <div class="modal fade" id="dynamicAppealModal" tabindex="-1" aria-labelledby="dynamicAppealModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                <div class="modal-header" style="border-bottom: 1px solid rgba(0,0,0,0.08); background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 152, 0, 0.1)); border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                    <h5 class="modal-title fw-bold text-dark" id="dynamicAppealModalLabel"><i class="bi bi-shield-exclamation text-warning me-2"></i> Appeal Deletion/Ban</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="${pageContext.request.contextPath}/appeals/submit" method="post">
+                    <div class="modal-body p-4">
+                        <input type="hidden" name="targetType" id="appealTargetType" value="">
+                        <input type="hidden" name="targetId" id="appealTargetId" value="">
+                        
+                        <p class="text-muted small mb-3">If you believe your content was incorrectly deleted/banned, you can submit an appeal. Our moderators will review it.</p>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary small">Appeal Reason</label>
+                            <textarea name="reason" class="form-control" rows="4" placeholder="Explain why your content should be restored..." required style="border-radius: 8px; resize: none;"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid rgba(0,0,0,0.08);">
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                        <button type="submit" class="btn btn-warning px-4" style="border-radius: 8px;">Submit Appeal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <jsp:include page="footer.jsp" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -293,6 +409,12 @@
         const currentSheetId = parseInt('${sheet.id}') || 0;
         const contextPath = '${pageContext.request.contextPath}';
 
+        function openAppealModal(type, id) {
+            document.getElementById('appealTargetType').value = type;
+            document.getElementById('appealTargetId').value = id;
+            var modal = new bootstrap.Modal(document.getElementById('dynamicAppealModal'));
+            modal.show();
+        }
         function checkLogin() {
             if (currentUserId === 0) { alert("Please login first!"); return false; }
             return true;

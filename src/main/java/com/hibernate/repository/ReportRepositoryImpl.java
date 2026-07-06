@@ -141,4 +141,17 @@ public class ReportRepositoryImpl implements ReportRepository {
                 .setMaxResults(limit)
                 .list();
     }
+
+    @Override
+    public long countDistinctUsersByTarget(String targetType, Integer targetId) {
+        Long count = getSession()
+                .createQuery(
+                        "select count(distinct r.user.id) from ReportEntity r "
+                      + "where r.targetType = :targetType and r.targetId = :targetId",
+                        Long.class)
+                .setParameter("targetType", targetType)
+                .setParameter("targetId", targetId)
+                .uniqueResult();
+        return count != null ? count : 0;
+    }
 }

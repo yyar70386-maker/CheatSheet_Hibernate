@@ -95,8 +95,8 @@ public class CheatsheetServiceImpl implements CheatsheetService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId, String filter) {
-        return cheatsheetRepository.findByCategoryIdWithPagination(categoryId, page, size, currentUserId, filter);
+    public List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId, String filter, String sortBy) {
+        return cheatsheetRepository.findByCategoryIdWithPagination(categoryId, page, size, currentUserId, filter, sortBy);
     }
 
     @Override
@@ -143,8 +143,8 @@ public class CheatsheetServiceImpl implements CheatsheetService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter) {
-        return cheatsheetRepository.findPublicCheatsheetsByTagId(tagId, page, size, currentUserId, filter);
+    public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter, String sortBy) {
+        return cheatsheetRepository.findPublicCheatsheetsByTagId(tagId, page, size, currentUserId, filter, sortBy);
     }
 
     @Override

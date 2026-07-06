@@ -112,7 +112,7 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
     }
 
     @Override
-    public List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId, String filter) {
+    public List<CheatsheetEntity> findByCategoryIdWithPagination(Integer categoryId, int page, int size, Integer currentUserId, String filter, String sortBy) {
         int offset = (page - 1) * size;
         StringBuilder hql = new StringBuilder("select distinct c from CheatsheetEntity c left join fetch c.tags left join fetch c.author where c.category.id = :catId and c.status='active' and c.visibility != 'PRIVATE' ");
         if (currentUserId == null || currentUserId == 0) { 
@@ -122,7 +122,14 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
         }
         if ("PUBLIC".equalsIgnoreCase(filter)) hql.append("and c.visibility = 'PUBLIC' ");
         else if ("FRIEND".equalsIgnoreCase(filter)) hql.append("and c.visibility = 'FRIEND-ONLY' ");
-        hql.append("order by c.id desc");
+        
+        if ("likes".equalsIgnoreCase(sortBy)) {
+            hql.append("order by (select count(sr) from SheetReactionEntity sr where sr.cheatSheet.id = c.id and sr.isLike = true) desc, c.id desc");
+        } else if ("dislikes".equalsIgnoreCase(sortBy)) {
+            hql.append("order by (select count(sr) from SheetReactionEntity sr where sr.cheatSheet.id = c.id and sr.isLike = false) desc, c.id desc");
+        } else {
+            hql.append("order by c.id desc");
+        }
         var query = getSession().createQuery(hql.toString(), CheatsheetEntity.class).setParameter("catId", categoryId);
         if (currentUserId != null && currentUserId > 0) query.setParameter("currentUserId", currentUserId);
         return query.setFirstResult(offset).setMaxResults(size).list();
@@ -150,7 +157,7 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
     }
 
     @Override
-    public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter) {
+    public List<CheatsheetEntity> findPublicCheatsheetsByTagId(Integer tagId, int page, int size, Integer currentUserId, String filter, String sortBy) {
         int offset = (page - 1) * size;
         StringBuilder hql = new StringBuilder("select distinct c from CheatsheetEntity c join c.tags t left join fetch c.tags left join fetch c.author where t.id = :tagId and c.status = 'active' and c.visibility != 'PRIVATE' ");
         if (currentUserId == null || currentUserId == 0) { 
@@ -160,7 +167,14 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
         }
         if ("PUBLIC".equalsIgnoreCase(filter)) hql.append("and c.visibility = 'PUBLIC' ");
         else if ("FRIEND".equalsIgnoreCase(filter)) hql.append("and c.visibility = 'FRIEND-ONLY' ");
-        hql.append("order by c.id desc");
+        
+        if ("likes".equalsIgnoreCase(sortBy)) {
+            hql.append("order by (select count(sr) from SheetReactionEntity sr where sr.cheatSheet.id = c.id and sr.isLike = true) desc, c.id desc");
+        } else if ("dislikes".equalsIgnoreCase(sortBy)) {
+            hql.append("order by (select count(sr) from SheetReactionEntity sr where sr.cheatSheet.id = c.id and sr.isLike = false) desc, c.id desc");
+        } else {
+            hql.append("order by c.id desc");
+        }
         var query = getSession().createQuery(hql.toString(), CheatsheetEntity.class).setParameter("tagId", tagId);
         if (currentUserId != null && currentUserId > 0) query.setParameter("currentUserId", currentUserId);
         return query.setFirstResult(offset).setMaxResults(size).list();
