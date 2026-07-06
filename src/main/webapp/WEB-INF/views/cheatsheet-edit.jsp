@@ -7,7 +7,7 @@
 <head>
 <title>Edit Cheatsheet</title>
 
-<!-- Bootstrap & Bootstrap Icons CDN လင့်ခ်များ ထည့်သွင်းခြင်း (Layout ညီသွားစေရန် အဓိက လိုအပ်ချက်) -->
+<!-- Bootstrap & Bootstrap Icons CDN လင့်ခ်များ ထည့်သွင်းခြင်း -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
@@ -20,7 +20,6 @@ body{
     padding: 0;
 }
 
-/* Glassmorphism Box style အား Bootstrap Container နှင့် ကိုက်ညီအောင် ညှိထားခြင်း */
 .glass-box {
     background: rgba(255, 255, 255, 0.45);
     backdrop-filter: blur(16px);
@@ -132,7 +131,6 @@ textarea.form-control {
 <body>
 <jsp:include page="header.jsp" />
 
-<!-- Bootstrap row/col စနစ်သုံးပြီး အလယ်တည့်တည့်မှာ ညီညီညာညာ ဖြစ်အောင် ထိန်းထားပါသည် -->
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-9 col-md-11">
@@ -144,29 +142,39 @@ textarea.form-control {
                     modelAttribute="cheatsheet"
                     action="${pageContext.request.contextPath}/cheatsheet/update"
                     method="post"
+                    id="editForm"
                     enctype="multipart/form-data">
 
                     <form:hidden path="id"/>
 
                     <div class="form-group mb-4">
                         <label class="form-label">Title</label>
-                        <form:input path="title" cssClass="form-control"/>
+                        <form:input path="title" cssClass="form-control" id="titleInput" required="true"/>
                     </div>
 
                     <div class="form-group mb-4">
                         <label class="form-label">Description</label>
-                        <form:textarea path="description" cssClass="form-control"/>
+                        <form:textarea path="description" cssClass="form-control" id="descriptionInput" required="true"/>
                     </div>
+                    
                     <div class="form-group mb-4">
                         <label class="form-label">Content</label>
-                        <form:textarea path="content" cssClass="form-control content-area"/>
+                        <form:textarea path="content" cssClass="form-control content-area" id="contentInput" style="font-family: monospace;" required="true"/>
                     </div>
 
                     <div class="form-group mb-4">
                         <label class="form-label">Cover Photo</label>
                         <c:if test="${not empty cheatsheet.imagePath}">
-                            <div class="mb-2">
+                            <div class="mb-2 position-relative d-inline-block">
                                 <img src="${pageContext.request.contextPath}${cheatsheet.imagePath}" style="max-height: 150px; border-radius: 8px;" alt="Current Cover"/>
+                                
+                                <%-- 🌟 [ADDED] ပုံဟောင်းအား ဖျက်ထုတ်ချင်ပါက ရွေးချယ်နိုင်မည့် Checkbox Option --%>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" name="removePhoto" value="true" id="removePhotoCheck">
+                                    <label class="form-check-label text-danger small fw-bold" for="removePhotoCheck">
+                                        <i class="bi bi-trash3-fill"></i> Remove Current Photo
+                                    </label>
+                                </div>
                             </div>
                         </c:if>
                         <input type="file" name="imageFile" class="form-control" accept="image/*" />
@@ -225,7 +233,7 @@ textarea.form-control {
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-submit mt-2">
+                    <button type="button" class="btn-submit mt-2" onclick="validateAndSubmit()">
                         <i class="bi bi-check-circle me-1"></i> Update Cheatsheet
                     </button>
 
@@ -239,6 +247,7 @@ textarea.form-control {
         </div>
     </div>
 </div>
+
 <script>
 document.getElementById("categorySelect").addEventListener("change", function(){
     let categoryId = this.value;
@@ -254,11 +263,30 @@ document.getElementById("categorySelect").addEventListener("change", function(){
             document.getElementById("tagContainer").innerHTML = data;
         });
 });
+
+function validateAndSubmit() {
+    const title = document.getElementById('titleInput').value.trim();
+    const description = document.getElementById('descriptionInput').value.trim();
+    const content = document.getElementById('contentInput').value.trim();
+
+    if (!title) {
+        alert('Please fill out the Title fields.');
+        return;
+    }
+    if (!description) {
+        alert('Please fill out the Description fields.');
+        return;
+    }
+    if (!content) {
+        alert('Please fill out the Cheatsheet Content fields.');
+        return;
+    }
+
+    document.getElementById('editForm').submit();
+}
 </script>
 
 <jsp:include page="footer.jsp" />
-
-<!-- Bootstrap Bundle JS ထည့်သွင်းခြင်း -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

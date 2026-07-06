@@ -24,7 +24,6 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
         return sessionFactory.getCurrentSession(); 
     }
 
-    // ==================== 🌟 [STORED PROCEDURE CALL IMPLEMENTATION] ====================
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> callStoredProcedureForTagCounts(Integer categoryId, Integer currentUserId) {
@@ -35,7 +34,6 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
                 .list();
     }
 
-    // 🌟 [NEW PRIVACY IMPLEMENTATION] Pure Hibernate Method
     @Override
     public List<CheatsheetEntity> findByUserIdAndVisibilityList(Integer userId, List<String> visibilities) {
         if (visibilities == null || visibilities.isEmpty()) {
@@ -97,8 +95,12 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
             old.setDownloadCount(cheatsheet.getDownloadCount()); 
             old.setVisibility(cheatsheet.getVisibility()); 
             old.setStatus(cheatsheet.getStatus());
+            
+            // 🌟 [UPDATED] Checkbox ကြောင့် Null သက်ရောက်လာမှုအား Database သို့ တိုက်ရိုက် Overwrite လုပ်ရန် ညှိနှိုင်းခြင်း
+            old.setImagePath(cheatsheet.getImagePath());
             if (cheatsheet.getAuthor() != null) old.setAuthor(cheatsheet.getAuthor());
-            getSession().update(old);
+            
+            getSession().merge(old);
         }
     }
 
@@ -107,7 +109,7 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
         CheatsheetEntity cheatsheet = findById(id);
         if (cheatsheet != null) {
             cheatsheet.setStatus("inactive"); 
-            getSession().update(cheatsheet);
+            getSession().merge(cheatsheet);
         }
     }
 
