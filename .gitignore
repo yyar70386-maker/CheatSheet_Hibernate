@@ -23,3 +23,12 @@
 hs_err_pid*
 replay_pid*
 /target/
+
+
+# Ignore Database & Mail Credentials
+src/main/resources/db.properties
+
+# Eclipse specific files 
+.settings/
+.classpath
+.project
