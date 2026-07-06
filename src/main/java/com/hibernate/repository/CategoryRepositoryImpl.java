@@ -77,6 +77,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
             // "inactive" နေရာမှာ "INACTIVE" (စာလုံးကြီး) သို့ ပြောင်းလဲပေးလိုက်ပါတယ်ဗျာ။
             category.setStatus("INACTIVE");
             getSession().update(category);
+            getSession().flush();
         }
     }
 

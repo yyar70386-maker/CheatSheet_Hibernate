@@ -82,23 +82,35 @@
                             <tbody>
                                 <c:choose>
                                     <c:when test="${not empty categorylist}">
-                                        <c:forEach var="c" items="${categorylist}" varStatus="statusLoop">
-                                            <tr>
-                                                <td class="ps-4 fw-bold text-secondary">${statusLoop.index + 1}</td>
-                                                <td><span class="fw-semibold text-dark">${c.name}</span></td>
-                                                <td>${c.createdAt}</td>
-                                                <td class="text-end pe-4">
-                                                    <a href="${pageContext.request.contextPath}/category/edit/${c.id}" class="btn btn-sm btn-outline-primary me-1 rounded-2">
-                                                        <i class="bi bi-pencil-square"></i>
-                                                    </a>
-                                                    <a href="${pageContext.request.contextPath}/category/delete/${c.id}" 
-                                                       class="btn btn-sm btn-outline-danger rounded-2" 
-                                                       onclick="return confirm('Are you sure you want to delete this category?');">
-                                                        <i class="bi bi-trash3-fill"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
+                                         <c:set var="counter" value="1"/>
+                                         <c:forEach var="c" items="${categorylist}">
+                                             <c:if test="${c.status != 'INACTIVE' && c.status != 'inactive'}">
+                                                 <tr>
+                                                     <td class="ps-4 fw-bold text-secondary">${counter}</td>
+                                                     <td><span class="fw-semibold text-dark">${c.name}</span></td>
+                                                     <td>${c.createdAt}</td>
+                                                     <td class="text-end pe-4">
+                                                         <a href="${pageContext.request.contextPath}/category/edit/${c.id}" class="btn btn-sm btn-outline-primary me-1 rounded-2">
+                                                             <i class="bi bi-pencil-square"></i>
+                                                         </a>
+                                                         <a href="${pageContext.request.contextPath}/category/delete/${c.id}" 
+                                                            class="btn btn-sm btn-outline-danger rounded-2" 
+                                                            onclick="return confirm('Are you sure you want to delete this category?');">
+                                                             <i class="bi bi-trash3-fill"></i>
+                                                         </a>
+                                                     </td>
+                                                 </tr>
+                                                 <c:set var="counter" value="${counter + 1}"/>
+                                             </c:if>
+                                         </c:forEach>
+                                         <c:if test="${counter == 1}">
+                                             <tr>
+                                                 <td colspan="4" class="text-center py-5 text-muted">
+                                                     <i class="bi bi-folder-x display-4 d-block mb-3" style="color: #ff3366;"></i>
+                                                     No Category Found!
+                                                 </td>
+                                             </tr>
+                                         </c:if>
                                     </c:when>
                                     <c:otherwise>
                                         <tr>

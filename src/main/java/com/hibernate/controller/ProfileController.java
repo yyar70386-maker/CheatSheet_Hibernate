@@ -154,4 +154,115 @@ public class ProfileController {
         }
         return "redirect:/profile?tab=security";
     }
+
+    @org.springframework.web.bind.annotation.PostMapping("/profile/update")
+    public String updateProfile(
+            @org.springframework.web.bind.annotation.RequestParam("fullName") String fullName,
+            @org.springframework.web.bind.annotation.RequestParam("email") String email,
+            @org.springframework.web.bind.annotation.RequestParam(value = "bio", required = false) String bio,
+            HttpSession session,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            User user = userService.findById(currentUser.getId());
+            if (user != null) {
+                user.setFullName(fullName);
+                user.setEmail(email);
+                user.setBio(bio);
+                userService.updateUser(user);
+                
+                // Update session user
+                currentUser.setFullName(fullName);
+                currentUser.setEmail(email);
+                currentUser.setBio(bio);
+                session.setAttribute("currentUser", currentUser);
+                
+                redirectAttributes.addFlashAttribute("message", "Profile details updated successfully.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Failed to update profile: " + e.getMessage());
+        }
+        
+        return "redirect:/profile";
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/profile/upload-avatar")
+    public String uploadAvatar(
+            @org.springframework.web.bind.annotation.RequestParam("avatarFile") org.springframework.web.multipart.MultipartFile avatarFile,
+            HttpSession session,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            try {
+                String uploadDir = "C:/my_project_uploads/";
+                java.io.File dir = new java.io.File(uploadDir);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                String orgName = avatarFile.getOriginalFilename();
+                String ext = "";
+                if (orgName != null && orgName.contains(".")) {
+                    ext = orgName.substring(orgName.lastIndexOf("."));
+                }
+                String newName = java.util.UUID.randomUUID().toString() + ext;
+                java.io.File dest = new java.io.File(dir, newName);
+                avatarFile.transferTo(dest);
+
+                User user = userService.findById(currentUser.getId());
+                if (user != null) {
+                    user.setAvatarPath(newName);
+                    userService.updateUser(user);
+                    
+                    // Update session user
+                    currentUser.setAvatarPath(newName);
+                    session.setAttribute("currentUser", currentUser);
+                    
+                    redirectAttributes.addFlashAttribute("message", "Profile picture updated successfully.");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                redirectAttributes.addFlashAttribute("error", "Failed to upload avatar: " + e.getMessage());
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Please select a file to upload.");
+        }
+        
+        return "redirect:/profile";
+    }
+
+    @GetMapping("/profile/avatar/{filename:.+}")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public org.springframework.http.ResponseEntity<org.springframework.core.io.Resource> getAvatar(@PathVariable String filename) {
+        try {
+            java.nio.file.Path filePath = java.nio.file.Paths.get("C:/my_project_uploads/").resolve(filename).normalize();
+            org.springframework.core.io.Resource resource = new org.springframework.core.io.UrlResource(filePath.toUri());
+            if (resource.exists()) {
+                String contentType = "image/jpeg";
+                if (filename.toLowerCase().endsWith(".png")) {
+                    contentType = "image/png";
+                } else if (filename.toLowerCase().endsWith(".gif")) {
+                    contentType = "image/gif";
+                } else if (filename.toLowerCase().endsWith(".webp")) {
+                    contentType = "image/webp";
+                }
+                return org.springframework.http.ResponseEntity.ok()
+                        .contentType(org.springframework.http.MediaType.parseMediaType(contentType))
+                        .body(resource);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return org.springframework.http.ResponseEntity.notFound().build();
+    }
 }
