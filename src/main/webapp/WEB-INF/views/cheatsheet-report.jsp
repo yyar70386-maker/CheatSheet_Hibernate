@@ -62,7 +62,7 @@
                         <input type="date" name="endDate" class="form-control" value="${param.endDate}">
                     </div>
                     <div class="col-md-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary flex-grow-1" style="background-color: #ff3366 !important; border-color: #ff3366 !important;">
+                        <button type="submit" class="btn btn-primary flex-grow-1" style="background-color: #ff3366 !important; border-color: #ff3366 !important; color: #ffffff !important;">
                             <i class="bi bi-filter me-1"></i> Filter
                         </button>
                         <a href="${pageContext.request.contextPath}/admin/reports/cheatsheet" class="btn btn-outline-secondary">

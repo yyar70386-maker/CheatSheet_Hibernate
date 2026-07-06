@@ -59,6 +59,13 @@
             </li>
 
             <li>
+                <a href="${pageContext.request.contextPath}/admin/reports"
+                   class="nav-link ${param.activePage == 'reports' ? 'active text-white' : 'text-dark'}" style="${param.activePage == 'reports' ? 'background-color: #ff3366;' : ''}">
+                    <i class="bi bi-flag me-2 ${param.activePage == 'reports' ? 'text-white' : 'text-secondary'}"></i> Content Reports
+                </a>
+            </li>
+
+            <li>
                 <a href="${pageContext.request.contextPath}/admin/comments"
                    class="nav-link ${param.activePage == 'comments' ? 'active text-white' : 'text-dark'}" style="${param.activePage == 'comments' ? 'background-color: #ff3366;' : ''}">
                     <i class="bi bi-chat-left-text me-2 ${param.activePage == 'comments' ? 'text-white' : 'text-secondary'}"></i> Comment Management
@@ -72,12 +79,6 @@
                 </a>
             </li>
 
-            <li>
-                <a href="${pageContext.request.contextPath}/admin/notifications"
-                   class="nav-link ${param.activePage == 'notifications' ? 'active text-white' : 'text-dark'}" style="${param.activePage == 'notifications' ? 'background-color: #ff3366;' : ''}">
-                    <i class="bi bi-bell me-2 ${param.activePage == 'notifications' ? 'text-white' : 'text-secondary'}"></i> Notifications
-                </a>
-            </li>
 
             <li>
                 <a href="${pageContext.request.contextPath}/admin/audit-logs"

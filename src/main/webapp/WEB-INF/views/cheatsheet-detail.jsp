@@ -244,6 +244,45 @@
         </div>
     </div>
 
+    <!-- Report Cheatsheet Modal -->
+    <div class="modal fade" id="reportSheetModal" tabindex="-1" aria-labelledby="reportSheetModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                <div class="modal-header" style="border-bottom: 1px solid rgba(0,0,0,0.08); background: linear-gradient(135deg, rgba(255, 51, 102, 0.05), rgba(255, 94, 132, 0.05)); border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                    <h5 class="modal-title fw-bold text-dark" id="reportSheetModalLabel"><i class="bi bi-flag-fill text-danger me-2"></i> Report CheatSheet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="${pageContext.request.contextPath}/reports/create" method="post">
+                    <div class="modal-body p-4">
+                        <input type="hidden" name="targetType" value="CHEATSHEET">
+                        <input type="hidden" name="targetId" value="${sheet.id}">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary small">Reason for Reporting</label>
+                            <select name="reason" class="form-select" required style="border-radius: 8px;">
+                                <option value="" disabled selected>Select a reason...</option>
+                                <option value="Spam">Spam / Misleading</option>
+                                <option value="Inappropriate Content">Inappropriate Content</option>
+                                <option value="Plagiarism / Copyright Violation">Plagiarism / Copyright Violation</option>
+                                <option value="Harassment">Harassment</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary small">Additional Details (Optional)</label>
+                            <textarea name="description" class="form-control" rows="4" placeholder="Please provide details about why you are reporting this content..." style="border-radius: 8px; resize: none;"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid rgba(0,0,0,0.08);">
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                        <button type="submit" class="btn btn-danger px-4" style="background-color: #ff3366; border-color: #ff3366; border-radius: 8px;">Submit Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <jsp:include page="footer.jsp" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -448,5 +487,17 @@
             }
         });
     </script>
+    <c:if test="${not empty message}">
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                Swal.fire({
+                    title: 'Success!',
+                    text: '<c:out value="${message}"/>',
+                    icon: 'success',
+                    confirmButtonColor: '#ff3366'
+                });
+            });
+        </script>
+    </c:if>
 </body>
 </html>

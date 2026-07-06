@@ -67,7 +67,7 @@
         }
 
         /* Buttons */
-        .btn-primary { background-color: #ff3366; border-color: #ff3366; font-weight: 600; padding: 12px 24px; border-radius: 8px; }
+        .btn-primary { background-color: #ff3366; border-color: #ff3366; color: #ffffff !important; font-weight: 600; padding: 12px 24px; border-radius: 8px; }
         .btn-primary:hover { background-color: #e62e5c; border-color: #e62e5c; }
         .btn-secondary { background-color: #e2e8f0; border-color: #e2e8f0; color: #495057; font-weight: 600; padding: 12px 24px; border-radius: 8px; }
         .btn-secondary:hover { background-color: #cbd5e1; border-color: #cbd5e1; color: #1e293b; }

@@ -152,4 +152,9 @@ public class CommentServiceImpl {
     public long countAll() {
         return commentRepo.countAll();
     }
+
+    @Transactional
+    public CommentEntity getCommentById(Integer id) {
+        return commentRepo.getById(id);
+    }
 }

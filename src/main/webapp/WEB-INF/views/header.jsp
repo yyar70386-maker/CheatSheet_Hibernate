@@ -102,21 +102,21 @@
         border-color: #e62e5c !important;
         color: #fff !important;
     }
-    .btn-outline-primary {
+    .custom-navbar .btn-outline-primary {
         color: #ffffff;
         border-color: rgba(255, 255, 255, 0.6);
     }
-    .btn-outline-primary:hover {
+    .custom-navbar .btn-outline-primary:hover {
         background-color: #ffffff;
         color: #ff3366;
         border-color: #ffffff;
     }
-    .btn-primary {
+    .custom-navbar .btn-primary {
         background-color: #ffffff;
         border-color: #ffffff;
         color: #ff3366 !important;
     }
-    .btn-primary:hover {
+    .custom-navbar .btn-primary:hover {
         background-color: rgba(255, 255, 255, 0.9);
         border-color: rgba(255, 255, 255, 0.9);
         color: #e62e5c !important;

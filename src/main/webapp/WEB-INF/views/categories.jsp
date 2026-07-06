@@ -47,7 +47,7 @@
         }
         
         /* Custom Admin Pink/White Theme Overrides */
-        .btn-primary { background-color: #ff3366 !important; border-color: #ff3366 !important; }
+        .btn-primary { background-color: #ff3366 !important; border-color: #ff3366 !important; color: #ffffff !important; }
         .btn-primary:hover { background-color: #e62e5c !important; border-color: #e62e5c !important; }
         .btn-outline-primary { color: #ff3366 !important; border-color: #ff3366 !important; }
         .btn-outline-primary:hover { background-color: #ff3366 !important; color: white !important; }

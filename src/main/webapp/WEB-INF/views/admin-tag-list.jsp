@@ -103,7 +103,7 @@
                                                         <i class="bi bi-pencil-square me-1"></i>Edit
                                                     </a>
                                                     <a class="btn btn-sm btn-outline-danger px-3 fw-bold" style="border-radius: 6px;"
-                                                       href="${pageContext.request.contextPath}/category/delete/${t.id}"
+                                                       href="${pageContext.request.contextPath}/tag/delete/${t.id}"
                                                        onclick="return confirm('Are you sure you want to delete this tag?');">
                                                         <i class="bi bi-trash3-fill me-1"></i>Delete
                                                     </a>
