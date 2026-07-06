@@ -186,34 +186,37 @@
                                                             </form>
                                                         </c:if>
                                                         
-                                                        <%-- Ban / Restore Actions --%>
-                                                        <c:choose>
-                                                            <c:when test="${s.banned}">
-                                                                <form method="post" action="${pageContext.request.contextPath}/admin/cheatsheets/${s.id}/restore" class="d-inline">
-                                                                    <button type="submit" class="btn btn-sm btn-info text-white rounded-2 px-3 py-1">
-                                                                        <i class="bi bi-arrow-counterclockwise"></i> Restore
-                                                                    </button>
-                                                                </form>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <button type="button" class="btn btn-sm btn-warning rounded-2 px-3 py-1" onclick="openBanModal(${s.id}, '${s.title}')">
-                                                                    <i class="bi bi-slash-circle me-1"></i> Ban
-                                                                </button>
-                                                            </c:otherwise>
-                                                        </c:choose>
-
-                                                        <c:choose>
-                                                            <c:when test="${s.author != null && s.author.role != 1}">
-                                                                <span class="badge text-bg-light border align-self-center">User-created: Ban/Restore only</span>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <form method="post" action="${pageContext.request.contextPath}/admin/cheatsheets/${s.id}/delete" class="d-inline" onsubmit="return confirm('Delete CheatSheet permanently?');">
-                                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-2 px-3 py-1">
-                                                                        <i class="bi bi-trash3-fill"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </c:otherwise>
-                                                        </c:choose>
+                                                         <c:choose>
+                                                             <%-- Case 1: Own post - Edit & Delete --%>
+                                                             <c:when test="${s.author != null && s.author.id == sessionScope.currentUser.id}">
+                                                                 <a href="${pageContext.request.contextPath}/cheatsheet/edit/${s.obfuscatedId}" class="btn btn-sm btn-outline-primary rounded-2 px-3 py-1">
+                                                                     <i class="bi bi-pencil-square"></i> Edit
+                                                                 </a>
+                                                                 <form method="post" action="${pageContext.request.contextPath}/admin/cheatsheets/${s.id}/delete" class="d-inline" onsubmit="return confirm('Delete CheatSheet permanently?');">
+                                                                     <button type="submit" class="btn btn-sm btn-outline-danger rounded-2 px-3 py-1">
+                                                                         <i class="bi bi-trash3-fill"></i> Delete
+                                                                     </button>
+                                                                 </form>
+                                                             </c:when>
+                                                             
+                                                             <%-- Case 2: Other user's post - Ban / Restore only --%>
+                                                             <c:otherwise>
+                                                                 <c:choose>
+                                                                     <c:when test="${s.banned}">
+                                                                         <form method="post" action="${pageContext.request.contextPath}/admin/cheatsheets/${s.id}/restore" class="d-inline">
+                                                                             <button type="submit" class="btn btn-sm btn-info text-white rounded-2 px-3 py-1">
+                                                                                 <i class="bi bi-arrow-counterclockwise"></i> Restore
+                                                                             </button>
+                                                                         </form>
+                                                                     </c:when>
+                                                                     <c:otherwise>
+                                                                         <button type="button" class="btn btn-sm btn-warning rounded-2 px-3 py-1" onclick="openBanModal(${s.id}, '${s.title}')">
+                                                                             <i class="bi bi-slash-circle me-1"></i> Ban
+                                                                         </button>
+                                                                     </c:otherwise>
+                                                                 </c:choose>
+                                                             </c:otherwise>
+                                                         </c:choose>
                                                         
                                                     </div>
                                                 </td>

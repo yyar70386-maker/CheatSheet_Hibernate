@@ -98,7 +98,12 @@ public class ProfileController {
         model.addAttribute("followersCount", userFollowService.getFollowersCount(userId));
         model.addAttribute("followingCount", userFollowService.getFollowingCount(userId));
 
-        List<CheatsheetEntity> targetCheatSheets = cheatsheetService.findByUserId(userId);
+        List<String> visibilities = new java.util.ArrayList<>();
+        visibilities.add("PUBLIC");
+        if (currentUser != null && userFollowService.isFollowing(currentUser.getId(), userId)) {
+            visibilities.add("FRIEND-ONLY");
+        }
+        List<CheatsheetEntity> targetCheatSheets = cheatsheetService.findByUserIdAndVisibility(userId, visibilities);
         model.addAttribute("cheatSheetsList", targetCheatSheets);
         model.addAttribute("cheatsheetlist", targetCheatSheets);
 

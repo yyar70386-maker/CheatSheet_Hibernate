@@ -207,6 +207,15 @@ textarea{
         </div>
 
         <div class="form-group">
+            <label>Publish Status</label>
+
+            <form:select path="status" cssClass="form-control">
+                <form:option value="active">Public Post</form:option>
+                <form:option value="draft">Draft Post</form:option>
+            </form:select>
+        </div>
+
+        <div class="form-group">
             <label>Tags</label>
 
             <div id="tagContainer">

@@ -80,7 +80,7 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
 
     @Override
     public List<CheatsheetEntity> findByUserId(Integer userId) {
-        String hql = "select distinct c from CheatsheetEntity c left join fetch c.tags left join fetch c.author where c.author.id = :userId and c.status='active' order by c.id desc";
+        String hql = "select distinct c from CheatsheetEntity c left join fetch c.tags left join fetch c.author where c.author.id = :userId and c.status in ('active', 'draft') order by c.id desc";
         return getSession().createQuery(hql, CheatsheetEntity.class).setParameter("userId", userId).list();
     }
     
@@ -96,6 +96,7 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
             old.setViewCount(cheatsheet.getViewCount()); 
             old.setDownloadCount(cheatsheet.getDownloadCount()); 
             old.setVisibility(cheatsheet.getVisibility()); 
+            old.setStatus(cheatsheet.getStatus());
             if (cheatsheet.getAuthor() != null) old.setAuthor(cheatsheet.getAuthor());
             getSession().update(old);
         }

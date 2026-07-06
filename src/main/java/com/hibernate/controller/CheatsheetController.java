@@ -282,7 +282,7 @@ public class CheatsheetController {
             }
         }
         CheatsheetEntity sheet = cheatsheetService.findById(id);
-        if (sheet == null || !"active".equals(sheet.getStatus())) {
+        if (sheet == null || "inactive".equalsIgnoreCase(sheet.getStatus())) {
             return new ModelAndView("redirect:/error/404"); 
         }
 
@@ -290,8 +290,12 @@ public class CheatsheetController {
         Integer currentUserId = (currentUser != null) ? currentUser.getId() : 0;
         Integer authorId = (sheet.getAuthor() != null) ? sheet.getAuthor().getId() : -1;
 
-        boolean isPrivate = "PRIVATE".equalsIgnoreCase(sheet.getVisibility());
         boolean isOwner = currentUserId.equals(authorId);
+        if (!"active".equalsIgnoreCase(sheet.getStatus()) && !isOwner) {
+            return new ModelAndView("redirect:/error/404");
+        }
+
+        boolean isPrivate = "PRIVATE".equalsIgnoreCase(sheet.getVisibility());
 
         if (!isPrivate && !isOwner) {
             int currentViews = (sheet.getViewCount() != null) ? sheet.getViewCount() : 0;

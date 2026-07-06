@@ -256,11 +256,6 @@
             </ul>
             
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
-                <li class="nav-item me-2">
-                    <button class="btn btn-link nav-link text-white d-flex align-items-center" id="themeToggleBtn" type="button" style="border: none; background: transparent; box-shadow: none;">
-                        <i class="bi bi-moon-fill fs-5" id="themeIcon"></i>
-                    </button>
-                </li>
                 <c:choose>
                     <%-- ==================== 🔓 CASE 1: USER IS NOT LOGGED IN ==================== --%>
                     <c:when test="${empty sessionScope.currentUser}">
@@ -476,39 +471,4 @@
         }
     </script>
 </c:if>
-
-<script>
-    (function() {
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        const themeIcon = document.getElementById('themeIcon');
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        
-        if (currentTheme === 'dark') {
-            document.body.classList.add('dark-mode');
-            if (themeIcon) {
-                themeIcon.classList.remove('bi-moon-fill');
-                themeIcon.classList.add('bi-sun-fill');
-            }
-        }
-        
-        if (themeToggleBtn) {
-            themeToggleBtn.addEventListener('click', function() {
-                document.body.classList.toggle('dark-mode');
-                let theme = 'light';
-                if (document.body.classList.contains('dark-mode')) {
-                    theme = 'dark';
-                    if (themeIcon) {
-                        themeIcon.classList.remove('bi-moon-fill');
-                        themeIcon.classList.add('bi-sun-fill');
-                    }
-                } else {
-                    if (themeIcon) {
-                        themeIcon.classList.remove('bi-sun-fill');
-                        themeIcon.classList.add('bi-moon-fill');
-                    }
-                }
-                localStorage.setItem('theme', theme);
-            });
-        }
-    })();
-</script>
+

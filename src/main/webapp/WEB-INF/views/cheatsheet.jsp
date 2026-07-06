@@ -176,8 +176,7 @@
 
     <form:form modelAttribute="cheatsheet" action="${pageContext.request.contextPath}/cheatsheet/save" method="post" id="createForm" enctype="multipart/form-data">
         
-        <!-- Hidden visibility attribute -->
-        <form:hidden path="visibility" id="hiddenVisibility" value="PUBLIC" />
+        <!-- Publication settings managed via select dropdowns below -->
 
         <!-- Main Two Column Layout -->
         <div class="row g-4">
@@ -216,6 +215,27 @@
                 </div>
 
                 <div class="glass-box mb-4">
+                    <div class="section-title">Publication Settings</div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label>Visibility</label>
+                            <form:select path="visibility" cssClass="form-select" id="visibilitySelect">
+                                <form:option value="PUBLIC">PUBLIC</form:option>
+                                <form:option value="FRIEND-ONLY">FRIEND-ONLY</form:option>
+                                <form:option value="PRIVATE">PRIVATE</form:option>
+                            </form:select>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Publish Status</label>
+                            <form:select path="status" cssClass="form-select" id="statusSelect">
+                                <form:option value="active">Public Post</form:option>
+                                <form:option value="draft">Draft Post</form:option>
+                            </form:select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-box mb-4">
                     <div class="section-title">Tags Association Hub</div>
                     <div id="tagContainer" class="mb-2">
                         <span class="text-muted small">Select category first to see available tags.</span>
@@ -232,8 +252,8 @@
 
                 <!-- Form Submit Actions -->
                 <div class="d-flex gap-3 mb-5">
-                    <button type="button" class="btn btn-secondary w-50" onclick="submitForm('PRIVATE')">Save as Draft</button>
-                    <button type="button" class="btn btn-primary w-50" onclick="submitForm('PUBLIC')">Publish Cheatsheet</button>
+                    <a href="${pageContext.request.contextPath}/cheatsheet/list" class="btn btn-secondary w-50 d-flex align-items-center justify-content-center">Cancel</a>
+                    <button type="button" class="btn btn-primary w-50" onclick="submitForm()">Save Cheatsheet</button>
                 </div>
 
             </div>
@@ -303,9 +323,7 @@
     });
 
     // Handle Form Submission
-    function submitForm(visibility) {
-        document.getElementById('hiddenVisibility').value = visibility;
-        
+    function submitForm() {
         const titleVal = titleInput.value.trim();
         const categoryVal = categorySelect.value;
         const contentVal = contentInput.value.trim();
