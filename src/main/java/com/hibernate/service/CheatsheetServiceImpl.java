@@ -28,7 +28,6 @@ public class CheatsheetServiceImpl implements CheatsheetService {
     @Override
     @Transactional(readOnly = true)
     public List<CheatsheetEntity> findByUserIdAndVisibility(Integer userId, List<String> visibilities) {
-        // Core Hibernate Repository implementation ဆီသို့ ဒေတာစာရင်း လှမ်းပို့ပေးခြင်း
         return cheatsheetRepository.findByUserIdAndVisibilityList(userId, visibilities);
     }
 
@@ -60,6 +59,12 @@ public class CheatsheetServiceImpl implements CheatsheetService {
     @Override
     @Transactional
     public Integer save(CheatsheetEntity cheatsheet) {
+        // 🌟 [ADDED VALIDATION] Title, Description, Content များ ဗလာဖြစ်နေပါက သိမ်းဆည်းခွင့်မပြုရန် တားဆီးခြင်း
+        if (cheatsheet.getTitle() == null || cheatsheet.getTitle().trim().isEmpty() ||
+            cheatsheet.getDescription() == null || cheatsheet.getDescription().trim().isEmpty() ||
+            cheatsheet.getContent() == null || cheatsheet.getContent().trim().isEmpty()) {
+            throw new RuntimeException("Required fields (Title, Description, Content) cannot be empty!");
+        }
         return cheatsheetRepository.save(cheatsheet);
     }
 
@@ -78,6 +83,12 @@ public class CheatsheetServiceImpl implements CheatsheetService {
     @Override
     @Transactional
     public void update(CheatsheetEntity cheatsheet) {
+        // 🌟 [ADDED VALIDATION] Update ပြုလုပ်သည့်အခါတွင်လည်း ဒေတာအလွတ်များ ဝင်မလာစေရန် စစ်ဆေးခြင်း
+        if (cheatsheet.getTitle() == null || cheatsheet.getTitle().trim().isEmpty() ||
+            cheatsheet.getDescription() == null || cheatsheet.getDescription().trim().isEmpty() ||
+            cheatsheet.getContent() == null || cheatsheet.getContent().trim().isEmpty()) {
+            throw new RuntimeException("Required fields (Title, Description, Content) cannot be empty!");
+        }
         cheatsheetRepository.update(cheatsheet);
     }
 

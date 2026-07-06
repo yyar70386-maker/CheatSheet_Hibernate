@@ -32,7 +32,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
     @Override
     public List<CategoryEntity> findAllActive() {
-        
+        // 🌟 Controller ကနေ လှမ်းခေါ်သုံးထားတဲ့ Active သီးသန့်ဆွဲထုတ်မည့် Query ဖြစ်ပါတယ်
         return getSession()
                 .createQuery("from CategoryEntity where status='ACTIVE'", CategoryEntity.class)
                 .getResultList(); 
@@ -45,8 +45,6 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
     @Override
     public CategoryEntity findByName(String name) {
-        // 📌 ပြင်ဆင်ချက် (၂): ပြီးခဲ့တဲ့အဆင့်က Interface ထဲမှာ ထည့်သွင်းခဲ့တဲ့ findByName(name) ကို 
-        // uniqueResult() သုံးပြီး အခုလို အပြည့်အစုံ Implement လုပ်ပေးလိုက်ပါတယ်ဗျာ။
         try {
             return getSession()
                     .createQuery("from CategoryEntity where name = :name", CategoryEntity.class)
@@ -63,7 +61,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
         if (oldCategory != null) {
             oldCategory.setName(category.getName());
-            oldCategory.setStatus(category.getStatus()); // 📌 Name ရော Status ပါ ပြောင်းလဲနိုင်အောင် ထည့်ပေးထားပါတယ်
+            oldCategory.setStatus(category.getStatus()); 
             getSession().update(oldCategory);
         }
     }
@@ -73,8 +71,6 @@ public class CategoryRepositoryImpl implements CategoryRepository {
         CategoryEntity category = findById(id);
 
         if (category != null) {
-            // 📌 ပြင်ဆင်ချက် (၃): UI ဘက်က Badge (INACTIVE) စာလုံးကြီးတွေနဲ့ တိုက်ရိုက် ကိုက်ညီသွားအောင် 
-            // "inactive" နေရာမှာ "INACTIVE" (စာလုံးကြီး) သို့ ပြောင်းလဲပေးလိုက်ပါတယ်ဗျာ။
             category.setStatus("INACTIVE");
             getSession().update(category);
             getSession().flush();

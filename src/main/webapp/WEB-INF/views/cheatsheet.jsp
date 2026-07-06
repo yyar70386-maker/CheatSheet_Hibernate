@@ -125,9 +125,10 @@
                         <form:input path="title" cssClass="form-control" id="titleInput" placeholder="Enter title" required="true" />
                     </div>
 
+                    <!-- 🌟 [UPDATED] Description အား Frontend တွင် required="true" ဖြည့်စွက်ခြင်း -->
                     <div class="mb-3">
                         <label>Description</label>
-                        <form:textarea path="description" cssClass="form-control" rows="3" placeholder="Write a short cheatsheet description..." />
+                        <form:textarea path="description" cssClass="form-control" id="descriptionInput" rows="3" placeholder="Write a short cheatsheet description..." required="true" />
                     </div>
                 </div>
 
@@ -187,6 +188,7 @@
 
     const titleInput = document.getElementById('titleInput');
     const categorySelect = document.getElementById('categorySelect');
+    const descriptionInput = document.getElementById('descriptionInput');
     const contentInput = document.getElementById('contentInput');
 
     categorySelect.addEventListener('change', function() {
@@ -207,6 +209,7 @@
     function submitForm() {
         const titleVal = titleInput.value.trim();
         const categoryVal = categorySelect.value;
+        const descriptionVal = descriptionInput.value.trim();
         const contentVal = contentInput.value.trim();
         
         if(!categoryVal) {
@@ -215,6 +218,11 @@
         }
         if(!titleVal) {
             alert('Please enter a Title.');
+            return;
+        }
+        /* 🌟 [UPDATED JS VALIDATION] Description ဗလာဖြစ်နေပါက တားဆီးရန် */
+        if(!descriptionVal) {
+            alert('Please enter a Description.');
             return;
         }
         if(!contentVal) {
