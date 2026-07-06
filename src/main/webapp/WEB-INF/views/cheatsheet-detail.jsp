@@ -17,8 +17,24 @@
         .detail-container { max-width: 900px; margin: 60px auto; padding: 0 20px; }
         .sheet-title { font-size: 48px; font-weight: 800; color: #1a1a1a; display: inline-block; }
         .author-text { font-size: 22px; color: #555; font-weight: bold; margin-left: 10px; }
-        .description-text { font-size: 18px; color: #333; margin-top: 25px; margin-bottom: 35px; line-height: 1.6; }
+        .description-text { font-size: 18px; color: #333; margin-top: 25px; margin-bottom: 25px; line-height: 1.6; }
         
+        /* Screenshot 2026-07-06 at 12.49.58.jpg ပါ ပုံစံအတိုင်း ပုံ Size နှင့် Card Box ကို ပြင်ဆင်ထားခြင်း */
+        .sheet-cover-box {
+            max-width: 320px;
+            background: #fff;
+            padding: 12px;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .sheet-cover-img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
         .code-container-box { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 20px; padding: 25px 30px; margin-bottom: 35px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); }
         .plain-code-text { font-family: 'Courier New', Courier, monospace; font-size: 18px; line-height: 1.5; color: #1a1a1a; margin: 0; white-space: pre-wrap; word-break: break-all; }
         
@@ -32,7 +48,6 @@
         .btn-heart:hover, .btn-heart.active { background: #fff0f1; color: #ff3366; border-color: #ff3366; }
         .btn-like:hover, .btn-like.active { background: #e0fbfc; color: #ff3366; border-color: #ff3366; }
         .btn-dislike:hover, .btn-dislike.active { background: #fae0e4; color: #d62828; border-color: #d62828; }
-
         .comment-section { margin-top: 50px; }
         .comment-box { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(16px); padding: 20px; border-radius: 20px; margin-bottom: 15px; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
         .reply-box { margin-left: 50px; border-left: 3px solid #ff3366; background: rgba(255, 255, 255, 0.3); }
@@ -52,13 +67,6 @@
 
     <div class="detail-container">
         
-        <%-- Cover Photo --%>
-        <c:if test="${not empty sheet.imagePath}">
-            <div class="mb-4 text-center">
-                <img src="${pageContext.request.contextPath}${sheet.imagePath}" alt="${sheet.title}" class="img-fluid rounded shadow-sm" style="max-height: 400px; object-fit: cover; width: 100%;">
-            </div>
-        </c:if>
-
         <%-- Title & Author --%>
         <div>
             <h1 class="sheet-title">${sheet.title}</h1>
@@ -83,6 +91,15 @@
         <p class="description-text">
             ${sheet.description}
         </p>
+
+        <%-- Cover Photo (Description ၏ အောက်ဘက်သို ရွှေ့ပြောင်းပြီး Size ညှိထားပါသည်) --%>
+        <c:if test="${not empty sheet.imagePath}">
+            <div class="mb-4">
+                <div class="sheet-cover-box">
+                    <img src="${pageContext.request.contextPath}${sheet.imagePath}" alt="${sheet.title}" class="sheet-cover-img">
+                </div>
+            </div>
+        </c:if>
 
         <div class="code-container-box">
             <pre class="plain-code-text"><c:out value="${sheet.content}" /></pre>
@@ -111,7 +128,6 @@
                     <button type="button" id="sheetDislikeBtn" onclick="reactSheetJS(false)" class="action-btn btn-dislike ${userSheetLike == false ? 'active' : ''}">
                         <i class="fa-solid fa-thumbs-down"></i> <span id="sheetDislikeCount">${sheetDislikes != null ? sheetDislikes : 0}</span>
                     </button>
-
                     <div class="vr mx-2"></div> 
                     
                     <div class="d-flex align-items-center">
@@ -132,15 +148,13 @@
 
                     <div class="vr mx-2"></div>
 
-                    <div class="ms-auto d-flex align-items-center gap-2">
-                        <button type="button" id="shareBtn" onclick="shareCheatsheetJS()" class="btn btn-sm btn-primary fw-bold px-3">
-                            <i class="bi bi-share-fill me-1"></i> <span id="shareBtnText">Share</span>
-                        </button>
-                        
-                        <button type="button" class="action-btn text-danger" data-bs-toggle="modal" data-bs-target="#reportSheetModal">
-                            <i class="bi bi-flag"></i> Report
-                        </button>
-                    </div>
+                    <button type="button" id="shareBtn" onclick="shareCheatsheetJS()" class="btn btn-sm btn-primary fw-bold px-3 me-2">
+                        <i class="bi bi-share-fill me-1"></i> <span id="shareBtnText">Share</span>
+                    </button>
+                    
+                    <button type="button" class="action-btn text-danger ms-auto" data-bs-toggle="modal" data-bs-target="#reportSheetModal">
+                        <i class="bi bi-flag"></i> Report
+                    </button>
                 </c:when>
 
                 <c:otherwise>
@@ -170,7 +184,6 @@
                 <c:if test="${empty commentsList}">
                     <p id="noCommentsMsg" class="text-muted text-center py-4">No comments yet. Be the first to start the conversation!</p>
                 </c:if>
-
                 <c:forEach items="${commentsList}" var="comment">
                     <c:if test="${comment.parentComment == null}">
                         
@@ -201,7 +214,6 @@
                                         <div class="comment-box reply-box">
                                             <div class="comment-author"><i class="fa-solid fa-reply text-info me-1"></i> ${reply.user.username} <span class="text-muted fw-normal" style="font-size:12px;">replied to ${comment.user.username}</span></div>
                                             <div class="comment-text">${reply.content}</div>
-
                                             <div class="mt-2">
                                                 <c:if test="${not empty sessionScope.currentUser}">
                                                     <button type="button" id="cLikeBtn_${reply.id}" onclick="reactCommentJS(${reply.id}, true)" class="btn btn-sm btn-link text-decoration-none p-0 me-2 ${reply.currentUserReaction == true ? 'text-primary fw-bold' : 'text-muted'}"><i class="bi bi-hand-thumbs-up-fill"></i> <span id="cLikeCount_${reply.id}">${reply.likeCount}</span></button>
@@ -232,56 +244,6 @@
         </div>
     </div>
 
-    <!-- Report Sheet Modal -->
-    <div class="modal fade" id="reportSheetModal" tabindex="-1" aria-labelledby="reportSheetModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="${pageContext.request.contextPath}/reports/create" method="POST">
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bold" id="reportSheetModalLabel">Report Cheatsheet</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="targetType" value="CHEATSHEET">
-                        <input type="hidden" name="targetId" value="${sheet.id}">
-                        
-                        <p class="mb-3 text-muted small">Please select a reason for reporting this cheatsheet:</p>
-                        
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="reason" id="reasonSpam" value="Spam" required>
-                            <label class="form-check-label" for="reasonSpam">Spam</label>
-                        </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="reason" id="reasonPlagiarism" value="Plagiarism">
-                            <label class="form-check-label" for="reasonPlagiarism">Plagiarism</label>
-                        </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="reason" id="reasonInappropriate" value="Inappropriate Content">
-                            <label class="form-check-label" for="reasonInappropriate">Inappropriate Content</label>
-                        </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="reason" id="reasonHarassment" value="Harassment">
-                            <label class="form-check-label" for="reasonHarassment">Harassment</label>
-                        </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="radio" name="reason" id="reasonOther" value="Other">
-                            <label class="form-check-label" for="reasonOther">Other</label>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="reportDescription" class="form-label fw-bold">Additional Details (Optional)</label>
-                            <textarea class="form-control" name="description" id="reportDescription" rows="3" placeholder="Please provide any additional details..."></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger">Submit Report</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <jsp:include page="footer.jsp" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -296,7 +258,6 @@
             if (currentUserId === 0) { alert("Please login first!"); return false; }
             return true;
         }
-
         function toggleFavJS(btn) {
             if (!checkLogin()) return;
             fetch(contextPath + '/favorite/toggle', {method: 'POST', body: new URLSearchParams({userId: currentUserId, cheatSheetId: currentSheetId})})
@@ -341,7 +302,6 @@
                 }
             }).catch(err => alert("Action failed: " + err.message));
         }
-
         function submitRatingJS(ratingValue) {
             if (!checkLogin()) return;
             if(!ratingValue) {
@@ -387,7 +347,6 @@
             const input = document.getElementById('mainCommentContent');
             const content = input.value.trim();
             if (content === "") { alert("Comment cannot be empty!"); return; }
-
             fetch(contextPath + '/interaction/comment', {method: 'POST', body: new URLSearchParams({userId: currentUserId, cheatSheetId: currentSheetId, content: content})})
             .then(res => { if(!res.ok) throw new Error("Server error"); return res.json(); })
             .then(data => {
@@ -426,7 +385,6 @@
             const input = document.getElementById('replyInput_' + parentId);
             const content = input.value.trim();
             if (content === "") { alert("Reply cannot be empty!"); return; }
-
             fetch(contextPath + '/interaction/comment', {method: 'POST', body: new URLSearchParams({userId: currentUserId, cheatSheetId: currentSheetId, content: content, parentCommentId: parentId})})
             .then(res => { if(!res.ok) throw new Error("Server error"); return res.json(); })
             .then(data => {

@@ -103,8 +103,9 @@ h3{
 			<label>Username</label>
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-person"></i></span>
-				<input type="text" name="username" class="form-control" required>
+				<input type="text" id="username" name="username" class="form-control">
 			</div>
+			<div id="usernameError" class="error">Username is required</div>
 		</div>
 
 		<!-- Email -->
@@ -112,7 +113,7 @@ h3{
 			<label>Email</label>
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-envelope"></i></span>
-				<input type="email" id="email" name="email" class="form-control" required>
+				<input type="text" id="email" name="email" class="form-control">
 			</div>
 			<div id="emailError" class="error">Invalid email</div>
 		</div>
@@ -122,7 +123,7 @@ h3{
 			<label>Full Name</label>
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-card-text"></i></span>
-				<input type="text" id="fullName" name="fullName" class="form-control" required>
+				<input type="text" id="fullName" name="fullName" class="form-control">
 			</div>
 			<div id="nameError" class="error">Only letters allowed</div>
 		</div>
@@ -138,19 +139,18 @@ h3{
 					   id="password"
 					   name="password"
 					   class="form-control"
-					   placeholder="Hover to auto-generate"
-					   required>
+					   placeholder="Hover to auto-generate">
 
 				<button type="button"
-						class="btn btn-outline-secondary"
-						onclick="togglePassword()">
+					   class="btn btn-outline-secondary"
+					   onclick="togglePassword()">
 
 					<i class="bi bi-eye" id="eyeIcon"></i>
 
 				</button>
 			</div>
 
-			<div id="passwordError" class="error">Min 8 characters</div>
+			<div id="passwordError" class="error">Min 6 characters, numbers and letters only</div>
 		</div>
 
 		<!-- Confirm -->
@@ -163,11 +163,10 @@ h3{
 				<input type="password"
 					   id="confirmPassword"
 					   name="confirmPassword"
-					   class="form-control"
-					   required>
+					   class="form-control">
 			</div>
 
-			<div id="matchError" class="error">Password not match</div>
+			<div id="matchError" class="error">Password does not match</div>
 		</div>
 
 		<!-- Buttons -->
@@ -190,6 +189,15 @@ h3{
 
 const pass=document.getElementById("password");
 const confirm=document.getElementById("confirmPassword");
+const username=document.getElementById("username");
+const email=document.getElementById("email");
+const fullName=document.getElementById("fullName");
+
+const usernameError=document.getElementById("usernameError");
+const emailError=document.getElementById("emailError");
+const nameError=document.getElementById("nameError");
+const passwordError=document.getElementById("passwordError");
+const matchError=document.getElementById("matchError");
 
 let done=false;
 
@@ -208,24 +216,25 @@ function generateOnce(){
 
 	pass.type="text";
 	confirm.type="text";
+	
+	// Trigger live validation immediately after generation
+	validatePasswordLive();
+	validateConfirmPasswordLive();
 }
 
 function generate(){
-
 	const u="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	const l="abcdefghijklmnopqrstuvwxyz";
 	const n="0123456789";
-	const s="!@#$%^&*()";
 
-	let all=u+l+n+s;
+	let all=u+l+n;
 	let p="";
 
 	p+=u[Math.floor(Math.random()*u.length)];
 	p+=l[Math.floor(Math.random()*l.length)];
 	p+=n[Math.floor(Math.random()*n.length)];
-	p+=s[Math.floor(Math.random()*s.length)];
 
-	for(let i=0;i<6;i++){
+	for(let i=0;i<5;i++){
 		p+=all[Math.floor(Math.random()*all.length)];
 	}
 
@@ -237,17 +246,106 @@ pass.addEventListener("input",()=>{
 	pass.type="password";
 	confirm.type="password";
 	done=true;
+	validatePasswordLive();
 });
 
 confirm.addEventListener("input",()=>{
 	confirm.type="password";
+	validateConfirmPasswordLive();
 });
+
+username.addEventListener("input", validateUsernameLive);
+email.addEventListener("input", validateEmailLive);
+fullName.addEventListener("input", validateFullNameLive);
+
+// Live Validation Functions
+function validateUsernameLive() {
+	const val = username.value.trim();
+	if (val === "") {
+		usernameError.innerText = "Username is required";
+		usernameError.style.display = "block";
+		return false;
+	} else if (!/^[a-zA-Z0-9_]{3,20}$/.test(val)) {
+		usernameError.innerText = "Min 3 characters, alphanumeric & underscores only";
+		usernameError.style.display = "block";
+		return false;
+	} else {
+		usernameError.style.display = "none";
+		return true;
+	}
+}
+
+function validateEmailLive() {
+	const val = email.value.trim();
+	if (val === "") {
+		emailError.innerText = "Email is required";
+		emailError.style.display = "block";
+		return false;
+	} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+		emailError.innerText = "Invalid email format";
+		emailError.style.display = "block";
+		return false;
+	} else {
+		emailError.style.display = "none";
+		return true;
+	}
+}
+
+function validateFullNameLive() {
+	const val = fullName.value.trim();
+	if (val === "") {
+		nameError.innerText = "Full Name is required";
+		nameError.style.display = "block";
+		return false;
+	} else if (!/^[a-zA-Z\s]+$/.test(val)) {
+		nameError.innerText = "Only letters and spaces allowed";
+		nameError.style.display = "block";
+		return false;
+	} else {
+		nameError.style.display = "none";
+		return true;
+	}
+}
+
+function validatePasswordLive() {
+	const val = pass.value;
+	if (val === "") {
+		passwordError.innerText = "Password is required";
+		passwordError.style.display = "block";
+		return false;
+	} else if (val.length < 6) {
+		passwordError.innerText = "Password must be at least 6 characters";
+		passwordError.style.display = "block";
+		return false;
+	} else if (!/^[a-zA-Z0-9]+$/.test(val)) {
+		passwordError.innerText = "Letters and numbers only. Special characters not allowed";
+		passwordError.style.display = "block";
+		return false;
+	} else {
+		passwordError.style.display = "none";
+		return true;
+	}
+}
+
+function validateConfirmPasswordLive() {
+	const val = confirm.value;
+	if (val === "") {
+		matchError.innerText = "Confirm password is required";
+		matchError.style.display = "block";
+		return false;
+	} else if (pass.value !== val) {
+		matchError.innerText = "Passwords do not match";
+		matchError.style.display = "block";
+		return false;
+	} else {
+		matchError.style.display = "none";
+		return true;
+	}
+}
 
 // toggle show/hide
 function togglePassword(){
-
 	const eye=document.getElementById("eyeIcon");
-
 	if(pass.type==="password"){
 		pass.type="text";
 		confirm.type="text";
@@ -259,45 +357,15 @@ function togglePassword(){
 	}
 }
 
-// validation
+// Form Submission validation
 function validateForm(){
+	let isUsernameValid = validateUsernameLive();
+	let isEmailValid = validateEmailLive();
+	let isFullNameValid = validateFullNameLive();
+	let isPasswordValid = validatePasswordLive();
+	let isConfirmValid = validateConfirmPasswordLive();
 
-	let ok=true;
-
-	const email=document.getElementById("email").value;
-	const full=document.getElementById("fullName").value;
-
-	const emailError=document.getElementById("emailError");
-	const nameError=document.getElementById("nameError");
-	const passwordError=document.getElementById("passwordError");
-	const matchError=document.getElementById("matchError");
-
-	emailError.style.display="none";
-	nameError.style.display="none";
-	passwordError.style.display="none";
-	matchError.style.display="none";
-
-	if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-		emailError.style.display="block";
-		ok=false;
-	}
-
-	if(!/^[a-zA-Z\s]+$/.test(full)){
-		nameError.style.display="block";
-		ok=false;
-	}
-
-	if(pass.value.length<8){
-		passwordError.style.display="block";
-		ok=false;
-	}
-
-	if(pass.value!==confirm.value){
-		matchError.style.display="block";
-		ok=false;
-	}
-
-	return ok;
+	return isUsernameValid && isEmailValid && isFullNameValid && isPasswordValid && isConfirmValid;
 }
 
 </script>

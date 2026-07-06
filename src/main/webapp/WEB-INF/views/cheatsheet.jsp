@@ -66,89 +66,11 @@
             margin-bottom: 20px;
         }
 
-        /* Liquid Glass Card (Preview) */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, rgba(255,51,102,0.1) 0%, rgba(255,255,255,0) 100%);
-            z-index: -1;
-        }
-
-        .terminal-box {
-            background-color: #1e1e1e;
-            border-radius: 8px;
-            padding: 10px;
-            min-height: 120px;
-            margin-bottom: 15px;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
-            border: 1px dashed rgba(255,255,255,0.2);
-        }
-        .terminal-header {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 8px;
-        }
-        .terminal-dot {
-            width: 10px; height: 10px; border-radius: 50%;
-        }
-        .dot-red { background: #ff5f56; }
-        .dot-yellow { background: #ffbd2e; }
-        .dot-green { background: #27c93f; }
-
         /* Buttons */
         .btn-primary { background-color: #ff3366; border-color: #ff3366; font-weight: 600; padding: 12px 24px; border-radius: 8px; }
         .btn-primary:hover { background-color: #e62e5c; border-color: #e62e5c; }
         .btn-secondary { background-color: #e2e8f0; border-color: #e2e8f0; color: #495057; font-weight: 600; padding: 12px 24px; border-radius: 8px; }
         .btn-secondary:hover { background-color: #cbd5e1; border-color: #cbd5e1; color: #1e293b; }
-        
-        .btn-outline {
-            border: 1px dashed #ced4da;
-            color: #6c757d;
-            background: rgba(255,255,255,0.5);
-            font-weight: 600;
-        }
-        .btn-outline:hover {
-            background: rgba(255,255,255,0.8);
-            border-color: #adb5bd;
-            color: #495057;
-        }
-        .btn-remove {
-            background-color: rgba(255, 51, 102, 0.1);
-            color: #ff3366;
-            border: none;
-            border-radius: 6px;
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .btn-remove:hover {
-            background-color: #ff3366;
-            color: white;
-        }
-
-        /* Tree Builder Sub-box */
-        .builder-box {
-            border: 1px dashed #ced4da;
-            border-radius: 12px;
-            padding: 20px;
-            background: rgba(255,255,255,0.3);
-            margin-bottom: 20px;
-        }
 
         .header-banner {
             background: rgba(255, 255, 255, 0.45);
@@ -159,30 +81,25 @@
             border: 1px solid rgba(255, 255, 255, 0.6);
             border-left: 8px solid #ff3366;
         }
-        
     </style>
 </head>
 <body>
 
 <jsp:include page="header.jsp" />
 
-<div class="container py-5">
+<div class="container py-5" style="max-width: 960px;">
     
     <!-- Top Banner -->
     <div class="header-banner shadow-sm">
         <h2 class="fw-bold text-dark mb-2">Create Cheatsheet</h2>
         <p class="text-muted m-0">Create cheatsheet with category, tags, cover photo and cheatsheet content.</p>
     </div>
-
     <form:form modelAttribute="cheatsheet" action="${pageContext.request.contextPath}/cheatsheet/save" method="post" id="createForm" enctype="multipart/form-data">
         
-        <!-- Publication settings managed via select dropdowns below -->
-
-        <!-- Main Two Column Layout -->
         <div class="row g-4">
             
-            <!-- Left Column: Form Elements -->
-            <div class="col-lg-8">
+            <!-- Full Width Container (12 Columns) -->
+            <div class="col-12">
                 
                 <div class="glass-box mb-4">
                     <div class="section-title">Cheatsheet Information</div>
@@ -249,30 +166,10 @@
                         <form:textarea path="content" cssClass="form-control" id="contentInput" rows="12" placeholder="Write your cheat sheet syntax, code snippets, or documentation details here..." style="font-family: monospace; font-size: 0.95rem; line-height: 1.5;" required="true" />
                     </div>
                 </div>
-
                 <!-- Form Submit Actions -->
                 <div class="d-flex gap-3 mb-5">
                     <a href="${pageContext.request.contextPath}/cheatsheet/list" class="btn btn-secondary w-50 d-flex align-items-center justify-content-center">Cancel</a>
                     <button type="button" class="btn btn-primary w-50" onclick="submitForm()">Save Cheatsheet</button>
-                </div>
-
-            </div>
-
-            <!-- Right Column: Preview & Sticky Details -->
-            <div class="col-lg-4">
-                
-                <div class="glass-card mb-4" id="previewCard" style="position: sticky; top: 90px;">
-                    <div class="terminal-box" style="min-height: 250px;">
-                        <div class="terminal-header">
-                            <div class="terminal-dot dot-red"></div>
-                            <div class="terminal-dot dot-yellow"></div>
-                            <div class="terminal-dot dot-green"></div>
-                        </div>
-                        <div class="text-white small" id="previewContent" style="font-family: monospace; opacity: 0.9; white-space: pre-wrap; font-size: 0.85rem; max-height: 350px; overflow-y: auto;">// Content preview will appear here as you type...</div>
-                    </div>
-                    
-                    <h4 class="fw-bold text-dark mb-1" id="previewTitle">My Cheat Sheet</h4>
-                    <div class="text-muted small mb-2" id="previewCategory">Category: None</div>
                 </div>
 
             </div>
@@ -288,27 +185,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 
-    // Dynamic Preview Updating
     const titleInput = document.getElementById('titleInput');
     const categorySelect = document.getElementById('categorySelect');
     const contentInput = document.getElementById('contentInput');
-    const previewTitle = document.getElementById('previewTitle');
-    const previewCategory = document.getElementById('previewCategory');
-    const previewContent = document.getElementById('previewContent');
-
-    titleInput.addEventListener('input', function() {
-        previewTitle.textContent = this.value || 'My Cheat Sheet';
-    });
-
-    contentInput.addEventListener('input', function() {
-        previewContent.textContent = this.value || '// Content preview will appear here as you type...';
-    });
 
     categorySelect.addEventListener('change', function() {
-        const selectedText = this.options[this.selectedIndex].text;
-        previewCategory.textContent = this.value ? 'Category: ' + selectedText : 'Category: None';
-        
-        // Load tags
         let categoryId = this.value;
         if(categoryId == "") {
             document.getElementById("tagContainer").innerHTML = '<span class="text-muted small">Select category first to see available tags.</span>';

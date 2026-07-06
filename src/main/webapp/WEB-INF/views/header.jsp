@@ -137,90 +137,6 @@
     .custom-navbar .navbar-toggler-icon {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
     }
-
-    /* Dark Mode variables & overrides */
-    body.dark-mode {
-        background: #0f172a !important;
-        background-color: #0f172a !important;
-        color: #f1f5f9 !important;
-    }
-    body.dark-mode .bg-white,
-    body.dark-mode .card,
-    body.dark-mode .glass-card,
-    body.dark-mode .glass-box,
-    body.dark-mode .management-card,
-    body.dark-mode .navbar:not(.custom-navbar),
-    body.dark-mode .admin-sidebar,
-    body.dark-mode .modal-content,
-    body.dark-mode .dropdown-menu {
-        background-color: #1e293b !important;
-        color: #f1f5f9 !important;
-        border-color: #334155 !important;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
-    }
-    body.dark-mode .text-dark,
-    body.dark-mode h1,
-    body.dark-mode h2,
-    body.dark-mode h3,
-    body.dark-mode h4,
-    body.dark-mode h5,
-    body.dark-mode h6 {
-        color: #f8fafc !important;
-    }
-    body.dark-mode .text-muted,
-    body.dark-mode p.text-muted,
-    body.dark-mode span.text-muted {
-        color: #94a3b8 !important;
-    }
-    body.dark-mode .form-control,
-    body.dark-mode .form-select {
-        background-color: #1e293b !important;
-        color: #f1f5f9 !important;
-        border-color: #334155 !important;
-    }
-    body.dark-mode .form-control:focus,
-    body.dark-mode .form-select:focus {
-        background-color: #0f172a !important;
-        border-color: #ff3366 !important;
-    }
-    body.dark-mode .table {
-        color: #f1f5f9 !important;
-        border-color: #334155 !important;
-    }
-    body.dark-mode .table-light {
-        background-color: #334155 !important;
-        color: #f1f5f9 !important;
-    }
-    body.dark-mode .list-group-item {
-        background-color: #1e293b !important;
-        color: #f1f5f9 !important;
-        border-color: #334155 !important;
-    }
-    body.dark-mode .nav-link {
-        color: #cbd5e1 !important;
-    }
-    body.dark-mode .nav-link:hover,
-    body.dark-mode .nav-link.active {
-        color: #ff3366 !important;
-    }
-    body.dark-mode .border,
-    body.dark-mode .border-bottom,
-    body.dark-mode .border-top,
-    body.dark-mode .border-end,
-    body.dark-mode .border-start {
-        border-color: #334155 !important;
-    }
-    body.dark-mode .dropdown-item {
-        color: #f1f5f9 !important;
-    }
-    body.dark-mode .dropdown-item:hover {
-        background-color: #334155 !important;
-    }
-    body.dark-mode .plain-code-text {
-        background-color: #0f172a !important;
-        color: #38bdf8 !important;
-        border-color: #334155 !important;
-    }
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light sticky-top custom-navbar" style="background: linear-gradient(135deg, rgba(255, 51, 102, 0.9), rgba(255, 94, 132, 0.9)); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
@@ -239,17 +155,17 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" href="${pageContext.request.contextPath}/home">
+                    <a class="nav-link ${fn:contains(pageContext.request.requestURI, '/home') || reqUri == '/' ? 'active' : ''}" href="${pageContext.request.contextPath}/home">
                         <i class="bi bi-house-door me-1"></i> Home
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/cheatsheet/list">
+                    <a class="nav-link ${fn:contains(pageContext.request.requestURI, '/list') ? 'active' : ''}" href="${pageContext.request.contextPath}/cheatsheet/list">
                         <i class="bi bi-list-ul me-1"></i> List
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/cheatsheet/add">
+                    <a class="nav-link ${fn:contains(pageContext.request.requestURI, '/add') ? 'active' : ''}" href="${pageContext.request.contextPath}/cheatsheet/add">
                         <i class="bi bi-plus-circle me-1"></i> Create
                     </a>
                 </li>

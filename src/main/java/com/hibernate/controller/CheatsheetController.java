@@ -156,8 +156,18 @@ public class CheatsheetController {
         CheatsheetEntity existingSheet = cheatsheetService.findById(cheatsheet.getId());
         if (existingSheet != null) {
             cheatsheet.setAuthor(existingSheet.getAuthor());
+            cheatsheet.setCreatedAt(existingSheet.getCreatedAt());
+            cheatsheet.setStatus(existingSheet.getStatus());
+            cheatsheet.setBanned(existingSheet.isBanned());
+            cheatsheet.setBannedReason(existingSheet.getBannedReason());
+            cheatsheet.setBannedBy(existingSheet.getBannedBy());
+            cheatsheet.setBannedAt(existingSheet.getBannedAt());
+            cheatsheet.setShareCount(existingSheet.getShareCount());
             if (cheatsheet.getViewCount() == null) {
                 cheatsheet.setViewCount(existingSheet.getViewCount());
+            }
+            if (cheatsheet.getDownloadCount() == null) {
+                cheatsheet.setDownloadCount(existingSheet.getDownloadCount());
             }
             if (imageFile != null && !imageFile.isEmpty()) {
                 try {

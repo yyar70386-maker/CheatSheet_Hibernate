@@ -32,7 +32,7 @@ public class AppConfig {
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver"); // သင့် Driver
         dataSource.setUrl("jdbc:mysql://localhost:3306/cheat_sheetsdb"); // သင့် DB URL
         dataSource.setUsername("root");
-        dataSource.setPassword("myanmary");
+        dataSource.setPassword("root");
         return dataSource;
     }
 

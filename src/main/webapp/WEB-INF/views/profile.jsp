@@ -504,15 +504,23 @@ body {
                             </h5>
                             <p class="text-muted small mb-4 pb-2 border-bottom">Ensure your account is using a long, random password to stay secure.</p>
 
-                            <form action="${pageContext.request.contextPath}/profile/change-password" method="POST" style="max-width: 500px;">
+                            <form id="changePasswordForm" action="${pageContext.request.contextPath}/profile/change-password" method="POST" style="max-width: 500px;" onsubmit="return validateChangePasswordForm(event)">
                                 <div class="mb-3">
                                     <label class="form-label text-muted small fw-bold">Current Password</label> 
-                                    <input type="password" name="oldPassword" class="form-control" placeholder="Enter current password" required>
+                                    <input type="password" id="oldPassword" name="oldPassword" class="form-control" placeholder="Enter current password">
+                                    <div id="oldPasswordError" class="error text-danger" style="display:none; font-size:12px; margin-top:5px;"></div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-bold">New Password</label> 
+                                    <input type="password" id="newPassword" name="newPassword" class="form-control" placeholder="At least 6 characters">
+                                    <div id="newPasswordError" class="error text-danger" style="display:none; font-size:12px; margin-top:5px;"></div>
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="form-label text-muted small fw-bold">New Password</label> 
-                                    <input type="password" name="newPassword" class="form-control" placeholder="At least 6 characters" required>
+                                    <label class="form-label text-muted small fw-bold">Confirm New Password</label> 
+                                    <input type="password" id="confirmNewPassword" name="confirmNewPassword" class="form-control" placeholder="Re-enter new password">
+                                    <div id="confirmNewPasswordError" class="error text-danger" style="display:none; font-size:12px; margin-top:5px;"></div>
                                 </div>
 
                                 <div>
@@ -591,6 +599,94 @@ body {
             btn.innerText = 'See More';
         }
     }
+    </script>
+
+    <script>
+    (function() {
+        const oldPassword = document.getElementById("oldPassword");
+        const newPassword = document.getElementById("newPassword");
+        const confirmNewPassword = document.getElementById("confirmNewPassword");
+
+        const oldPasswordError = document.getElementById("oldPasswordError");
+        const newPasswordError = document.getElementById("newPasswordError");
+        const confirmNewPasswordError = document.getElementById("confirmNewPasswordError");
+
+        if (oldPassword && newPassword && confirmNewPassword) {
+            oldPassword.addEventListener("input", validateOldPasswordLive);
+            newPassword.addEventListener("input", validateNewPasswordLive);
+            confirmNewPassword.addEventListener("input", validateConfirmNewPasswordLive);
+        }
+
+        function validateOldPasswordLive() {
+            const val = oldPassword.value;
+            if (val === "") {
+                oldPasswordError.innerText = "Current Password is required";
+                oldPasswordError.style.display = "block";
+                return false;
+            } else {
+                oldPasswordError.style.display = "none";
+                return true;
+            }
+        }
+
+        function validateNewPasswordLive() {
+            const val = newPassword.value;
+            const oldVal = oldPassword.value;
+            if (val === "") {
+                newPasswordError.innerText = "New Password is required";
+                newPasswordError.style.display = "block";
+                return false;
+            } else if (val.length < 6) {
+                newPasswordError.innerText = "New password must be at least 6 characters";
+                newPasswordError.style.display = "block";
+                return false;
+            } else if (!/^[a-zA-Z0-9]+$/.test(val)) {
+                newPasswordError.innerText = "Letters and numbers only. Special characters not allowed";
+                newPasswordError.style.display = "block";
+                return false;
+            } else if (val === oldVal) {
+                newPasswordError.innerText = "New password cannot be the same as old password";
+                newPasswordError.style.display = "block";
+                return false;
+            } else {
+                newPasswordError.style.display = "none";
+                if (confirmNewPassword.value !== "") {
+                    validateConfirmNewPasswordLive();
+                }
+                return true;
+            }
+        }
+
+        function validateConfirmNewPasswordLive() {
+            const val = confirmNewPassword.value;
+            const newVal = newPassword.value;
+            if (val === "") {
+                confirmNewPasswordError.innerText = "Confirm New Password is required";
+                confirmNewPasswordError.style.display = "block";
+                return false;
+            } else if (val !== newVal) {
+                confirmNewPasswordError.innerText = "Confirm password must match new password";
+                confirmNewPasswordError.style.display = "block";
+                return false;
+            } else {
+                confirmNewPasswordError.style.display = "none";
+                return true;
+            }
+        }
+
+        window.validateChangePasswordForm = function(event) {
+            const isOldValid = validateOldPasswordLive();
+            const isNewValid = validateNewPasswordLive();
+            const isConfirmValid = validateConfirmNewPasswordLive();
+
+            if (isOldValid && isNewValid && isConfirmValid) {
+                return true;
+            } else {
+                event.preventDefault();
+                return false;
+            }
+        };
+    })();
     </script>
 </body>
 </html>

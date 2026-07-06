@@ -116,4 +116,42 @@ public class ProfileController {
 
         return "user-profile";
     }
+
+    @org.springframework.web.bind.annotation.PostMapping("/profile/change-password")
+    public String changePassword(
+            @org.springframework.web.bind.annotation.RequestParam("oldPassword") String oldPassword,
+            @org.springframework.web.bind.annotation.RequestParam("newPassword") String newPassword,
+            @org.springframework.web.bind.annotation.RequestParam("confirmNewPassword") String confirmNewPassword,
+            HttpSession session,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        // Validate formats backend-side
+        if (newPassword.length() < 6 || !newPassword.matches("^[a-zA-Z0-9]+$")) {
+            redirectAttributes.addFlashAttribute("error", "New password must be at least 6 characters and alphanumeric only.");
+            return "redirect:/profile?tab=security";
+        }
+
+        if (newPassword.equals(oldPassword)) {
+            redirectAttributes.addFlashAttribute("error", "New password cannot be the same as old password.");
+            return "redirect:/profile?tab=security";
+        }
+
+        if (!newPassword.equals(confirmNewPassword)) {
+            redirectAttributes.addFlashAttribute("error", "Confirm password does not match new password.");
+            return "redirect:/profile?tab=security";
+        }
+
+        boolean success = userService.changePassword(currentUser.getId(), oldPassword, newPassword);
+        if (success) {
+            redirectAttributes.addFlashAttribute("message", "Password updated successfully.");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Incorrect current password.");
+        }
+        return "redirect:/profile?tab=security";
+    }
 }

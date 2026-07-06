@@ -155,12 +155,11 @@ body{
                 </div>
             </c:when>
             <c:otherwise>
-
-                <div class="table-responsive">
+            <div class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>No.</th> <!-- ID နေရာတွင် No. ဟု ပြောင်းလဲထားပါသည် -->
                                 <th>Title</th>
                                 <th>Category</th>
                                 <th>Tags</th>
@@ -173,9 +172,10 @@ body{
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach items="${cheatsheetlist}" var="c">
+                            <!-- varStatus="status" ကို ထည့်သွင်းပေးထားပါသည် -->
+                            <c:forEach items="${cheatsheetlist}" var="c" varStatus="status">
                                 <tr>
-                                    <td>${c.id}</td>
+                                    <td>${status.count}</td> <!-- Database ID နေရာတွင် Loop ပတ်ထားသည့် အစဉ်လိုက်နံပါတ် (1,2,3...) ပြပေးထားပါသည် -->
                                     <td>
                                         <a href="${pageContext.request.contextPath}/cheatsheet/detail/${c.obfuscatedId}" style="color:#ff3366; text-decoration:none; font-weight:bold;">
                                             ${c.title}
@@ -216,7 +216,6 @@ body{
                                            title="Edit Cheatsheet">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-
                                         <a class="btn-icon-delete"
                                            href="${pageContext.request.contextPath}/cheatsheet/delete/${c.obfuscatedId}"
                                            onclick="return confirm('Are you sure you want to delete this cheat sheet?');"
