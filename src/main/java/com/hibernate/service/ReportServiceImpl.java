@@ -21,6 +21,8 @@ public class ReportServiceImpl implements ReportService {
     private final UserRepository userRepository;
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
+    private final com.hibernate.repository.CheatsheetRepository cheatsheetRepository;
+    private final com.hibernate.repository.CommentRepositoryImpl commentRepository;
 
     @Override
     @Transactional
@@ -75,13 +77,59 @@ public class ReportServiceImpl implements ReportService {
         if (report != null) {
             auditLogService.log(admin, "Report Status Changed", "Report", id,
                     "Status changed to " + status + ".", null);
+            
+            // Notify the reporter
             if (report.getUser() != null) {
-                return notificationService.createNotification(
+                notificationService.createNotification(
                         report.getUser().getId(),
                         admin != null ? admin.getId() : null,
                         "Report status changed to " + status + ".",
                         "REPORT",
                         "/notifications");
+            }
+            
+            // Notify the reported user if status is "Resolved"
+            if ("Resolved".equalsIgnoreCase(status)) {
+                Integer reportedUserId = null;
+                String msg = "";
+                String linkUrl = "/notifications";
+                
+                if ("CHEATSHEET".equalsIgnoreCase(report.getTargetType())) {
+                    if (report.getTargetId() != null) {
+                        com.hibernate.entity.CheatsheetEntity sheet = cheatsheetRepository.findById(report.getTargetId());
+                        if (sheet != null && sheet.getAuthor() != null) {
+                            reportedUserId = sheet.getAuthor().getId();
+                            msg = "A report against your cheatsheet '" + sheet.getTitle() + "' has been resolved by the admin.";
+                            linkUrl = "/cheatsheet/detail/" + sheet.getObfuscatedId();
+                        }
+                    }
+                } else if ("COMMENT".equalsIgnoreCase(report.getTargetType())) {
+                    if (report.getTargetId() != null) {
+                        com.hibernate.entity.CommentEntity comment = commentRepository.getById(report.getTargetId());
+                        if (comment != null && comment.getUser() != null) {
+                            reportedUserId = comment.getUser().getId();
+                            msg = "A report against your comment has been resolved by the admin.";
+                            if (comment.getCheatSheet() != null) {
+                                linkUrl = "/cheatsheet/detail/" + comment.getCheatSheet().getObfuscatedId();
+                            }
+                        }
+                    }
+                } else if ("USER".equalsIgnoreCase(report.getTargetType())) {
+                    if (report.getTargetId() != null) {
+                        reportedUserId = report.getTargetId();
+                        msg = "A report against your profile has been resolved by the admin.";
+                    }
+                }
+                
+                if (reportedUserId != null) {
+                    return notificationService.createNotification(
+                            reportedUserId,
+                            admin != null ? admin.getId() : null,
+                            msg,
+                            "REPORT_RESOLVED",
+                            linkUrl
+                    );
+                }
             }
         }
         return null;

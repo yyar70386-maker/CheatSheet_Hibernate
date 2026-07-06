@@ -157,7 +157,6 @@ public class CheatsheetController {
         if (existingSheet != null) {
             cheatsheet.setAuthor(existingSheet.getAuthor());
             cheatsheet.setCreatedAt(existingSheet.getCreatedAt());
-            cheatsheet.setStatus(existingSheet.getStatus());
             cheatsheet.setBanned(existingSheet.isBanned());
             cheatsheet.setBannedReason(existingSheet.getBannedReason());
             cheatsheet.setBannedBy(existingSheet.getBannedBy());

@@ -194,24 +194,85 @@
                                                     </c:choose>
                                                 </td>
                                                 <td class="small text-muted">${r.report.createdAt}</td>
-                                                <td class="text-end pe-4">
-                                                    <div class="d-inline-flex gap-1">
-                                                        <a class="btn btn-xs btn-outline-primary fw-semibold" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" href="${pageContext.request.contextPath}/admin/reports/${r.report.id}">View</a>
-                                                        
-                                                        <form class="m-0" method="post" action="${pageContext.request.contextPath}/admin/reports/${r.report.id}/status/Reviewing">
-                                                            <button class="btn btn-xs btn-outline-info fw-semibold" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Review</button>
-                                                        </form>
-                                                        <form class="m-0" method="post" action="${pageContext.request.contextPath}/admin/reports/${r.report.id}/status/Resolved">
-                                                            <button class="btn btn-xs btn-outline-success fw-semibold" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Resolve</button>
-                                                        </form>
-                                                        <form class="m-0" method="post" action="${pageContext.request.contextPath}/admin/reports/${r.report.id}/status/Rejected">
-                                                            <button class="btn btn-xs btn-outline-warning fw-semibold" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Reject</button>
-                                                        </form>
-                                                        <form class="m-0" method="post" action="${pageContext.request.contextPath}/admin/reports/${r.report.id}/delete" onsubmit="return confirm('Delete this report?');">
-                                                            <button class="btn btn-xs btn-outline-danger fw-semibold" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;"><i class="bi bi-trash"></i></button>
-                                                        </form>
-                                                    </div>
-                                                </td>
+                                                 <td class="text-end pe-4">
+                                                     <div class="d-inline-flex gap-1">
+                                                         <button type="button" class="btn btn-xs btn-outline-primary fw-semibold" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" data-bs-toggle="modal" data-bs-target="#detailModal_${r.report.id}">
+                                                             View
+                                                         </button>
+                                                         
+                                                         <form class="m-0" method="post" action="${pageContext.request.contextPath}/admin/reports/${r.report.id}/status/Reviewing">
+                                                             <button class="btn btn-xs btn-outline-info fw-semibold" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Review</button>
+                                                         </form>
+                                                         <form class="m-0" method="post" action="${pageContext.request.contextPath}/admin/reports/${r.report.id}/status/Resolved">
+                                                             <button class="btn btn-xs btn-outline-success fw-semibold" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Resolve</button>
+                                                         </form>
+                                                         <form class="m-0" method="post" action="${pageContext.request.contextPath}/admin/reports/${r.report.id}/status/Rejected">
+                                                             <button class="btn btn-xs btn-outline-warning fw-semibold" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Reject</button>
+                                                         </form>
+                                                         <form class="m-0" method="post" action="${pageContext.request.contextPath}/admin/reports/${r.report.id}/delete" onsubmit="return confirm('Delete this report?');">
+                                                             <button class="btn btn-xs btn-outline-danger fw-semibold" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;"><i class="bi bi-trash"></i></button>
+                                                         </form>
+                                                     </div>
+
+                                                     <!-- Modal for Report Details -->
+                                                     <div class="modal fade text-start" id="detailModal_${r.report.id}" tabindex="-1" aria-labelledby="detailModalLabel_${r.report.id}" aria-hidden="true">
+                                                         <div class="modal-dialog modal-dialog-centered">
+                                                             <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                                                                 <div class="modal-header" style="border-bottom: 1px solid rgba(0,0,0,0.08); background: linear-gradient(135deg, rgba(255, 51, 102, 0.05), rgba(255, 94, 132, 0.05)); border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                                                                     <h5 class="modal-title fw-bold text-dark" id="detailModalLabel_${r.report.id}">
+                                                                         <i class="bi bi-info-circle-fill text-primary me-2"></i> Report Details #${r.report.id}
+                                                                     </h5>
+                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                 </div>
+                                                                 <div class="modal-body p-4">
+                                                                     <div class="card border-0 bg-light p-3 mb-3" style="border-radius: 12px;">
+                                                                         <div class="row g-2">
+                                                                             <div class="col-4 text-secondary small fw-bold">Reporter:</div>
+                                                                             <div class="col-8 text-dark"><c:out value="${r.report.user != null ? r.report.user.username : 'Unknown'}" /></div>
+                                                                             
+                                                                             <div class="col-4 text-secondary small fw-bold">Reported:</div>
+                                                                             <div class="col-8 text-dark"><c:out value="${r.reportedUsername}" /></div>
+                                                                             
+                                                                             <div class="col-4 text-secondary small fw-bold">Target Type:</div>
+                                                                             <div class="col-8 text-dark">
+                                                                                 <span class="badge bg-secondary-subtle text-secondary px-2 py-0.5 rounded border">${r.report.targetType}</span>
+                                                                             </div>
+                                                                             
+                                                                             <div class="col-4 text-secondary small fw-bold">Target Content:</div>
+                                                                             <div class="col-8 text-dark">
+                                                                                 <c:choose>
+                                                                                     <c:when test="${r.targetUrl != '#'}">
+                                                                                         <a href="${pageContext.request.contextPath}${r.targetUrl}" class="text-decoration-none text-brand-primary fw-medium" target="_blank">
+                                                                                             <c:out value="${r.targetTitle}" /> <i class="bi bi-box-arrow-up-right small"></i>
+                                                                                         </a>
+                                                                                     </c:when>
+                                                                                     <c:otherwise>
+                                                                                         <span class="text-muted"><c:out value="${r.targetTitle}" /></span>
+                                                                                     </c:otherwise>
+                                                                                 </c:choose>
+                                                                             </div>
+                                                                         </div>
+                                                                     </div>
+                                                                     
+                                                                     <div class="mb-3">
+                                                                         <label class="form-label text-secondary small fw-bold mb-1">Reason for Reporting</label>
+                                                                         <div class="p-3 border rounded text-danger bg-danger-subtle fw-semibold" style="border-radius: 8px;">
+                                                                             <i class="bi bi-exclamation-triangle-fill me-2"></i><c:out value="${r.report.reason}" />
+                                                                         </div>
+                                                                     </div>
+                                                                     
+                                                                     <div class="mb-0">
+                                                                         <label class="form-label text-secondary small fw-bold mb-1">Additional Details / Description</label>
+                                                                         <div class="p-3 border rounded text-dark bg-white" style="border-radius: 8px; min-height: 80px; white-space: pre-wrap;"><c:out value="${empty r.report.description ? 'No additional description provided.' : r.report.description}" /></div>
+                                                                     </div>
+                                                                 </div>
+                                                                 <div class="modal-footer" style="border-top: 1px solid rgba(0,0,0,0.08);">
+                                                                     <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" style="border-radius: 8px;">Close</button>
+                                                                 </div>
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                 </td>
                                             </tr>
                                         </c:forEach>
                                     </c:otherwise>
