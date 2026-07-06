@@ -27,6 +27,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private AuditLogService auditLogService;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Override
     public void registerUser(User user) {
         String usernamePattern = "^[a-zA-Z0-9]{4,20}$";
@@ -61,7 +64,11 @@ public class UserServiceImpl implements UserService {
             if (user.isAccountLocked()) {
                 throw new IllegalArgumentException("Your account is locked due to 5 consecutive failed login attempts. Please contact Admin.");
             }
-            throw new IllegalArgumentException("Your account has been suspended by an administrator.");
+            String msg = "Your account has been suspended by an administrator.";
+            if (user.getSuspendReason() != null && !user.getSuspendReason().trim().isEmpty()) {
+                msg += " Reason: " + user.getSuspendReason();
+            }
+            throw new IllegalArgumentException(msg);
         }
 
         if (BCrypt.checkpw(password, user.getPassword())) {
@@ -180,7 +187,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void suspendUser(int id, String reason, User admin, String ipAddress) {
+    public com.hibernate.dto.NotificationDto suspendUser(int id, String reason, User admin, String ipAddress) {
         User user = userRepository.findById(id);
         if (user != null) {
             user.setSuspended(true);
@@ -188,12 +195,22 @@ public class UserServiceImpl implements UserService {
             user.setSuspendReason(reason);
             userRepository.update(user);
             auditLogService.log(admin, "User Suspended", "User", id, "Suspended user: " + user.getUsername() + ". Reason: " + reason, ipAddress);
+            
+            return notificationService.createNotification(
+                id,
+                admin != null ? admin.getId() : null,
+                "Account Suspended",
+                "Your account has been suspended by an administrator. Reason: " + reason,
+                "USER_SUSPEND",
+                "/notifications"
+            );
         }
+        return null;
     }
 
     @Override
     @Transactional
-    public void unsuspendUser(int id, User admin, String ipAddress) {
+    public com.hibernate.dto.NotificationDto unsuspendUser(int id, User admin, String ipAddress) {
         User user = userRepository.findById(id);
         if (user != null) {
             user.setSuspended(false);
@@ -205,12 +222,22 @@ public class UserServiceImpl implements UserService {
             }
             userRepository.update(user);
             auditLogService.log(admin, "User Unsuspended", "User", id, "Unsuspended user: " + user.getUsername(), ipAddress);
+            
+            return notificationService.createNotification(
+                id,
+                admin != null ? admin.getId() : null,
+                "Account Unsuspended",
+                "Your account has been unsuspended by an administrator.",
+                "USER_UNSUSPEND",
+                "/notifications"
+            );
         }
+        return null;
     }
 
     @Override
     @Transactional
-    public void unlockUser(int id, User admin, String ipAddress) {
+    public com.hibernate.dto.NotificationDto unlockUser(int id, User admin, String ipAddress) {
         User user = userRepository.findById(id);
         if (user != null) {
             user.setAccountLocked(false);
@@ -220,7 +247,17 @@ public class UserServiceImpl implements UserService {
             user.setFailedLoginAttempts(0);
             userRepository.update(user);
             auditLogService.log(admin, "Account Unlocked", "User", id, "Unlocked account for user: " + user.getUsername(), ipAddress);
+            
+            return notificationService.createNotification(
+                id,
+                admin != null ? admin.getId() : null,
+                "Account Unlocked",
+                "Your account has been unlocked by an administrator.",
+                "USER_UNLOCK",
+                "/notifications"
+            );
         }
+        return null;
     }
 
     @Override

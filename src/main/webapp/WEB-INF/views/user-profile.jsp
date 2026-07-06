@@ -171,14 +171,14 @@
                         <c:if test="${sessionScope.currentUser.id != targetUser.id}">
                             <c:choose>
                                 <c:when test="${isFollowing}">
-                                    <form action="${pageContext.request.contextPath}/unfollow/${targetUser.id}" method="POST" class="d-inline">
+                                    <form action="${pageContext.request.contextPath}/unfollow/${targetUser.obfuscatedId}" method="POST" class="d-inline">
                                         <button type="submit" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">
                                             <i class="bi bi-person-x-fill me-1"></i> Unfollow
                                         </button>
                                     </form>
                                 </c:when>
                                 <c:otherwise>
-                                    <form action="${pageContext.request.contextPath}/follow/${targetUser.id}" method="POST" class="d-inline">
+                                    <form action="${pageContext.request.contextPath}/follow/${targetUser.obfuscatedId}" method="POST" class="d-inline">
                                         <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold">
                                             <i class="bi bi-person-plus-fill me-1"></i> Follow
                                         </button>
@@ -203,10 +203,6 @@
                         <div class="stats-box">
                             <span class="stats-count">${followingCount}</span>
                             <span class="stats-label">Following</span>
-                        </div>
-                        <div class="stats-box">
-                            <span class="stats-count">${mutualFollowersCount}</span>
-                            <span class="stats-label">Mutual</span>
                         </div>
                     </div>
                 </div>

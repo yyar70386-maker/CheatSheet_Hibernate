@@ -31,11 +31,11 @@ public interface UserService {
 
     long countSearch(String keyword, String role, String status);
 
-    void suspendUser(int id, String reason, User admin, String ipAddress);
+    com.hibernate.dto.NotificationDto suspendUser(int id, String reason, User admin, String ipAddress);
 
-    void unsuspendUser(int id, User admin, String ipAddress);
+    com.hibernate.dto.NotificationDto unsuspendUser(int id, User admin, String ipAddress);
 
-    void unlockUser(int id, User admin, String ipAddress);
+    com.hibernate.dto.NotificationDto unlockUser(int id, User admin, String ipAddress);
 
     void changeUserRole(int id, int role, User admin, String ipAddress);
 }

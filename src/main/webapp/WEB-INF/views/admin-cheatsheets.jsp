@@ -65,7 +65,7 @@
             <div class="card border-0 shadow-sm rounded-3 mb-4">
                 <div class="card-body">
                     <form method="get" action="${pageContext.request.contextPath}/admin/cheatsheets" class="row g-3">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Search</label>
                             <input type="text" name="q" value="${keyword}" class="form-control" placeholder="Search title, description...">
                         </div>
@@ -78,22 +78,12 @@
                                 </c:forEach>
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="form-label small fw-semibold text-secondary">Status</label>
                             <select name="status" class="form-select">
                                 <option value="">All Statuses</option>
                                 <option value="active" ${status == 'active' ? 'selected' : ''}>Active</option>
-                                <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
-                                <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
                                 <option value="banned" ${status == 'banned' ? 'selected' : ''}>Banned</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold text-secondary">Banned State</label>
-                            <select name="banned" class="form-select">
-                                <option value="">All</option>
-                                <option value="false" ${banned == 'false' ? 'selected' : ''}>Not Banned</option>
-                                <option value="true" ${banned == 'true' ? 'selected' : ''}>Banned Only</option>
                             </select>
                         </div>
                         <div class="col-md-2 d-flex align-items-end">

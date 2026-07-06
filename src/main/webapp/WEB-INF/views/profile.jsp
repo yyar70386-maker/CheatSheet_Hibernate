@@ -454,6 +454,11 @@ body {
 															</h5>
 
 															<c:choose>
+																<c:when test="${sheet.status == 'banned'}">
+																	<span class="badge bg-danger text-white px-2.5 py-1.5 rounded-pill shadow-sm" style="font-size: 11px;">
+																		<i class="bi bi-x-circle-fill me-1"></i> Banned
+																	</span>
+																</c:when>
 																<c:when test="${sheet.visibility == 'PUBLIC'}">
 																	<span class="visibility-pill pill-public"> <i
 																		class="bi bi-globe"></i> Public
@@ -477,6 +482,12 @@ body {
 															<span class="see-more-btn"
 																onclick="toggleDescription(this)">See More</span>
 														</div>
+
+														<c:if test="${sheet.status == 'banned'}">
+															<div class="alert alert-danger py-1 px-2 small mb-3" style="font-size: 12px; border-radius: 8px;">
+																<i class="bi bi-exclamation-triangle-fill me-1"></i> <strong>Reason:</strong> <c:out value="${sheet.bannedReason}" />
+															</div>
+														</c:if>
 
 														<div class="card-meta-item">
 															<i class="bi bi-person-fill"></i> ${sheet.author != null ? sheet.author.username : 'Unknown'}

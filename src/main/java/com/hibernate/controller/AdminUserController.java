@@ -25,6 +25,7 @@ public class AdminUserController {
 
     private final UserService userService;
     private final TagService tagService; // 🌟 Tag Service အား Dependency ထည့်သွင်းခြင်း
+    private final com.hibernate.websocket.NotificationSocketService notificationSocketService;
 
     private boolean isAdmin(User user) {
         return user != null && user.getRole() == 1;
@@ -86,7 +87,10 @@ public class AdminUserController {
         if (description != null && !description.trim().isEmpty()) {
             finalReason += " - " + description.trim();
         }
-        userService.suspendUser(id, finalReason, currentUser, request.getRemoteAddr());
+        com.hibernate.dto.NotificationDto notification = userService.suspendUser(id, finalReason, currentUser, request.getRemoteAddr());
+        if (notification != null) {
+            notificationSocketService.broadcastToUser(id, notification);
+        }
         redirectAttributes.addFlashAttribute("successMsg", "User suspended successfully.");
         return "redirect:/admin/users";
     }
@@ -97,7 +101,10 @@ public class AdminUserController {
         if (!isAdmin(currentUser)) {
             return "redirect:/login";
         }
-        userService.unsuspendUser(id, currentUser, request.getRemoteAddr());
+        com.hibernate.dto.NotificationDto notification = userService.unsuspendUser(id, currentUser, request.getRemoteAddr());
+        if (notification != null) {
+            notificationSocketService.broadcastToUser(id, notification);
+        }
         redirectAttributes.addFlashAttribute("successMsg", "User unsuspended successfully.");
         return "redirect:/admin/users";
     }
@@ -108,7 +115,10 @@ public class AdminUserController {
         if (!isAdmin(currentUser)) {
             return "redirect:/login";
         }
-        userService.unlockUser(id, currentUser, request.getRemoteAddr());
+        com.hibernate.dto.NotificationDto notification = userService.unlockUser(id, currentUser, request.getRemoteAddr());
+        if (notification != null) {
+            notificationSocketService.broadcastToUser(id, notification);
+        }
         redirectAttributes.addFlashAttribute("successMsg", "User account unlocked successfully.");
         return "redirect:/admin/users";
     }

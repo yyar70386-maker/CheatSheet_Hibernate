@@ -74,9 +74,6 @@
                                     <div class="text-muted small text-clamp-2 mt-1">
                                         <c:out value="${u.bio}" />
                                     </div>
-                                    <div class="mt-2 small text-muted">
-                                        Mutual followers: <span class="fw-semibold">${u.mutualFollowersCount}</span>
-                                    </div>
                                 </div>
                             </div>
 
@@ -87,14 +84,14 @@
                                 <c:if test="${sessionScope.currentUser.id != u.id}">
                                     <c:choose>
                                         <c:when test="${u.following}">
-                                            <form action="${pageContext.request.contextPath}/unfollow/${u.id}" method="post">
+                                            <form action="${pageContext.request.contextPath}/unfollow/${u.obfuscatedId}" method="post">
                                                 <button class="btn btn-outline-secondary btn-sm" type="submit">
                                                     Unfollow
                                                 </button>
                                             </form>
                                         </c:when>
                                         <c:otherwise>
-                                            <form action="${pageContext.request.contextPath}/follow/${u.id}" method="post">
+                                            <form action="${pageContext.request.contextPath}/follow/${u.obfuscatedId}" method="post">
                                                 <button class="btn btn-primary btn-sm" type="submit">
                                                     Follow back
                                                 </button>

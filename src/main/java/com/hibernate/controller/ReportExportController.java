@@ -173,6 +173,7 @@ public class ReportExportController {
             configuration.setRemoveEmptySpaceBetweenColumns(true);
             configuration.setWhitePageBackground(false);
             configuration.setDetectCellType(true);
+            configuration.setIgnoreGraphics(true);
             
             exporter.setConfiguration(configuration);
             exporter.exportReport();

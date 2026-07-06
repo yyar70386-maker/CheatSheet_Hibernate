@@ -66,13 +66,12 @@ public class AnnouncementController {
         }
 
         // Announcement အား Database ထဲသို့ အရင်သိမ်းဆည်းပါသည်
-        announcementService.save(announcement, currentUser);
+        Integer annId = announcementService.save(announcement, currentUser);
         
         // 🌟 [FIXED] တိုက်ရိုက် Save လုပ်ချိန်တွင်လည်း Real-time Notification ပို့ပေးနိုင်ရန် Comment ပြန်ဖွင့်ပေးခဲ့သည်။
-        // မှတ်ချက်- announcement.getId() အဆင်ပြေစေရန် Service ဘက်မှ Save ပြီးလျှင် ID ပြန်ထွက်လာဖို့ လိုအပ်ပါသည်။
-        if (announcement.getId() != null) {
+        if (annId != null) {
             List<NotificationDto> notifications = notificationService.createAnnouncementNotifications(
-                    currentUser.getId(), announcement.getId(), announcement.getTitle());
+                    currentUser.getId(), annId, announcement.getTitle());
             notificationSocketService.broadcastNotifications(notifications);
         }
         

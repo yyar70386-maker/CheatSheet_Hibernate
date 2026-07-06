@@ -81,7 +81,6 @@
                                 <option value="">All Statuses</option>
                                 <option value="active" ${status == 'active' ? 'selected' : ''}>Active Only</option>
                                 <option value="suspended" ${status == 'suspended' ? 'selected' : ''}>Suspended</option>
-                                <option value="locked" ${status == 'locked' ? 'selected' : ''}>Locked</option>
                             </select>
                         </div>
                         <div class="col-md-2 d-flex align-items-end">

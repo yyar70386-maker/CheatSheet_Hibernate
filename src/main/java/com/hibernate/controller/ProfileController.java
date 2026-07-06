@@ -33,6 +33,9 @@ public class ProfileController {
 	@Autowired
 	private SharedCheatsheetRepository sharedCheatsheetRepository;
 
+	@Autowired
+	private com.hibernate.websocket.NotificationSocketService notificationSocketService;
+
 	// 🌟 [CRITICAL UPDATE] URL ကို ပုံမှန်အတိုင်း "/profile" ဟုပြောင်းပြီး
 	// တစ်ခါတည်း ဒေတာအားလုံး ဆွဲထုတ်ပါမည်
 	@GetMapping("/profile")
@@ -101,6 +104,7 @@ public class ProfileController {
 		model.addAttribute("targetUser", targetUser);
 		model.addAttribute("followersCount", userFollowService.getFollowersCount(userId));
 		model.addAttribute("followingCount", userFollowService.getFollowingCount(userId));
+		model.addAttribute("isFollowing", currentUser != null && userFollowService.isFollowing(currentUser.getId(), userId));
 
 		List<String> visibilities = new java.util.ArrayList<>();
 		visibilities.add("PUBLIC");
@@ -119,6 +123,89 @@ public class ProfileController {
 		}
 
 		return "user-profile";
+	}
+
+	@GetMapping("/profile/show/followers")
+	@Transactional(readOnly = true)
+	public String showFollowers(HttpSession session, Model model) {
+		User currentUser = (User) session.getAttribute("currentUser");
+		if (currentUser == null) {
+			return "redirect:/login";
+		}
+		
+		model.addAttribute("pageTitle", "Followers");
+		model.addAttribute("profileUsers", userFollowService.getFollowersForView(currentUser.getId(), currentUser.getId()));
+		return "follow_list";
+	}
+
+	@GetMapping("/profile/show/following")
+	@Transactional(readOnly = true)
+	public String showFollowing(HttpSession session, Model model) {
+		User currentUser = (User) session.getAttribute("currentUser");
+		if (currentUser == null) {
+			return "redirect:/login";
+		}
+		
+		model.addAttribute("pageTitle", "Following");
+		model.addAttribute("profileUsers", userFollowService.getFollowingForView(currentUser.getId(), currentUser.getId()));
+		return "follow_list";
+	}
+
+	// ==================== ➕ Follow Request Handler ====================
+	@org.springframework.web.bind.annotation.PostMapping("/follow/{id}")
+	public String followUser(@PathVariable("id") String encodedId, HttpSession session, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+		User currentUser = (User) session.getAttribute("currentUser");
+		if (currentUser == null) {
+			return "redirect:/login";
+		}
+		
+		Integer targetUserId = com.hibernate.util.IdObfuscator.decode(encodedId);
+		if (targetUserId == null) {
+			try {
+				targetUserId = Integer.parseInt(encodedId);
+			} catch (NumberFormatException e) {
+				return "redirect:/home";
+			}
+		}
+
+		// မိမိကိုယ်ကိုယ် follow လုပ်ခြင်းမှ တားဆီးရန်
+		if (currentUser.getId().equals(targetUserId)) {
+			redirectAttributes.addFlashAttribute("errorMsg", "You cannot follow yourself!");
+			return "redirect:/profile/" + encodedId;
+		}
+
+		com.hibernate.dto.NotificationDto notification = userFollowService.followUser(currentUser.getId(), targetUserId);
+		
+		// Real-time Notification ပို့ပေးခြင်း
+		if (notification != null) {
+			notificationSocketService.broadcastToUser(targetUserId, notification);
+		}
+		
+		redirectAttributes.addFlashAttribute("successMsg", "User followed successfully.");
+		return "redirect:/profile/" + encodedId;
+	}
+
+	// ==================== ➖ Unfollow Request Handler ====================
+	@org.springframework.web.bind.annotation.PostMapping("/unfollow/{id}")
+	public String unfollowUser(@PathVariable("id") String encodedId, HttpSession session, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+		User currentUser = (User) session.getAttribute("currentUser");
+		if (currentUser == null) {
+			return "redirect:/login";
+		}
+		
+		Integer targetUserId = com.hibernate.util.IdObfuscator.decode(encodedId);
+		if (targetUserId == null) {
+			try {
+				targetUserId = Integer.parseInt(encodedId);
+			} catch (NumberFormatException e) {
+				return "redirect:/home";
+			}
+		}
+
+		userFollowService.unfollowUser(currentUser.getId(), targetUserId);
+		
+		redirectAttributes.addFlashAttribute("successMsg", "User unfollowed successfully.");
+		return "redirect:/profile/" + encodedId;
 	}
 
 	@org.springframework.web.bind.annotation.PostMapping("/profile/change-password")

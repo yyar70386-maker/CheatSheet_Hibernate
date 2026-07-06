@@ -198,14 +198,18 @@ body{
                                         <span class="badge bg-secondary text-white px-2 py-1 rounded small">${c.visibility}</span>
                                     </td>
                                     <td>
-                                        <c:choose>
-                                            <c:when test="${c.status == 'draft'}">
-                                                <span class="badge bg-warning text-dark px-2 py-1 rounded small">Draft</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="badge bg-success text-white px-2 py-1 rounded small">Published</span>
-                                            </c:otherwise>
-                                        </c:choose>
+                                         <c:choose>
+                                             <c:when test="${c.status == 'draft'}">
+                                                 <span class="badge bg-warning text-dark px-2 py-1 rounded small">Draft</span>
+                                             </c:when>
+                                             <c:when test="${c.status == 'banned'}">
+                                                 <span class="badge bg-danger text-white px-2 py-1 rounded small">Banned</span>
+                                                 <div class="text-danger small mt-1" style="font-size: 11px;">Reason: <c:out value="${c.bannedReason}"/></div>
+                                             </c:when>
+                                             <c:otherwise>
+                                                 <span class="badge bg-success text-white px-2 py-1 rounded small">Published</span>
+                                             </c:otherwise>
+                                         </c:choose>
                                     </td>
                                     <td>${c.viewCount != null ? c.viewCount : 0}</td>
                                     <td>${c.downloadCount != null ? c.downloadCount : 0}</td>
