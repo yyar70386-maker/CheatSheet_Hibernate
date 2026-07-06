@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired(required = false) // ဒီလိုလေး ပြင်ပေးလိုက်ရင် Bean မရှိလည်း Error မတက်တော့ပါဘူး
+    @Autowired
     private JavaMailSender mailSender;
 
     @Autowired
@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
         }
         return false;
     }
-
+    
     @Override
     public boolean sendResetPasswordEmail(String email, String contextPath) {
         User user = userRepository.findByEmail(email);

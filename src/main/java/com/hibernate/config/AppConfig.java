@@ -30,9 +30,9 @@ public class AppConfig {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver"); // သင့် Driver
-        dataSource.setUrl("jdbc:mysql://localhost:3306/cheat_sheetsdb"); // သင့် DB URL
+        dataSource.setUrl("jdbc:mysql://localhost:3306/cheatsheets_db"); // သင့် DB URL
         dataSource.setUsername("root");
-        dataSource.setPassword("12345678");
+        dataSource.setPassword("669972855");
         return dataSource;
     }
 

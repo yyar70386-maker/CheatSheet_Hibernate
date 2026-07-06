@@ -16,28 +16,32 @@
 
 <style>
 
+/* 1. image_ed75c6.jpg ထဲကအတိုင်း Soft Light Pinkish Background */
 body{
 	min-height:100vh;
 	display:flex;
 	justify-content:center;
 	align-items:center;
-	background:linear-gradient(135deg,#4facfe,#00c6fb);
+	background:#f4eaee;
 	font-family:"Segoe UI",sans-serif;
 	padding:20px;
 }
 
+/* 2. White Card Style with Softer Shadow */
 .card-box{
 	width:100%;
 	max-width:450px;
-	background:rgba(255,255,255,0.95);
+	background:#ffffff;
 	border-radius:20px;
 	padding:35px;
-	box-shadow:0 25px 50px rgba(0,0,0,0.15);
+	box-shadow:0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
+/* Brand Name / Title Color */
 h3{
 	font-weight:bold;
 	text-align:center;
+	color: #ff527b; /* CheatSheet Pink Accent */
 }
 
 .sub{
@@ -50,6 +54,7 @@ h3{
 .input-group-text{
 	background:#fff;
 	border-right:none;
+	color: #888;
 }
 
 .form-control{
@@ -57,21 +62,44 @@ h3{
 	border-left:none;
 }
 
+/* စာရိုက်တဲ့ Input Box တွေကို Focus ဖြတ်ရင် Pinkish Glow ထွက်စေရန် */
+.form-control:focus {
+	border-color: #ff527b;
+	box-shadow: 0 0 0 0.25rem rgba(255, 82, 123, 0.15);
+}
+
+/* 3. Login Button အတိုင်း Pink/Magenta Gradient Button Style */
 .btn-primary{
 	height:48px;
 	border-radius:12px;
-	background:linear-gradient(135deg,#0d6efd,#4facfe);
+	background:linear-gradient(135deg, #ff527b 0%, #ff406c 100%);
 	border:none;
 	font-weight:600;
 }
 
 .btn-primary:hover{
 	transform:translateY(-2px);
-	box-shadow:0 10px 20px rgba(13,110,253,.3);
+	background:linear-gradient(135deg, #ff406c 0%, #e6325c 100%);
+	box-shadow:0 10px 20px rgba(255, 82, 123, .3);
+}
+
+/* 4. Back Home Button အတိုင်း Outlined Soft Grey/Dark Style */
+.btn-outline-secondary{
+	border-radius:12px;
+	border: 1px solid #cccccc;
+	color: #4a4a4a;
+	font-weight: 500;
+	transition: all 0.3s;
+}
+
+.btn-outline-secondary:hover{
+	background-color: #f9f9f9;
+	color: #111;
+	border-color: #999;
 }
 
 .error{
-	color:red;
+	color:#ff406c; /* Elegant Soft Dark Red / Rose */
 	font-size:12px;
 	display:none;
 	margin-top:5px;
@@ -89,7 +117,7 @@ h3{
 	<p class="sub">Join Cheat Sheet System</p>
 
 	<c:if test="${not empty error}">
-		<div class="alert alert-danger text-center">
+		<div class="alert alert-danger bg-danger bg-opacity-10 border-danger text-danger text-center small mb-3">
 			${error}
 		</div>
 	</c:if>
@@ -100,7 +128,7 @@ h3{
 
 		<!-- Username -->
 		<div class="mb-3">
-			<label>Username</label>
+			<label class="form-label text-secondary small fw-medium">Username</label>
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-person"></i></span>
 				<input type="text" id="username" name="username" class="form-control">
@@ -110,7 +138,7 @@ h3{
 
 		<!-- Email -->
 		<div class="mb-3">
-			<label>Email</label>
+			<label class="form-label text-secondary small fw-medium">Email</label>
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-envelope"></i></span>
 				<input type="text" id="email" name="email" class="form-control">
@@ -120,7 +148,7 @@ h3{
 
 		<!-- Full Name -->
 		<div class="mb-3">
-			<label>Full Name</label>
+			<label class="form-label text-secondary small fw-medium">Full Name</label>
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-card-text"></i></span>
 				<input type="text" id="fullName" name="fullName" class="form-control">
@@ -130,7 +158,7 @@ h3{
 
 		<!-- Password -->
 		<div class="mb-3">
-			<label>Password</label>
+			<label class="form-label text-secondary small fw-medium">Password</label>
 
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-lock"></i></span>
@@ -155,7 +183,7 @@ h3{
 
 		<!-- Confirm -->
 		<div class="mb-3">
-			<label>Confirm Password</label>
+			<label class="form-label text-secondary small fw-medium">Confirm Password</label>
 
 			<div class="input-group">
 				<span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
@@ -176,7 +204,7 @@ h3{
 			</button>
 
 			<a href="${pageContext.request.contextPath}/"
-			   class="btn btn-outline-secondary">
+			   class="btn btn-outline-secondary d-flex align-items-center justify-content-center" style="height:48px;">
 				Cancel
 			</a>
 		</div>

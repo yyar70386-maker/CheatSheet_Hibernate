@@ -39,9 +39,9 @@ body {
 	width: 100%;
 	max-width: 430px;
 	background: rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	border: 1px solid rgba(255, 255, 255, 0.6);
 	border-radius: 20px;
 	padding: 35px;
 	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
@@ -53,7 +53,8 @@ body {
 	height: 80px;
 	margin: auto;
 	border-radius: 50%;
-	background: linear-gradient(135deg, rgba(255, 51, 102, 0.9), rgba(255, 102, 153, 0.9));
+	background: linear-gradient(135deg, rgba(255, 51, 102, 0.9),
+		rgba(255, 102, 153, 0.9));
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -108,7 +109,8 @@ h2 {
 	height: 50px;
 	border: none;
 	border-radius: 12px;
-	background: linear-gradient(135deg, rgba(255, 51, 102, 0.9), rgba(255, 102, 153, 0.9));
+	background: linear-gradient(135deg, rgba(255, 51, 102, 0.9),
+		rgba(255, 102, 153, 0.9));
 	font-weight: 600;
 	transition: .3s;
 }
@@ -149,7 +151,8 @@ to {
 	margin: auto;
 	margin-bottom: 20px;
 	border-radius: 50%;
-	background: linear-gradient(135deg, rgba(255, 51, 102, 0.9), rgba(255, 102, 153, 0.9));
+	background: linear-gradient(135deg, rgba(255, 51, 102, 0.9),
+		rgba(255, 102, 153, 0.9));
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -168,28 +171,36 @@ to {
 
 	<div class="login-card">
 
-        <div class="logo">
-            <i class="bi bi-shield-lock"></i>
-        </div>
-        <h3 class="text-center fw-bold mb-3" style="color: #ff3366;">CheatSheet</h3>
+		<div class="logo">
+			<i class="bi bi-shield-lock"></i>
+		</div>
+		<h3 class="text-center fw-bold mb-3" style="color: #ff3366;">CheatSheet</h3>
 
 		<h2 class="text-center">Welcome Back</h2>
 
 		<p class="text-center subtitle">Sign in to continue</p>
 
+
 		<c:if test="${not empty loginError}">
-			<div class="alert alert-danger text-center">
-				<i class="bi bi-exclamation-triangle-fill"></i> ${loginError}
+			<div class="alert alert-danger text-center rounded-3 shadow-sm">
+				<i class="bi bi-exclamation-triangle-fill me-2"></i> ${loginError}
 			</div>
 		</c:if>
 
+
 		<c:if test="${param.success == 'password_changed'}">
-			<div class="alert alert-success">
-				<i class="bi bi-check-circle-fill"></i> Password changed
+			<div class="alert alert-success text-center rounded-3 shadow-sm">
+				<i class="bi bi-check-circle-fill me-2"></i> Password changed
 				successfully! Please login again.
 			</div>
 		</c:if>
 
+
+		<c:if test="${not empty errorMessage}">
+			<div class="alert alert-danger text-center rounded-3 shadow-sm">
+				<i class="bi bi-exclamation-triangle-fill me-2"></i> ${errorMessage}
+			</div>
+		</c:if>
 		<form action="${pageContext.request.contextPath}/login" method="POST">
 
 			<div class="mb-3">
