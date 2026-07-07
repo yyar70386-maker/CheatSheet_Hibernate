@@ -95,13 +95,17 @@ public class NotificationController {
     }
 
     @PostMapping("/notifications/{id}/delete")
-    public ModelAndView delete(@PathVariable Integer id, HttpSession session) {
+    public ModelAndView delete(
+            @PathVariable Integer id,
+            @RequestParam(value = "redirect", required = false) String redirectUrl,
+            HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
             return new ModelAndView("redirect:/login");
         }
         notificationService.delete(id, currentUser.getId());
-        return new ModelAndView("redirect:/notifications");
+        String targetRedirect = (redirectUrl != null && !redirectUrl.isEmpty()) ? redirectUrl : "/notifications";
+        return new ModelAndView("redirect:" + targetRedirect);
     }
 
     @GetMapping("/admin/notifications")

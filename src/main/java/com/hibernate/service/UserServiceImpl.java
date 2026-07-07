@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = IllegalArgumentException.class)
     public User authenticateByEmail(String email, String password) {
         User user = userRepository.findByEmail(email);
         if (user == null) {

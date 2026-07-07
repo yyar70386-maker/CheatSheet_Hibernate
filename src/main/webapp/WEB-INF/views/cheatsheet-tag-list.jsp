@@ -105,37 +105,6 @@
                     </ul>
                 </div>
                 
-                <div class="dropdown mt-3 mt-md-0 ms-2">
-                    <button class="btn filter-dropdown-btn dropdown-toggle d-flex align-items-center gap-2" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-sort-down"></i> 
-                        Sort: 
-                        <c:choose>
-                            <c:when test="${sortBy == 'likes'}">Most Likes</c:when>
-                            <c:when test="${sortBy == 'dislikes'}">Most Dislikes</c:when>
-                            <c:otherwise>Latest</c:otherwise>
-                        </c:choose>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="sortDropdown">
-                        <li>
-                            <a class="dropdown-item ${sortBy == 'latest' || empty sortBy ? 'active bg-brand-primary' : ''}" 
-                               href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?filter=${currentFilter}&sortBy=latest">
-                                <i class="bi bi-clock-history me-2"></i> Latest
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item ${sortBy == 'likes' ? 'active bg-brand-primary' : ''}" 
-                               href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?filter=${currentFilter}&sortBy=likes">
-                                <i class="bi bi-hand-thumbs-up-fill me-2"></i> Most Likes
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item ${sortBy == 'dislikes' ? 'active bg-brand-primary' : ''}" 
-                               href="${pageContext.request.contextPath}/cheatsheet/tag/${tagId}?filter=${currentFilter}&sortBy=dislikes">
-                                <i class="bi bi-hand-thumbs-down-fill me-2"></i> Most Dislikes
-                            </a>
-                        </li>
-                    </ul>
-                </div>
             </c:if>
         </div>
 

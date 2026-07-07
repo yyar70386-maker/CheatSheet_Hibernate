@@ -47,22 +47,39 @@ public class AnnouncementController {
         java.util.Map<Integer, Integer> announcementNotiIdMap = new java.util.HashMap<>();
         
         if (currentUser != null) {
-            List<NotificationDto> notis = notificationService.findByUserId(currentUser.getId());
-            for (NotificationDto n : notis) {
-                if ("ANNOUNCEMENT".equals(n.getNotificationType()) && n.getLinkUrl() != null) {
-                    try {
-                        String url = n.getLinkUrl();
-                        if (url.contains("id=")) {
-                            String idStr = url.substring(url.indexOf("id=") + 3);
-                            if (idStr.contains("&")) {
-                                idStr = idStr.substring(0, idStr.indexOf("&"));
+            List<com.hibernate.dto.NotificationDto> list = notificationService.findByUserId(currentUser.getId());
+            List<com.hibernate.entity.AnnouncementEntity> activeAnnouncements = announcementService.findAllActive();
+            for (com.hibernate.dto.NotificationDto n : list) {
+                if ("ANNOUNCEMENT".equals(n.getNotificationType())) {
+                    Integer matchedAnnId = null;
+                    if (n.getLinkUrl() != null) {
+                        try {
+                            String url = n.getLinkUrl();
+                            int queryIdx = url.indexOf("?");
+                            if (queryIdx >= 0) {
+                                url = url.substring(queryIdx + 1);
+                                for (String param : url.split("&")) {
+                                    String[] pair = param.split("=");
+                                    if (pair.length == 2 && "id".equals(pair[0])) {
+                                        matchedAnnId = Integer.parseInt(pair[1]);
+                                    }
+                                }
                             }
-                            Integer annId = Integer.parseInt(idStr);
-                            readStatusMap.put(annId, n.isRead());
-                            announcementNotiIdMap.put(annId, n.getId());
+                        } catch (Exception e) {
+                            // ignore
                         }
-                    } catch (Exception e) {
-                        // ignore malformed URLs
+                    }
+                    if (matchedAnnId == null && n.getMessage() != null) {
+                        for (com.hibernate.entity.AnnouncementEntity a : activeAnnouncements) {
+                            if (n.getMessage().contains(a.getTitle())) {
+                                matchedAnnId = a.getId();
+                                break;
+                            }
+                        }
+                    }
+                    if (matchedAnnId != null) {
+                        announcementNotiIdMap.put(matchedAnnId, n.getId());
+                        readStatusMap.put(matchedAnnId, n.getIsRead());
                     }
                 }
             }

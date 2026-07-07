@@ -32,6 +32,11 @@
         </c:if>
     </div>
 
+    <div id="announcements-empty" class="text-center bg-white border rounded-3 py-5" style="display: none;">
+        <i class="bi bi-megaphone display-5 text-muted d-block mb-2"></i>
+        <div class="fw-semibold">No announcements yet</div>
+    </div>
+
     <c:choose>
         <c:when test="${empty announcements}">
             <div class="text-center bg-white border rounded-3 py-5">
@@ -40,15 +45,22 @@
             </div>
         </c:when>
         <c:otherwise>
-            <div class="d-grid gap-3">
+            <div class="d-grid gap-3" id="announcements-container">
                 <c:forEach items="${announcements}" var="a">
-                    <div class="border rounded-3 p-4 shadow-sm ${readStatusMap[a.id] == false ? 'bg-primary bg-opacity-10 border-primary' : 'bg-white'}">
+                    <div id="announcement-card-${a.id}" class="announcement-card border rounded-3 p-4 shadow-sm ${readStatusMap[a.id] == false ? 'bg-primary bg-opacity-10 border-primary' : 'bg-white'}">
                         <div class="d-flex justify-content-between align-items-start gap-3">
                             <div>
                                 <h5 class="fw-bold mb-2">
                                     <c:out value="${a.title}" />
-                                    <c:if test="${readStatusMap[a.id] == false}">
-                                        <span class="badge bg-primary ms-2" style="font-size: 0.75rem;">New</span>
+                                    <c:if test="${not empty sessionScope.currentUser}">
+                                        <c:choose>
+                                            <c:when test="${readStatusMap[a.id] == false}">
+                                                <span class="badge bg-danger ms-2" style="font-size: 0.75rem;"><i class="bi bi-envelope-open me-1"></i>Unread</span>
+                                            </c:when>
+                                            <c:when test="${readStatusMap[a.id] == true}">
+                                                <span class="badge bg-secondary ms-2" style="font-size: 0.75rem;"><i class="bi bi-envelope me-1"></i>Read</span>
+                                            </c:when>
+                                        </c:choose>
                                     </c:if>
                                 </h5>
                                 <p class="mb-3 text-muted"><c:out value="${a.content}" /></p>
@@ -58,15 +70,21 @@
                                     <span>${a.createdAt}</span>
                                     <span>|</span>
                                     <span class="badge text-bg-${a.status == 'active' ? 'success' : 'secondary'}">${a.status}</span>
-                                    <c:if test="${readStatusMap[a.id] == false}">
-                                        <span class="mx-1">|</span>
-                                        <form action="${pageContext.request.contextPath}/notifications/${announcementNotiIdMap[a.id]}/read" method="post" class="d-inline m-0">
-                                            <input type="hidden" name="redirect" value="/announcements" />
-                                            <button type="submit" class="btn btn-sm btn-outline-primary py-0 px-2 fw-semibold" style="font-size: 0.75rem; border-radius: 4px; line-height: 1.5;">
-                                                <i class="bi bi-check2 me-1"></i> Mark as read
-                                            </button>
-                                        </form>
-                                    </c:if>
+                                    
+                                    <span class="mx-1">|</span>
+                                    <div class="d-inline-flex gap-2">
+                                        <c:if test="${not empty sessionScope.currentUser && readStatusMap[a.id] == false}">
+                                            <form action="${pageContext.request.contextPath}/notifications/${announcementNotiIdMap[a.id]}/read" method="post" class="d-inline m-0">
+                                                <input type="hidden" name="redirect" value="/announcements" />
+                                                <button type="submit" class="btn btn-sm btn-outline-primary py-0 px-2 fw-semibold" style="font-size: 0.75rem; border-radius: 4px; line-height: 1.5;">
+                                                    <i class="bi bi-check2 me-1"></i> Mark as read
+                                                </button>
+                                            </form>
+                                        </c:if>
+                                        <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 fw-semibold" style="font-size: 0.75rem; border-radius: 4px; line-height: 1.5;" onclick="deleteAnnouncement(${a.id}, '${announcementNotiIdMap[a.id]}')">
+                                            <i class="bi bi-trash me-1"></i> Delete
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <c:if test="${sessionScope.currentUser.role == 1}">
@@ -98,5 +116,87 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    (function() {
+        var contextPath = '${pageContext.request.contextPath}';
+        var currentUserId = '${sessionScope.currentUser.id}';
+        var storageKey = currentUserId && currentUserId !== '0' ? 'hidden_announcements_' + currentUserId : 'hidden_announcements_guest';
+        
+        // Hide announcements stored in localStorage on load
+        var hiddenList = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        var visibleCount = 0;
+        
+        var cards = document.querySelectorAll('.announcement-card');
+        cards.forEach(function(card) {
+            var annId = card.id.replace('announcement-card-', '');
+            if (hiddenList.indexOf(Number(annId)) !== -1 || hiddenList.indexOf(String(annId)) !== -1) {
+                card.remove();
+            } else {
+                visibleCount++;
+            }
+        });
+        
+        if (visibleCount === 0 && cards.length > 0) {
+            var emptyDiv = document.getElementById('announcements-empty');
+            var container = document.getElementById('announcements-container');
+            if (container) container.remove();
+            if (emptyDiv) emptyDiv.style.display = 'block';
+        }
+        
+        window.deleteAnnouncement = function(annId, notiId) {
+            if (!confirm('Are you sure you want to delete/hide this announcement?')) {
+                return;
+            }
+            
+            // 1. Save to localStorage
+            var list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            if (list.indexOf(annId) === -1) {
+                list.push(annId);
+                localStorage.setItem(storageKey, JSON.stringify(list));
+            }
+            
+            // 2. Animate and remove from DOM
+            var card = document.getElementById('announcement-card-' + annId);
+            if (card) {
+                card.style.transition = 'all 0.4s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(-15px)';
+                setTimeout(function() {
+                    card.remove();
+                    // Check remaining visible cards
+                    var remaining = document.querySelectorAll('.announcement-card');
+                    if (remaining.length === 0) {
+                        var emptyDiv = document.getElementById('announcements-empty');
+                        var container = document.getElementById('announcements-container');
+                        if (container) container.remove();
+                        if (emptyDiv) emptyDiv.style.display = 'block';
+                    }
+                }, 400);
+            }
+            
+            // 3. Database Sync if notification exists and user is logged in
+            if (notiId && notiId !== '' && currentUserId && currentUserId !== '0') {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = contextPath + '/notifications/' + notiId + '/delete';
+                
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'redirect';
+                input.value = '/announcements';
+                form.appendChild(input);
+                
+                document.body.appendChild(form);
+                
+                fetch(form.action, {
+                    method: 'POST',
+                    body: new URLSearchParams(new FormData(form))
+                }).then(function() {
+                    console.log('Notification deleted in database.');
+                });
+            }
+        };
+    })();
+</script>
 </body>
 </html>

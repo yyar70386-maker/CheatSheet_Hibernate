@@ -371,7 +371,6 @@ a:hover { color: #cc0044; }
                                     <a class="tag-chip" href="${pageContext.request.contextPath}/${not empty sessionScope.currentUser ? 'cheatsheet/add' : 'login'}">
                                         <i class="bi bi-plus-lg"></i> Create
                                     </a>
-                                    <a class="tag-chip" href="${pageContext.request.contextPath}/announcements"><i class="bi bi-bell-fill"></i> Announcements</a>
                                     <a class="tag-chip" href="${pageContext.request.contextPath}/profile"><i class="bi bi-person-fill"></i> Profile</a>
                                 </div>
                             </div>

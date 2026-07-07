@@ -195,7 +195,7 @@ public class CheatsheetServiceImpl implements CheatsheetService {
                         admin != null ? admin.getId() : null,
                         "Your CheatSheet '" + cheatsheet.getTitle() + "' has been banned. Reason: " + reason,
                         "CHEATSHEET_BAN",
-                        "/notifications"
+                        "/cheatsheet/detail/" + cheatsheet.getObfuscatedId()
                 );
             }
         }

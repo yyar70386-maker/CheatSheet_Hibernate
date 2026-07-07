@@ -110,7 +110,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<NotificationDto> createAnnouncementNotifications(Integer senderId, Integer announcementId, String title) {
-        return broadcast(senderId, "New announcement", "New announcement posted: " + title, "ANNOUNCEMENT", "/announcements");
+        return broadcast(senderId, "New announcement", "New announcement posted: " + title, "ANNOUNCEMENT", "/announcements?id=" + announcementId);
     }
 
     @Override

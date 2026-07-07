@@ -169,6 +169,12 @@
                         <i class="bi bi-plus-circle me-1"></i> Create
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link ${fn:contains(pageContext.request.requestURI, '/announcements') ? 'active' : ''}" href="${pageContext.request.contextPath}/announcements">
+                        <i class="bi bi-megaphone me-1"></i> Announcements
+                        <span id="announcementBadge" class="badge bg-danger rounded-pill ms-1" style="font-size: 0.65rem; display: none;">0</span>
+                    </a>
+                </li>
             </ul>
             
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
@@ -284,6 +290,29 @@
                 }
             }
 
+            // Announcements navigation badge update
+            function updateAnnouncementBadge() {
+                var annBadge = document.getElementById('announcementBadge');
+                if (!annBadge) return;
+                
+                var count = 0;
+                if (window.myNotifications) {
+                    window.myNotifications.forEach(function(n) {
+                        if (n.notificationType === 'ANNOUNCEMENT' && (n.isRead === false || n.isRead === null)) {
+                            count++;
+                        }
+                    });
+                }
+                
+                if (count > 0) {
+                    annBadge.innerText = String(count);
+                    annBadge.style.display = 'inline-block';
+                } else {
+                    annBadge.innerText = '0';
+                    annBadge.style.display = 'none';
+                }
+            }
+
             // Dropdown List ထဲသို့ Notification အသစ် ထည့်သွင်းရန်
             function appendNotification(notification, prepend) {
                 if (empty) empty.style.display = "none";
@@ -327,6 +356,9 @@
                 window.myUnreadCount = Number(data.unreadCount) || 0;
                 updateBadgeDisplay();
                 
+                window.myNotifications = data.notifications || [];
+                updateAnnouncementBadge();
+                
                 list.innerHTML = "";
                 if (data.notifications && data.notifications.length > 0) {
                     if (empty) empty.style.display = "none";
@@ -351,6 +383,9 @@
 
                     window.myUnreadCount++; 
                     updateBadgeDisplay(); 
+                    if (!window.myNotifications) window.myNotifications = [];
+                    window.myNotifications.unshift(notification);
+                    updateAnnouncementBadge();
                     appendNotification(notification, true); // အသစ်ရောက်လာတာကို ထိပ်ဆုံးကပြရန် Prepend = true
                     showNotificationAlert(notification); // Screen ပေါ်မှာ Toast ပြရန်
 

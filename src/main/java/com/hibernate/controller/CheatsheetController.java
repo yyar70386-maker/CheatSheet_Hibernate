@@ -324,7 +324,8 @@ public class CheatsheetController {
         Integer authorId = (sheet.getAuthor() != null) ? sheet.getAuthor().getId() : -1;
 
         boolean isOwner = currentUserId.equals(authorId);
-        if (!"active".equalsIgnoreCase(sheet.getStatus()) && !isOwner) {
+        boolean isAdmin = currentUser != null && currentUser.getRole() == 1;
+        if (!"active".equalsIgnoreCase(sheet.getStatus()) && !isOwner && !isAdmin) {
             return new ModelAndView("redirect:/error/404");
         }
 

@@ -111,7 +111,7 @@ public class CommentServiceImpl {
                         admin != null ? admin.getId() : null,
                         "Your comment in CheatSheet '" + (comment.getCheatSheet() != null ? comment.getCheatSheet().getTitle() : "") + "' has been banned. Reason: " + reason,
                         "COMMENT_BAN",
-                        "/notifications"
+                        (comment.getCheatSheet() != null ? "/cheatsheet/detail/" + comment.getCheatSheet().getObfuscatedId() : "/notifications")
                 );
             }
         }
@@ -136,7 +136,7 @@ public class CommentServiceImpl {
                         admin != null ? admin.getId() : null,
                         "Your comment has been restored.",
                         "COMMENT_RESTORE",
-                        (comment.getCheatSheet() != null ? "/cheatsheet/detail/" + comment.getCheatSheet().getId() : "/notifications")
+                        (comment.getCheatSheet() != null ? "/cheatsheet/detail/" + comment.getCheatSheet().getObfuscatedId() : "/notifications")
                 );
             }
         }
