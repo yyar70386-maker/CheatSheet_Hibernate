@@ -93,7 +93,14 @@
                                         <c:otherwise>
                                             <form action="${pageContext.request.contextPath}/follow/${u.obfuscatedId}" method="post">
                                                 <button class="btn btn-primary btn-sm" type="submit">
-                                                    Follow back
+                                                    <c:choose>
+                                                        <c:when test="${u.follower}">
+                                                            Follow back
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            Follow
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </button>
                                             </form>
                                         </c:otherwise>

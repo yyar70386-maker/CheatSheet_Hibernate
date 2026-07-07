@@ -20,6 +20,8 @@ public interface NotificationRepository {
 
     void markAllAsRead(Integer userId);
 
+    void markAnnouncementAsRead(Integer userId, Integer announcementId);
+
     void delete(Integer id, Integer userId);
 
     long countAll();

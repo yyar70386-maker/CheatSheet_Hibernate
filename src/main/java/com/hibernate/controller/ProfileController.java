@@ -105,6 +105,7 @@ public class ProfileController {
 		model.addAttribute("followersCount", userFollowService.getFollowersCount(userId));
 		model.addAttribute("followingCount", userFollowService.getFollowingCount(userId));
 		model.addAttribute("isFollowing", currentUser != null && userFollowService.isFollowing(currentUser.getId(), userId));
+		model.addAttribute("isFollower", currentUser != null && userFollowService.isFollowing(userId, currentUser.getId()));
 
 		List<String> visibilities = new java.util.ArrayList<>();
 		visibilities.add("PUBLIC");
@@ -148,6 +149,60 @@ public class ProfileController {
 		
 		model.addAttribute("pageTitle", "Following");
 		model.addAttribute("profileUsers", userFollowService.getFollowingForView(currentUser.getId(), currentUser.getId()));
+		return "follow_list";
+	}
+
+	@GetMapping("/profile/{id}/followers")
+	@Transactional(readOnly = true)
+	public String showUserFollowers(@PathVariable("id") String encodedId, HttpSession session, Model model) {
+		User currentUser = (User) session.getAttribute("currentUser");
+		if (currentUser == null) {
+			return "redirect:/login";
+		}
+		
+		Integer targetUserId = com.hibernate.util.IdObfuscator.decode(encodedId);
+		if (targetUserId == null) {
+			try {
+				targetUserId = Integer.parseInt(encodedId);
+			} catch (NumberFormatException e) {
+				return "redirect:/home";
+			}
+		}
+		
+		User targetUser = userService.findById(targetUserId);
+		if (targetUser == null) {
+			return "redirect:/home";
+		}
+		
+		model.addAttribute("pageTitle", targetUser.getUsername() + "'s Followers");
+		model.addAttribute("profileUsers", userFollowService.getFollowersForView(targetUserId, currentUser.getId()));
+		return "follow_list";
+	}
+
+	@GetMapping("/profile/{id}/following")
+	@Transactional(readOnly = true)
+	public String showUserFollowing(@PathVariable("id") String encodedId, HttpSession session, Model model) {
+		User currentUser = (User) session.getAttribute("currentUser");
+		if (currentUser == null) {
+			return "redirect:/login";
+		}
+		
+		Integer targetUserId = com.hibernate.util.IdObfuscator.decode(encodedId);
+		if (targetUserId == null) {
+			try {
+				targetUserId = Integer.parseInt(encodedId);
+			} catch (NumberFormatException e) {
+				return "redirect:/home";
+			}
+		}
+		
+		User targetUser = userService.findById(targetUserId);
+		if (targetUser == null) {
+			return "redirect:/home";
+		}
+		
+		model.addAttribute("pageTitle", targetUser.getUsername() + "'s Following");
+		model.addAttribute("profileUsers", userFollowService.getFollowingForView(targetUserId, currentUser.getId()));
 		return "follow_list";
 	}
 

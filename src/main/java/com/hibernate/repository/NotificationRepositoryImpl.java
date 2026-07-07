@@ -94,6 +94,19 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
+    public void markAnnouncementAsRead(Integer userId, Integer announcementId) {
+        String linkUrl = "/announcements?id=" + announcementId;
+        getSession()
+                .createQuery(
+                        "update NotificationEntity n "
+                      + "set n.isRead = true "
+                      + "where n.user.id = :userId and n.notificationType = 'ANNOUNCEMENT' and n.linkUrl = :linkUrl and n.isRead = false")
+                .setParameter("userId", userId)
+                .setParameter("linkUrl", linkUrl)
+                .executeUpdate();
+    }
+
+    @Override
     public void delete(Integer id, Integer userId) {
         getSession()
                 .createQuery("delete from NotificationEntity n where n.id = :id and n.user.id = :userId")

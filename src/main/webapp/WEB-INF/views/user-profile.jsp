@@ -33,6 +33,11 @@
             background: #f8fafc;
             border-radius: 16px;
             min-width: 110px;
+            transition: all 0.2s ease-in-out;
+        }
+        .stats-box:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
         }
         .stats-count {
             font-size: 22px;
@@ -180,7 +185,15 @@
                                 <c:otherwise>
                                     <form action="${pageContext.request.contextPath}/follow/${targetUser.obfuscatedId}" method="POST" class="d-inline">
                                         <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold">
-                                            <i class="bi bi-person-plus-fill me-1"></i> Follow
+                                            <i class="bi bi-person-plus-fill me-1"></i> 
+                                            <c:choose>
+                                                <c:when test="${isFollower}">
+                                                    Follow Back
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Follow
+                                                </c:otherwise>
+                                            </c:choose>
                                         </button>
                                     </form>
                                 </c:otherwise>
@@ -196,14 +209,14 @@
                 
                 <div class="col-md-auto">
                     <div class="d-flex justify-content-center gap-3">
-                        <div class="stats-box">
+                        <a href="${pageContext.request.contextPath}/profile/${targetUser.obfuscatedId}/followers" class="stats-box text-decoration-none text-dark d-block">
                             <span class="stats-count">${followersCount}</span>
                             <span class="stats-label">Followers</span>
-                        </div>
-                        <div class="stats-box">
+                        </a>
+                        <a href="${pageContext.request.contextPath}/profile/${targetUser.obfuscatedId}/following" class="stats-box text-decoration-none text-dark d-block">
                             <span class="stats-count">${followingCount}</span>
                             <span class="stats-label">Following</span>
-                        </div>
+                        </a>
                     </div>
                 </div>
                 

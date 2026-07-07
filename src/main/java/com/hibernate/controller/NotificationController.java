@@ -69,14 +69,18 @@ public class NotificationController {
     }
 
     @PostMapping("/notifications/{id}/read")
-    public ModelAndView markAsRead(@PathVariable Integer id, HttpSession session) {
+    public ModelAndView markAsRead(
+            @PathVariable Integer id,
+            @RequestParam(value = "redirect", required = false) String redirectUrl,
+            HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
             return new ModelAndView("redirect:/login");
         }
 
         notificationService.markAsRead(id, currentUser.getId());
-        return new ModelAndView("redirect:/notifications");
+        String targetRedirect = (redirectUrl != null && !redirectUrl.isEmpty()) ? redirectUrl : "/notifications";
+        return new ModelAndView("redirect:" + targetRedirect);
     }
 
     @PostMapping("/notifications/read-all")

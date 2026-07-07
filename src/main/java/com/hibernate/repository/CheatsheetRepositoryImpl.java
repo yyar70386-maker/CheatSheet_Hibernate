@@ -373,7 +373,12 @@ public class CheatsheetRepositoryImpl implements CheatsheetRepository {
                 report.setCheatsheetName((String) tuple[1]);
                 report.setCreatedUser((String) tuple[2]);
                 java.sql.Timestamp ts = (java.sql.Timestamp) tuple[3];
-                report.setCreatedDate(ts != null ? ts.toString() : "");
+                if (ts != null) {
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    report.setCreatedDate(sdf.format(ts));
+                } else {
+                    report.setCreatedDate("");
+                }
                 Number rc = (Number) tuple[4];
                 report.setReactionCount(rc != null ? rc.longValue() : 0L);
                 return report;

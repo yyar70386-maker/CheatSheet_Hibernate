@@ -32,7 +32,44 @@ public class AnnouncementController {
     }
 
     @GetMapping("/announcements")
-    public String viewAnnouncements(Model model) {
+    public String viewAnnouncements(
+            @org.springframework.web.bind.annotation.RequestParam(value = "id", required = false) Integer announcementId,
+            HttpSession session,
+            Model model) {
+        
+        User currentUser = (User) session.getAttribute("currentUser");
+        
+        if (currentUser != null && announcementId != null) {
+            notificationService.markAnnouncementAsRead(currentUser.getId(), announcementId);
+        }
+        
+        java.util.Map<Integer, Boolean> readStatusMap = new java.util.HashMap<>();
+        java.util.Map<Integer, Integer> announcementNotiIdMap = new java.util.HashMap<>();
+        
+        if (currentUser != null) {
+            List<NotificationDto> notis = notificationService.findByUserId(currentUser.getId());
+            for (NotificationDto n : notis) {
+                if ("ANNOUNCEMENT".equals(n.getNotificationType()) && n.getLinkUrl() != null) {
+                    try {
+                        String url = n.getLinkUrl();
+                        if (url.contains("id=")) {
+                            String idStr = url.substring(url.indexOf("id=") + 3);
+                            if (idStr.contains("&")) {
+                                idStr = idStr.substring(0, idStr.indexOf("&"));
+                            }
+                            Integer annId = Integer.parseInt(idStr);
+                            readStatusMap.put(annId, n.isRead());
+                            announcementNotiIdMap.put(annId, n.getId());
+                        }
+                    } catch (Exception e) {
+                        // ignore malformed URLs
+                    }
+                }
+            }
+        }
+        
+        model.addAttribute("readStatusMap", readStatusMap);
+        model.addAttribute("announcementNotiIdMap", announcementNotiIdMap);
         model.addAttribute("announcements", announcementService.findAllActive());
         return "announcement-list";
     }
