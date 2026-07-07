@@ -32,6 +32,8 @@ public interface NotificationService {
 
     void markAllAsRead(Integer userId);
 
+    void markAnnouncementAsRead(Integer userId, Integer announcementId);
+
     // --- မင်းထည့်ထားတဲ့ Delete နှင့် Admin Count Methods ---
     void delete(Integer notificationId, Integer userId);
 

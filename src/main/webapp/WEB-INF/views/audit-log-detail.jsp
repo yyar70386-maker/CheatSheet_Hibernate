@@ -19,7 +19,6 @@
             <dt class="col-sm-3">Action</dt><dd class="col-sm-9"><c:out value="${log.action}" /></dd>
             <dt class="col-sm-3">Entity</dt><dd class="col-sm-9"><c:out value="${log.entityType != null ? log.entityType : log.entityName}" /> #${log.entityId}</dd>
             <dt class="col-sm-3">Description</dt><dd class="col-sm-9"><c:out value="${log.description}" /></dd>
-            <dt class="col-sm-3">IP Address</dt><dd class="col-sm-9"><c:out value="${log.ipAddress}" /></dd>
             <dt class="col-sm-3">Created At</dt><dd class="col-sm-9">${log.createdAt}</dd>
         </dl>
     </div>

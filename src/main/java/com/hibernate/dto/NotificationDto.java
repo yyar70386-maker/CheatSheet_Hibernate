@@ -43,6 +43,11 @@ public class NotificationDto {
 
         return dto;
     }
+ // NotificationDto.java ရဲ့ အောက်ဆုံးနား (fromEntity method ရဲ့အပြင်) တွင် ထည့်ရန်
+
+    public Boolean isRead() {
+        return this.isRead;
+    }
 
    
 }

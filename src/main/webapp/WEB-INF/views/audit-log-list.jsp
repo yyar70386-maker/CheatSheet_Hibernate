@@ -21,7 +21,7 @@
 
     <form class="row g-2 mb-3" method="get" action="${pageContext.request.contextPath}/admin/audit-logs">
         <div class="col-md-5">
-            <input class="form-control" name="q" value="${keyword}" placeholder="Search action, user, description, IP">
+            <input class="form-control" name="q" value="${keyword}" placeholder="Search action, user, description">
         </div>
         <div class="col-md-3">
             <select class="form-select" name="entityType">
@@ -51,7 +51,6 @@
                     <th>User</th>
                     <th>Action</th>
                     <th>Entity</th>
-                    <th>IP Address</th>
                     <th>Created At</th>
                     <th></th>
                 </tr>
@@ -59,7 +58,7 @@
             <tbody>
                 <c:choose>
                     <c:when test="${empty logs}">
-                        <tr><td colspan="7" class="text-center text-muted py-5">No audit logs found.</td></tr>
+                        <tr><td colspan="6" class="text-center text-muted py-5">No audit logs found.</td></tr>
                     </c:when>
                     <c:otherwise>
                         <c:forEach items="${logs}" var="log" varStatus="statusLoop">
@@ -68,7 +67,6 @@
                                 <td><c:out value="${log.user != null ? log.user.username : 'System'}" /></td>
                                 <td><c:out value="${log.action}" /></td>
                                 <td><c:out value="${log.entityType != null ? log.entityType : log.entityName}" /> #${log.entityId}</td>
-                                <td><c:out value="${log.ipAddress}" /></td>
                                 <td>${log.createdAt}</td>
                                 <td class="text-end">
                                     <a class="btn btn-sm btn-outline-primary" href="${pageContext.request.contextPath}/admin/audit-logs/${log.id}">View</a>

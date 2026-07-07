@@ -79,6 +79,7 @@ public class UserFollowServiceImpl implements UserFollowService {
                 .map(user -> FollowUserDto.fromUser(
                         user,
                         currentUserId != null && userFollowRepository.isFollowing(currentUserId, user.getId()),
+                        currentUserId != null && userFollowRepository.isFollowing(user.getId(), currentUserId),
                         userFollowRepository.countMutualFollowers(currentUserId, user.getId())))
                 .collect(java.util.stream.Collectors.toList());
     }
@@ -91,6 +92,7 @@ public class UserFollowServiceImpl implements UserFollowService {
                 .map(user -> FollowUserDto.fromUser(
                         user,
                         currentUserId != null && userFollowRepository.isFollowing(currentUserId, user.getId()),
+                        currentUserId != null && userFollowRepository.isFollowing(user.getId(), currentUserId),
                         userFollowRepository.countMutualFollowers(currentUserId, user.getId())))
                 .collect(java.util.stream.Collectors.toList());
     }

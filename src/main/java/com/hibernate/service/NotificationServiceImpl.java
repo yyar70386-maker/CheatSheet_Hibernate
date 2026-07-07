@@ -165,6 +165,11 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public void markAnnouncementAsRead(Integer userId, Integer announcementId) {
+        notificationRepository.markAnnouncementAsRead(userId, announcementId);
+    }
+
+    @Override
     public void delete(Integer notificationId, Integer userId) {
         notificationRepository.delete(notificationId, userId);
     }

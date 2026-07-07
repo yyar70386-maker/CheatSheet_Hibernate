@@ -42,15 +42,31 @@
         <c:otherwise>
             <div class="d-grid gap-3">
                 <c:forEach items="${announcements}" var="a">
-                    <div class="bg-white border rounded-3 p-4 shadow-sm">
+                    <div class="border rounded-3 p-4 shadow-sm ${readStatusMap[a.id] == false ? 'bg-primary bg-opacity-10 border-primary' : 'bg-white'}">
                         <div class="d-flex justify-content-between align-items-start gap-3">
                             <div>
-                                <h5 class="fw-bold mb-2"><c:out value="${a.title}" /></h5>
+                                <h5 class="fw-bold mb-2">
+                                    <c:out value="${a.title}" />
+                                    <c:if test="${readStatusMap[a.id] == false}">
+                                        <span class="badge bg-primary ms-2" style="font-size: 0.75rem;">New</span>
+                                    </c:if>
+                                </h5>
                                 <p class="mb-3 text-muted"><c:out value="${a.content}" /></p>
-                                <div class="text-muted small">
-                                    <c:out value="${a.createdBy != null ? (a.createdBy.fullName != null ? a.createdBy.fullName : a.createdBy.username) : 'Admin'}" />
-                                    <span class="mx-2">|</span>${a.createdAt}
-                                    <span class="mx-2">|</span><span class="badge text-bg-${a.status == 'active' ? 'success' : 'secondary'}">${a.status}</span>
+                                <div class="text-muted small d-flex align-items-center flex-wrap gap-2">
+                                    <span>By <c:out value="${a.createdBy != null ? (a.createdBy.fullName != null ? a.createdBy.fullName : a.createdBy.username) : 'Admin'}" /></span>
+                                    <span>|</span>
+                                    <span>${a.createdAt}</span>
+                                    <span>|</span>
+                                    <span class="badge text-bg-${a.status == 'active' ? 'success' : 'secondary'}">${a.status}</span>
+                                    <c:if test="${readStatusMap[a.id] == false}">
+                                        <span class="mx-1">|</span>
+                                        <form action="${pageContext.request.contextPath}/notifications/${announcementNotiIdMap[a.id]}/read" method="post" class="d-inline m-0">
+                                            <input type="hidden" name="redirect" value="/announcements" />
+                                            <button type="submit" class="btn btn-sm btn-outline-primary py-0 px-2 fw-semibold" style="font-size: 0.75rem; border-radius: 4px; line-height: 1.5;">
+                                                <i class="bi bi-check2 me-1"></i> Mark as read
+                                            </button>
+                                        </form>
+                                    </c:if>
                                 </div>
                             </div>
                             <c:if test="${sessionScope.currentUser.role == 1}">
